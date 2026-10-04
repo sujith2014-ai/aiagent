@@ -7,7 +7,7 @@
   {
    "learned": "compare_numbers",
    "teacher_calls_for_stage": 1,
-   "learn_seconds": 1.4107136726379395,
+   "learn_seconds": 1.4912796020507812,
    "build": {
     "capability_id": "compare_numbers",
     "attempts": [
@@ -15,7 +15,7 @@
       "epochs": 129,
       "val_accuracy": 1.0,
       "train_accuracy": 1.0,
-      "train_seconds": 0.22619891166687012,
+      "train_seconds": 0.27199554443359375,
       "params": 1251,
       "hidden": [
        32,
@@ -27,6 +27,11 @@
      }
     ],
     "onnx_max_abs_diff": 0.0,
+    "calibration": {
+     "temperature": 0.05,
+     "ece_heldout_before": 0.05824897776086227,
+     "ece_heldout_after": 0.006290489279331209
+    },
     "package_id": "compare_numbers-0.1.0-e12c489b"
    },
    "import_steps": [
@@ -61,7 +66,7 @@
      "step": "bundled_tests"
     },
     {
-     "detail": "probe 6 us",
+     "detail": "probe 7 us",
      "ok": true,
      "step": "resource_check"
     },
@@ -82,8 +87,8 @@
     "compare_numbers": {
      "accuracy": 1.0,
      "needs_help": 0,
-     "latency_us_p50": 17,
-     "peak_rss_kb": 12744
+     "latency_us_p50": 8,
+     "peak_rss_kb": 13308
     }
    },
    "bundled_regression": {
@@ -93,7 +98,7 @@
   {
    "learned": "point_region",
    "teacher_calls_for_stage": 1,
-   "learn_seconds": 1.0544459819793701,
+   "learn_seconds": 1.1418628692626953,
    "build": {
     "capability_id": "point_region",
     "attempts": [
@@ -101,7 +106,7 @@
       "epochs": 114,
       "val_accuracy": 0.996666669845581,
       "train_accuracy": 0.9973333477973938,
-      "train_seconds": 1.0176849365234375,
+      "train_seconds": 1.1026692390441895,
       "params": 1218,
       "hidden": [
        32,
@@ -113,6 +118,11 @@
      }
     ],
     "onnx_max_abs_diff": 0.0,
+    "calibration": {
+     "temperature": 0.4583597929899705,
+     "ece_heldout_before": 0.010308916692711853,
+     "ece_heldout_after": 0.0033604340679714976
+    },
     "package_id": "point_region-0.1.0-90ccb5c4"
    },
    "import_steps": [
@@ -168,14 +178,14 @@
     "compare_numbers": {
      "accuracy": 1.0,
      "needs_help": 0,
-     "latency_us_p50": 30,
-     "peak_rss_kb": 13348
+     "latency_us_p50": 8,
+     "peak_rss_kb": 13316
     },
     "point_region": {
      "accuracy": 0.992,
      "needs_help": 0,
-     "latency_us_p50": 21,
-     "peak_rss_kb": 14468
+     "latency_us_p50": 8,
+     "peak_rss_kb": 14632
     }
    },
    "bundled_regression": {
@@ -186,7 +196,7 @@
   {
    "learned": "argmax_position",
    "teacher_calls_for_stage": 1,
-   "learn_seconds": 1.6162071228027344,
+   "learn_seconds": 1.2670209407806396,
    "build": {
     "capability_id": "argmax_position",
     "attempts": [
@@ -194,7 +204,7 @@
       "epochs": 161,
       "val_accuracy": 1.0,
       "train_accuracy": 0.9960026741027832,
-      "train_seconds": 1.5847911834716797,
+      "train_seconds": 1.2158424854278564,
       "params": 1348,
       "hidden": [
        32,
@@ -206,6 +216,11 @@
      }
     ],
     "onnx_max_abs_diff": 0.0,
+    "calibration": {
+     "temperature": 0.05,
+     "ece_heldout_before": 0.023793341193027104,
+     "ece_heldout_after": 0.011834703494769661
+    },
     "package_id": "argmax_position-0.1.0-21182e0f"
    },
    "import_steps": [
@@ -240,7 +255,7 @@
      "step": "bundled_tests"
     },
     {
-     "detail": "probe 6 us",
+     "detail": "probe 7 us",
      "ok": true,
      "step": "resource_check"
     },
@@ -261,20 +276,20 @@
     "argmax_position": {
      "accuracy": 0.987,
      "needs_help": 0,
-     "latency_us_p50": 25,
-     "peak_rss_kb": 13996
+     "latency_us_p50": 8,
+     "peak_rss_kb": 14688
     },
     "compare_numbers": {
      "accuracy": 1.0,
      "needs_help": 0,
-     "latency_us_p50": 34,
-     "peak_rss_kb": 13356
+     "latency_us_p50": 8,
+     "peak_rss_kb": 13524
     },
     "point_region": {
      "accuracy": 0.992,
      "needs_help": 0,
-     "latency_us_p50": 24,
-     "peak_rss_kb": 14280
+     "latency_us_p50": 8,
+     "peak_rss_kb": 14664
     }
    },
    "bundled_regression": {
@@ -287,18 +302,31 @@
  "registry": [
   {
    "active_version": "0.1.0",
+   "calls": 1002,
    "capability_id": "argmax_position",
+   "keywords": [
+    "largest",
+    "maximum",
+    "max",
+    "argmax",
+    "position",
+    "index",
+    "values",
+    "biggest",
+    "highest"
+   ],
    "model_bytes": 6041,
    "params": 1348,
    "stats": {
     "calls": 1002,
     "failure": 13,
-    "last_trained": 1791136656,
-    "last_used": 1791136656,
-    "max_latency_us": 159,
+    "last_trained": 1791139420,
+    "last_used": 1791139420,
+    "max_latency_us": 195,
     "success": 987,
-    "total_latency_us": 31331
+    "total_latency_us": 10408
    },
+   "store_file": "argmax_position-0.1.0-21182e0f.cap",
    "test_accuracy": 0.9866666666666668,
    "versions": [
     "0.1.0"
@@ -306,18 +334,33 @@
   },
   {
    "active_version": "0.1.0",
+   "calls": 242,
    "capability_id": "compare_numbers",
+   "keywords": [
+    "compare",
+    "comparison",
+    "numbers",
+    "number",
+    "relation",
+    "less",
+    "greater",
+    "equal",
+    "larger",
+    "smaller",
+    "ordering"
+   ],
    "model_bytes": 5653,
    "params": 1251,
    "stats": {
     "calls": 242,
     "failure": 0,
-    "last_trained": 1791136653,
-    "last_used": 1791136656,
-    "max_latency_us": 144,
+    "last_trained": 1791139418,
+    "last_used": 1791139420,
+    "max_latency_us": 62,
     "success": 240,
-    "total_latency_us": 7439
+    "total_latency_us": 2312
    },
+   "store_file": "compare_numbers-0.1.0-e12c489b.cap",
    "test_accuracy": 1.0,
    "versions": [
     "0.1.0"
@@ -325,18 +368,31 @@
   },
   {
    "active_version": "0.1.0",
+   "calls": 2002,
    "capability_id": "point_region",
+   "keywords": [
+    "point",
+    "region",
+    "inside",
+    "outside",
+    "circle",
+    "circular",
+    "geometry",
+    "plane",
+    "coordinates"
+   ],
    "model_bytes": 5521,
    "params": 1218,
    "stats": {
     "calls": 2002,
     "failure": 16,
-    "last_trained": 1791136654,
-    "last_used": 1791136657,
-    "max_latency_us": 5335,
+    "last_trained": 1791139419,
+    "last_used": 1791139420,
+    "max_latency_us": 88,
     "success": 1984,
-    "total_latency_us": 62106
+    "total_latency_us": 18745
    },
+   "store_file": "point_region-0.1.0-90ccb5c4.cap",
    "test_accuracy": 1.0,
    "versions": [
     "0.1.0"
@@ -405,38 +461,38 @@
   "per_capability": {
    "compare_numbers": {
     "accuracy": 1.0,
-    "latency_us_p50": 24,
-    "peak_rss_kb": 13284,
+    "latency_us_p50": 8,
+    "peak_rss_kb": 13728,
     "max_prob_diff_vs_full": 0.0
    },
    "point_region": {
     "accuracy": 0.992,
-    "latency_us_p50": 27,
-    "peak_rss_kb": 13640,
+    "latency_us_p50": 8,
+    "peak_rss_kb": 14376,
     "max_prob_diff_vs_full": 0.0
    },
    "argmax_position": {
     "accuracy": 0.987,
-    "latency_us_p50": 21,
-    "peak_rss_kb": 14244,
+    "latency_us_p50": 9,
+    "peak_rss_kb": 14748,
     "max_prob_diff_vs_full": 0.0
    }
   },
   "full": {
    "compare_numbers": {
     "accuracy": 1.0,
-    "latency_us_p50": 30,
-    "peak_rss_kb": 12836
+    "latency_us_p50": 8,
+    "peak_rss_kb": 13192
    },
    "point_region": {
     "accuracy": 0.992,
-    "latency_us_p50": 21,
-    "peak_rss_kb": 13828
+    "latency_us_p50": 8,
+    "peak_rss_kb": 14816
    },
    "argmax_position": {
     "accuracy": 0.987,
-    "latency_us_p50": 24,
-    "peak_rss_kb": 14436
+    "latency_us_p50": 9,
+    "peak_rss_kb": 14672
    }
   },
   "max_prob_diff_vs_full": 0.0,

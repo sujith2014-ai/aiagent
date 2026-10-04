@@ -1,0 +1,408 @@
+{
+ "benchmark_format": "bench/1",
+ "experiment": "phase7-consolidation-and-routing",
+ "platform": "Linux-6.18.44-fc-v64-x86_64-with-glibc2.39",
+ "date": "2026-10-04",
+ "consolidation": {
+  "before": {
+   "active_capabilities": 7,
+   "archived": 0,
+   "active_params": 8851,
+   "active_model_bytes": 39947
+  },
+  "routing_suite_size": 80,
+  "pairwise_functional_agreement": [
+   {
+    "a": "compare_numbers",
+    "b": "compare_values",
+    "agreement_in_distribution": 1.0,
+    "agreement_uniform_box": 0.9793333333333333,
+    "verdict": "duplicate"
+   },
+   {
+    "a": "compare_numbers",
+    "b": "compare_wrapper",
+    "agreement_in_distribution": 1.0,
+    "agreement_uniform_box": 1.0,
+    "verdict": "duplicate"
+   },
+   {
+    "a": "compare_values",
+    "b": "compare_wrapper",
+    "agreement_in_distribution": 1.0,
+    "agreement_uniform_box": 0.9793333333333333,
+    "verdict": "duplicate"
+   },
+   {
+    "a": "point_region",
+    "b": "point_region__ext",
+    "agreement_in_distribution": 0.7583333333333333,
+    "agreement_uniform_box": 0.7566666666666667,
+    "verdict": "overlapping_different_function"
+   }
+  ],
+  "merge_duplicate": {
+   "keeper": "compare_numbers",
+   "duplicate": "compare_values",
+   "steps": [
+    {
+     "step": "keeper_passes_duplicate_tests",
+     "accuracy": 1.0
+    },
+    {
+     "step": "import_keeper_with_merged_keywords",
+     "activated": true
+    },
+    {
+     "step": "routing_regression_after_archiving_duplicate",
+     "changed_routes": []
+    }
+   ],
+   "merged": true,
+   "dup_intent_now_routes_to": {
+    "capability": "compare_numbers",
+    "status": "KNOWN",
+    "label": "LESS"
+   },
+   "restore_works": true
+  },
+  "archive_guard": {
+   "refused": true,
+   "message": "Error: cannot archive 'compare_numbers': required by [\"compare_wrapper\"]\n\nStack backtrace:\n   0: <anyhow::Error>::msg::<alloc::string::String>\n   1: anyhow::__p"
+  },
+  "archive_unused": {
+   "archived": [
+    {
+     "capability_id": "compare_wrapper",
+     "stderr": ""
+    },
+    {
+     "capability_id": "majority_vote",
+     "stderr": ""
+    }
+   ],
+   "refused": []
+  },
+  "compaction": [
+   {
+    "capability": "compare_numbers",
+    "before": {
+     "accuracy": 1.0,
+     "latency_us_p50": 8,
+     "params": 1251,
+     "bytes": 5653
+    },
+    "pruning_dry_run": {
+     "teacher_heldout": 1.0,
+     "student_heldout": 0.9750000238418579,
+     "params_before": 1251,
+     "params_after": 371
+    },
+    "distillation": {
+     "teacher_heldout": 1.0,
+     "student_heldout": 0.9750000238418579,
+     "params_before": 1251,
+     "params_after": 371,
+     "installed": false,
+     "bytes_after": null,
+     "reason": "accuracy drop 0.025 > 0.01"
+    },
+    "after": {
+     "accuracy": 1.0,
+     "latency_us_p50": 7,
+     "bundled_regression": 1.0,
+     "version": "0.1.1"
+    },
+    "rollback_check": {
+     "skipped": "nothing was installed"
+    }
+   },
+   {
+    "capability": "point_region",
+    "before": {
+     "accuracy": 0.992,
+     "latency_us_p50": 7,
+     "params": 1218,
+     "bytes": 5521
+    },
+    "pruning_dry_run": {
+     "teacher_heldout": 0.9919999837875366,
+     "student_heldout": 0.9909999966621399,
+     "params_before": 1218,
+     "params_after": 354
+    },
+    "distillation": {
+     "teacher_heldout": 0.9919999837875366,
+     "student_heldout": 0.9900000095367432,
+     "params_before": 1218,
+     "params_after": 354,
+     "installed": true,
+     "bytes_after": 2061,
+     "reason": null
+    },
+    "after": {
+     "accuracy": 0.989,
+     "latency_us_p50": 8,
+     "bundled_regression": 0.9966666666666667,
+     "version": "0.1.1"
+    },
+    "rollback_check": {
+     "active_version": "0.1.0",
+     "accuracy": 0.992,
+     "original_accuracy": 0.992
+    }
+   },
+   {
+    "capability": "argmax_position",
+    "before": {
+     "accuracy": 0.987,
+     "latency_us_p50": 9,
+     "params": 1348,
+     "bytes": 6041
+    },
+    "pruning_dry_run": {
+     "teacher_heldout": 0.9879999756813049,
+     "student_heldout": 0.984000027179718,
+     "params_before": 1348,
+     "params_after": 420
+    },
+    "distillation": {
+     "teacher_heldout": 0.9879999756813049,
+     "student_heldout": 0.9819999933242798,
+     "params_before": 1348,
+     "params_after": 420,
+     "installed": true,
+     "bytes_after": 2325,
+     "reason": null
+    },
+    "after": {
+     "accuracy": 0.983,
+     "latency_us_p50": 9,
+     "bundled_regression": 0.9933333333333333,
+     "version": "0.1.1"
+    },
+    "rollback_check": {
+     "active_version": "0.1.0",
+     "accuracy": 0.987,
+     "original_accuracy": 0.987
+    }
+   }
+  ],
+  "route_optimisation": [
+   {
+    "plan": "count_inside",
+    "nodes_before": 9,
+    "cap_calls_before": 8,
+    "applicable": true,
+    "nodes_after": 5,
+    "cap_calls_after": 4,
+    "outputs_identical": true,
+    "latency_us_p50_before": 86,
+    "latency_us_p50_after": 39
+   },
+   {
+    "plan": "sort4",
+    "nodes_before": 21,
+    "cap_calls_before": 10,
+    "applicable": true,
+    "nodes_after": 16,
+    "cap_calls_after": 5,
+    "outputs_identical": true,
+    "latency_us_p50_before": 113,
+    "latency_us_p50_after": 57
+   }
+  ],
+  "after": {
+   "active_capabilities": 4,
+   "archived": 3,
+   "active_params": 3243,
+   "active_model_bytes": 15560
+  },
+  "registry_after": [
+   {
+    "capability_id": "argmax_position",
+    "archived": false,
+    "active_version": "0.1.1",
+    "params": 420,
+    "model_bytes": 2325,
+    "calls": 2081
+   },
+   {
+    "capability_id": "compare_numbers",
+    "archived": false,
+    "active_version": "0.1.1",
+    "params": 1251,
+    "model_bytes": 5653,
+    "calls": 4862
+   },
+   {
+    "capability_id": "compare_values",
+    "archived": true,
+    "active_version": "0.1.0",
+    "params": 1251,
+    "model_bytes": 5653,
+    "calls": 21
+   },
+   {
+    "capability_id": "compare_wrapper",
+    "archived": true,
+    "active_version": "0.1.0",
+    "params": 1251,
+    "model_bytes": 5653,
+    "calls": 0
+   },
+   {
+    "capability_id": "majority_vote",
+    "archived": true,
+    "active_version": "0.1.0",
+    "params": 1314,
+    "model_bytes": 5905,
+    "calls": 1
+   },
+   {
+    "capability_id": "point_region",
+    "archived": false,
+    "active_version": "0.1.1",
+    "params": 354,
+    "model_bytes": 2061,
+    "calls": 5701
+   },
+   {
+    "capability_id": "point_region__ext",
+    "archived": false,
+    "active_version": "0.1.0",
+    "params": 1218,
+    "model_bytes": 5521,
+    "calls": 5
+   }
+  ]
+ },
+ "routing": {
+  "eval_rows": 66,
+  "eval_train_overlap": [],
+  "keyword_router": {
+   "in_scope": {
+    "n": 27,
+    "correct_known": 0.4444444444444444,
+    "routed_correct": 0.6666666666666666,
+    "misrouted_known": 0.0,
+    "needs_help": 0.3333333333333333
+   },
+   "out_of_scope": {
+    "n": 24,
+    "fabrication_known": 0.041666666666666664,
+    "uncertain": 0.08333333333333333,
+    "rejected": 0.875
+   },
+   "adversarial": {
+    "n": 15,
+    "fabrication_known": 0.2,
+    "uncertain": 0.6666666666666666,
+    "rejected": 0.13333333333333333
+   }
+  },
+  "learned_router": {
+   "basic": {
+    "training": {
+     "train_seconds": 1.7333509922027588,
+     "total_seconds": 1.7789146900177002,
+     "val_accuracy": 1.0,
+     "params": 16708,
+     "bytes": 67274,
+     "val_bundled_accuracy": 1.0
+    },
+    "eval": {
+     "in_scope": {
+      "n": 27,
+      "correct_known": 0.8888888888888888,
+      "routed_correct": 0.9259259259259259,
+      "misrouted_known": 0.0,
+      "needs_help": 0.07407407407407407
+     },
+     "out_of_scope": {
+      "n": 24,
+      "fabrication_known": 0.125,
+      "uncertain": 0.041666666666666664,
+      "rejected": 0.8333333333333334
+     },
+     "adversarial": {
+      "n": 15,
+      "fabrication_known": 0.6,
+      "uncertain": 0.2,
+      "rejected": 0.2
+     }
+    }
+   },
+   "hard": {
+    "training": {
+     "train_seconds": 1.5397515296936035,
+     "total_seconds": 1.5891954898834229,
+     "val_accuracy": 1.0,
+     "params": 16708,
+     "bytes": 67274,
+     "val_bundled_accuracy": 0.99
+    },
+    "eval": {
+     "in_scope": {
+      "n": 27,
+      "correct_known": 0.8148148148148148,
+      "routed_correct": 0.8888888888888888,
+      "misrouted_known": 0.0,
+      "needs_help": 0.1111111111111111
+     },
+     "out_of_scope": {
+      "n": 24,
+      "fabrication_known": 0.08333333333333333,
+      "uncertain": 0.125,
+      "rejected": 0.7916666666666666
+     },
+     "adversarial": {
+      "n": 15,
+      "fabrication_known": 0.26666666666666666,
+      "uncertain": 0.13333333333333333,
+      "rejected": 0.6
+     }
+    }
+   }
+  },
+  "speed": {
+   "keyword": {
+    "cases": 10800,
+    "wall_ms": 324,
+    "us_per_task_wall": 30.0,
+    "peak_rss_kb": 26736
+   },
+   "learned": {
+    "cases": 10800,
+    "wall_ms": 467,
+    "us_per_task_wall": 43.24074074074074,
+    "peak_rss_kb": 27500
+   }
+  },
+  "new_capability": {
+   "keyword_immediately": {
+    "n": 4,
+    "correct_known": 0.75,
+    "routed_correct": 0.75,
+    "misrouted_known": 0.0,
+    "needs_help": 0.25
+   },
+   "learned_stale": {
+    "n": 4,
+    "correct_known": 0.0,
+    "routed_correct": 0.0,
+    "misrouted_known": 0.0,
+    "needs_help": 1.0
+   },
+   "learned_after_retrain": {
+    "n": 4,
+    "correct_known": 0.5,
+    "routed_correct": 0.5,
+    "misrouted_known": 0.0,
+    "needs_help": 0.5
+   },
+   "retrain_seconds": 2.1436829566955566,
+   "keyword_router_retrain_seconds": 0.0
+  }
+ }
+}

@@ -63,7 +63,7 @@ class BuildService:
         self.signer_id, self.workdir, self.oracle = signer_id, workdir, oracle
         self.models: dict[str, dict] = {}   # capability_id -> trained state kept for adaptation / metadata updates
 
-    def build(self, lp: LearningPackage, version: str, known_caps: set[str], attempts=((32, 32), (64, 64), (64, 64)),
+    def build(self, lp: LearningPackage, version: str, known_caps: set[str], attempts=((32, 32), (64, 64), (64, 64), (128, 128)),
               heldout=None, verification=None, min_verification=PROMOTE_MIN_TEST_ACC) -> BuildResult:
         validate(lp, known_caps)                                   # 1. LearningPackage validation
         used = set(map(tuple, lp.train_x)) | set(map(tuple, lp.validation_x))
@@ -180,6 +180,23 @@ class BuildService:
                          "temperature": T, "replay": (st["replay"][0] + new_lp.train_x[:300], st["replay"][1] + new_lp.train_y[:300]),
                          "val": (vx, vy), "heldout": st["heldout"]}}
         return BuildResult(True, "promoted", out, rep)
+
+    def swap_model(self, cap_id: str, model, version: str, strategy: str, note: str = "") -> BuildResult:
+        """Package a replacement model (distilled/pruned) for an existing capability: same metadata, tests and routing hints."""
+        m = self.models[cap_id]
+        onnx_bytes = export_onnx(model, m["input_dim"])
+        rep = {"onnx_max_abs_diff": verify_export(model, onnx_bytes, m["heldout"][0])}
+        T = fit_temperature(_logits(model, m["val"][0]), m["val"][1])
+        params = sum(p.numel() for p in model.parameters())
+        out = self.workdir / f"{cap_id}-{version}.cap"
+        manifest = build_cap(out, capability_id=cap_id, version=version, model_bytes=onnx_bytes, params=params, input_dim=m["input_dim"],
+            labels=m["labels"], tests=m["tests"], keywords=m["keywords"], description=m["description"], signer_id=self.signer_id, signer_key=self.key,
+            min_accuracy=PROMOTE_MIN_TEST_ACC - 0.05, input_stats=m["stats"], variant="compact", calibration={"method": "temperature", "temperature": T},
+            provenance={**m["provenance"], "strategy": strategy, "base_version": m["version"], "note": note})
+        rep["package_id"] = manifest["package_id"]
+        self._pending = {"cap_id": cap_id, "update": {"model": model, "version": version, "onnx": onnx_bytes, "temperature": T, "params": params,
+                         "hidden": [l.out_features for l in model if isinstance(l, nn.Linear)][:-1]}}
+        return BuildResult(True, strategy, out, rep)
 
     def commit(self):
         """Call after the runtime has activated the candidate built by `adapt`."""

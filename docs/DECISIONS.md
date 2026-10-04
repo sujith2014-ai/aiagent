@@ -45,3 +45,12 @@ Status: accepted. Teacher output is never ground truth. A spec-derived candidate
 
 ## ADR-015: Selective learning order and gates
 Status: accepted. Cheapest first: metadata_update (no neural change) -> router_update (re-sign with new keywords) -> adapt_existing with replay -> new_module. Gates: new-domain verification >= 0.95; old-domain regression drop <= 1 point; routing regression for router/metadata changes; failed candidates are never installed, installed versions can be rolled back. The remaining strategies in the schema (adapter, new_connection, module_expansion) are not implemented.
+
+## ADR-016: Archive instead of delete; routers and capabilities share one package format
+Status: accepted. Archiving hides a capability from routing but keeps its packages in the store (restorable); it is refused while an active capability declares a dependency on it. A learned router is a normal signed `.cap` with `role: "router"` (optional additive manifest field): it goes through the same activation sequence, is excluded from capability listings and is never routed to. Nothing is ever permanently deleted by consolidation.
+
+## ADR-017: Keyword router stays the default; learned router is optional and not scaled
+Status: accepted. Evidence in FINDINGS F16: the learned router improves paraphrase recall but is not clearly safer on adversarial intents, is >10x larger than the modules, adds ~13 us per task and must be retrained for every new capability (stale routers cannot reach new capabilities). `--router learned` is available for experiments; defaults and the escalation loop use the keyword router.
+
+## ADR-018: Consolidation gates
+Status: accepted. Merge: keeper must pass the duplicate's bundled tests, inherit its keywords, and all previously served routes must still resolve KNOWN to the same (or merged) capability with the duplicate archived; otherwise restore + rollback. Compaction (distillation/pruning): held-out accuracy within 1 point of the original, bundled tests pass, version kept for rollback. Admin/probe traffic never counts as usage. Duplicate detection compares only capabilities with equal input dimension and label set, on in-distribution probes.

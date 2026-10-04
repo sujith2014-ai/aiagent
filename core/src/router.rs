@@ -1,6 +1,7 @@
 //! Baseline deterministic router: scores registry records from their declared
 //! metadata only (keyword overlap + input shape). No capability-name logic.
 //! A learned-router interface (`Router` trait) allows replacement later.
+use crate::backend::Model;
 use crate::registry::{CapabilityRecord, Registry};
 use serde::{Deserialize, Serialize};
 
@@ -91,5 +92,86 @@ mod tests {
     #[test]
     fn tokenizer_drops_stopwords_and_dedups() {
         assert_eq!(tokens("Compare the numbers, compare!"), vec!["compare", "numbers"]);
+    }
+}
+
+
+/// FNV-1a 32-bit over bytes (must match training/routing.py exactly).
+pub fn fnv1a(bytes: &[u8]) -> u32 {
+    let mut h: u32 = 0x811c9dc5;
+    for b in bytes { h ^= *b as u32; h = h.wrapping_mul(0x01000193); }
+    h
+}
+
+/// Hashed bag of word and char-trigram features, L2-normalised (ASCII-lowercase tokens). Mirrors training/routing.py.
+pub fn hash_features(text: &str, dim: usize) -> Vec<f32> {
+    let mut v = vec![0f32; dim];
+    let lower = text.to_lowercase();
+    for w in lower.split(|c: char| !c.is_ascii_alphanumeric()).filter(|t| !t.is_empty()) {
+        v[(fnv1a(format!("w:{w}").as_bytes()) as usize) % dim] += 1.0;
+        let padded: Vec<u8> = format!("#{w}#").into_bytes();
+        for tri in padded.windows(3) {
+            let mut key = b"t:".to_vec(); key.extend_from_slice(tri);
+            v[(fnv1a(&key) as usize) % dim] += 1.0;
+        }
+    }
+    let n = v.iter().map(|x| x * x).sum::<f32>().sqrt();
+    if n > 0.0 { for x in v.iter_mut() { *x /= n; } }
+    v
+}
+
+/// Learned intent -> capability router (a signed model artifact with role "router").
+pub struct LearnedRouter {
+    pub model: Box<dyn Model>,
+    /// class names: capability ids followed by "UNKNOWN"
+    pub classes: Vec<String>,
+    pub dim: usize,
+    pub known_p: f32,
+    pub uncertain_p: f32,
+}
+
+impl Router for LearnedRouter {
+    fn route(&self, reg: &Registry, task: &Task) -> Decision {
+        let feats = hash_features(&task.intent, self.dim);
+        let logits = match self.model.run(&feats) { Ok(l) => l, Err(_) => return Decision { status: Status::Unknown, chosen: None, candidates: vec![] } };
+        let m = logits.iter().cloned().fold(f32::NEG_INFINITY, f32::max);
+        let e: Vec<f32> = logits.iter().map(|x| (x - m).exp()).collect();
+        let s: f32 = e.iter().sum();
+        let probs: Vec<f32> = e.iter().map(|x| x / s).collect();
+        let mut cands: Vec<Candidate> = vec![];
+        for (i, c) in self.classes.iter().enumerate() {
+            if c == "UNKNOWN" { continue; }
+            if let Some(rec) = reg.get(c) {
+                if rec.archived || rec.role != "capability" { continue; }
+                cands.push(Candidate { capability_id: c.clone(), score: probs[i] as f64, dice: 0.0, shape_ok: rec.input_dim == task.input.len() });
+            }
+        }
+        cands.sort_by(|a, b| b.shape_ok.cmp(&a.shape_ok).then(b.score.partial_cmp(&a.score).unwrap()).then(a.capability_id.cmp(&b.capability_id)));
+        let unknown_p = self.classes.iter().position(|c| c == "UNKNOWN").map(|i| probs[i]).unwrap_or(0.0);
+        let best = cands.first().filter(|c| c.shape_ok);
+        let (status, chosen) = match best {
+            Some(c) if (c.score as f32) >= self.known_p && (c.score as f32) > unknown_p => (Status::Known, Some(c.capability_id.clone())),
+            Some(c) if (c.score as f32) >= self.uncertain_p && (c.score as f32) > unknown_p => (Status::Uncertain, Some(c.capability_id.clone())),
+            _ => (Status::Unknown, None),
+        };
+        Decision { status, chosen, candidates: cands }
+    }
+}
+
+#[cfg(test)]
+mod learned_tests {
+    use super::*;
+    #[test]
+    fn fnv_known_vectors() {
+        assert_eq!(fnv1a(b""), 0x811c9dc5);
+        assert_eq!(fnv1a(b"a"), 0xe40c292c);
+        assert_eq!(fnv1a(b"foobar"), 0xbf9cf968);
+    }
+    #[test]
+    fn features_are_unit_norm_and_deterministic() {
+        let a = hash_features("Compare these numbers", 64);
+        assert!((a.iter().map(|x| x * x).sum::<f32>() - 1.0).abs() < 1e-5);
+        assert_eq!(a, hash_features("compare THESE numbers!", 64));
+        assert!(hash_features("", 64).iter().all(|x| *x == 0.0));
     }
 }

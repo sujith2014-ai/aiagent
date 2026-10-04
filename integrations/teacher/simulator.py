@@ -29,6 +29,11 @@ def _gen_majority(rng):         # 5 binary-ish values: is the majority > 0.5 ?  
     return v, int(sum(x > 0.5 for x in v) >= 3)
 
 
+def _gen_majority5(rng):        # 5 values: do most of them exceed one half?
+    v = [rng.random() for _ in range(5)]
+    return v, int(sum(x > 0.5 for x in v) >= 3)
+
+
 TASKS: dict[str, dict] = {
     "compare_numbers": dict(gen=_gen_compare, dim=2, labels=["LESS", "EQUAL", "GREATER"], dedupe=True, n_train=240, n_val=80, n_test=80,
         description="Compare two numbers and classify their relation",
@@ -42,6 +47,10 @@ TASKS: dict[str, dict] = {
         description="Find the position of the largest of four values",
         keywords=["largest", "maximum", "max", "argmax", "position", "index", "values", "biggest", "highest"],
         match=["largest", "maximum", "argmax", "biggest"]),
+    "majority_vote": dict(gen=_gen_majority5, dim=5, labels=["MINORITY", "MAJORITY"], dedupe=False, n_train=4000, n_val=600, n_test=1000,
+        description="Decide whether most of five values exceed one half",
+        keywords=["majority", "vote", "most", "values", "exceed", "half", "threshold", "above", "count"],
+        match=["majority", "vote", "most"]),
 }
 
 
@@ -95,8 +104,9 @@ class TeacherSimulator(TeacherProvider):
     # words a language model would associate with each task (stands in for semantic understanding)
     SEMANTIC = {"compare_numbers": {"order", "bigger", "smaller", "greater", "larger", "same", "equal", "less", "relation", "rank", "ordering"},
                 "point_region": {"coordinate", "disc", "within", "inside", "outside", "circle", "circular", "region", "geometry"},
-                "argmax_position": {"index", "slot", "winning", "biggest", "highest", "maximum", "largest", "entry", "max", "argmax"}}
-    CANON_INTENT = {"compare_numbers": "compare numbers relation", "point_region": "point inside region", "argmax_position": "largest value position"}
+                "argmax_position": {"index", "slot", "winning", "biggest", "highest", "maximum", "largest", "entry", "max", "argmax"},
+                "majority_vote": {"majority", "vote", "most", "exceed", "half", "above"}}
+    CANON_INTENT = {"compare_numbers": "compare numbers relation", "point_region": "point inside region", "argmax_position": "largest value position", "majority_vote": "majority vote values"}
 
     def _identify(self, intent: str, dim: int) -> str:
         toks = set(intent.lower().replace(",", " ").split())

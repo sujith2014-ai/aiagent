@@ -8,4 +8,5 @@
 | 4 Dynamic routing, reuse, composition, execution graph | done (hand-written plans; see FINDINGS F2) | benchmarks/reports/phase4.*, tests/test_graph.py |
 | 5 Unknown/novelty detection, NEEDS_HELP flow, TeacherProvider, simulator | done, with documented failures (FINDINGS F6-F9) | benchmarks/reports/phase5.*, tests/test_phase5.py |
 | 6 Real-teacher integration, selective learning, automated candidate evaluation | done locally; live teacher PENDING (R1) | benchmarks/reports/phase6.*, tests/test_phase6.py |
-| 7-15 | not started | |
+| 7 Consolidation/pruning, learned routing, baseline comparison | done; small-LLM baseline PENDING (no weights/egress) | benchmarks/reports/phase7.*, tests/test_phase7.py |
+| 8-15 | not started | |

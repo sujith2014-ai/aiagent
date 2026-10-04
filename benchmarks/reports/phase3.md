@@ -34,9 +34,9 @@ PC_CONSTRAINED (512MB RAM budget, 8MB model limit, 4 loaded modules; process: 1 
 
 | capability | acc (constrained) | acc (full) | p50 latency us (constr./full) | peak RSS KB (constr./full) |
 |---|---|---|---|---|
-| compare_numbers | 1.000 | 1.000 | 24 / 30 | 13284 / 12836 |
-| point_region | 0.992 | 0.992 | 27 / 21 | 13640 / 13828 |
-| argmax_position | 0.987 | 0.987 | 21 / 24 | 14244 / 14436 |
+| compare_numbers | 1.000 | 1.000 | 8 / 8 | 13728 / 13192 |
+| point_region | 0.992 | 0.992 | 8 / 8 | 14376 / 14816 |
+| argmax_position | 0.987 | 0.987 | 9 / 9 | 14748 / 14672 |
 
 Max probability difference constrained vs full: 0.0
 

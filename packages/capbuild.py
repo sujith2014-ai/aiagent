@@ -37,7 +37,7 @@ def build_cap(out: Path, *, capability_id: str, version: str, model_bytes: bytes
               device_caps: list[str] | None = None, dependencies: list[str] | None = None,
               model_format: str = "onnx", variant: str = "fp32", runtime_min: str = RUNTIME_MIN,
               min_ram_mb: int = 64, format_version: str = FORMAT_VERSION,
-              input_stats: dict | None = None, calibration: dict | None = None) -> dict:
+              input_stats: dict | None = None, calibration: dict | None = None, role: str | None = None) -> dict:
     tests_blob = ("\n".join(json.dumps({"input": x, "expected": y}) for x, y in tests) + "\n").encode()
     hints_blob = json.dumps({"description": description, "keywords": keywords}, sort_keys=True).encode()
     model_name = f"model/model.{model_format}"
@@ -56,6 +56,7 @@ def build_cap(out: Path, *, capability_id: str, version: str, model_bytes: bytes
         "routing_file": "routing/hints.json",
         "created": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "signer": {"key_id": signer_id},
+        **({"role": role} if role else {}),
         **({"input_stats": input_stats} if input_stats else {}),
         **({"calibration": calibration} if calibration else {}),
         "contents": {k: sha256(v) for k, v in sorted(files.items())},

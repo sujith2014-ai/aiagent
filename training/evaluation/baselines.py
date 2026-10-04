@@ -6,14 +6,14 @@ import torch, torch.nn as nn
 from training.trainer.train import make_mlp, count_params, torch
 from integrations.teacher.simulator import TASKS, sample, splits
 
-NAMES = list(TASKS)
-DIN = max(t["dim"] for t in TASKS.values()) + len(TASKS)
-DOUT = max(len(t["labels"]) for t in TASKS.values())
+NAMES = ["compare_numbers", "point_region", "argmax_position"]   # the three Phase 3 tasks (TASKS may contain later additions)
+DIN = max(TASKS[n]["dim"] for n in NAMES) + len(NAMES)
+DOUT = max(len(TASKS[n]["labels"]) for n in NAMES)
 
 
 def encode(task: str, x):
     t = NAMES.index(task)
-    v = list(x) + [0.0] * (max(tt["dim"] for tt in TASKS.values()) - len(x)) + [1.0 if i == t else 0.0 for i in range(len(NAMES))]
+    v = list(x) + [0.0] * (max(TASKS[n]["dim"] for n in NAMES) - len(x)) + [1.0 if i == t else 0.0 for i in range(len(NAMES))]
     return v
 
 

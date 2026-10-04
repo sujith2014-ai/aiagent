@@ -11,3 +11,6 @@ Not implemented / limitations (do not assume otherwise):
 
 ## Escalation privacy (Phase 5)
 Teacher requests carry only: redacted intent (<=200 chars), input dimension, installed capability ids, routing status/candidates, a redacted failure string and tool names. No input values, history, files or credentials. Redaction is regex-based (see FINDINGS F9) and is not a guarantee. Teacher responses are untrusted text (ADR-012).
+
+## Phase 6-7 additions
+Teacher rules are evaluated by a whitelist AST interpreter (no eval/exec; node and magnitude limits; 15 hostile expressions rejected in tests) and promoted only after environment verification. Learned routers are signed packages. Consolidation never deletes (archive is reversible), refuses to archive capabilities others depend on, and every compaction/merge is gated and rollback-able. Limits: a teacher rule wrong on a small region passes any tolerance-level gate (FINDINGS F10); routing-regression checks only cover intents seen so far (F11).

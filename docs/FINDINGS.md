@@ -48,3 +48,27 @@ When the rule itself changed (point_region -> smaller circle) the labels conflic
 - No live LLM teacher was called (no credentials/egress here): runbook R1, status PENDING. The "teacher" in all experiments is the simulator (including its spec mode and fault injection), which is itself written by me and knows the ground truth; the acceptance rates above are properties of the gates, not of any real model.
 - Only classification capabilities over small numeric vectors are handled by specs; no images, text or tool use.
 - `adapt_existing` is evaluated on two scenarios; no claim about how often adaptation vs new modules wins in general.
+
+## F14 (Phase 7): consolidation shrinks storage a lot, time not at all
+Registry with injected sprawl (a functional duplicate, a dependency wrapper, a never-used capability, an overlapping-rule capability): 7 active capabilities / 8,851 params / 39,947 bytes -> 4 active (+3 archived, all restorable) / 3,243 params / 15,560 bytes (-63% params, -61% bytes). Contributions: duplicate merged (-1,251), two unused capabilities archived by a usage policy (-2,565), two modules distilled from 1,2xx-1,3xx to 354/420 params (accuracy -0.2 and -0.4 points on held-out sets; bytes -63%). The compare_numbers student (371 params) was **rejected by the gate** (-2.5 points: that task is close to memorisation of a 400-pair domain and needs capacity). Structured pruning and distillation ended at identical sizes with accuracy within 0.2 points of each other: no evidence to prefer either. **Per-inference latency did not change** (7-10 us before and after): these modules are so small that fixed per-call costs dominate, so compaction saves storage/transfer, not time. Rollback restored the original accuracy exactly (checked on an isolated copy of the runtime state). The scenario was constructed by me, so the percentages measure the tools, not how fast real registries sprawl (Phase 14).
+
+## F15 (Phase 7): duplicate detection is sensitive to the probe distribution
+Two independently trained compare modules agreed on 100% of in-distribution inputs (the packages' bundled test inputs) but only 97.9% on uniform random inputs, because neither was trained off the 20-value grid and they differ there. A 0.98 threshold on uniform probes would have missed the duplicate; on in-distribution probes it is found. Rule-conflicting modules (point_region vs the small-circle variant) scored 0.76 and were correctly *not* called duplicates. Agreement says nothing about regions neither module covers.
+
+## F16 (Phase 7): learned routing is better at paraphrases, not clearly safer, and costs more
+Hand-written evaluation intents disjoint from the training templates (27 in-scope, 24 out-of-scope, 15 adversarial; intervals are wide):
+- Correct-and-KNOWN on in-scope paraphrases: keyword 0.44 [0.28-0.63] vs learned 0.81-0.89 (separated).
+- Adversarial keyword-overlap tasks answered KNOWN: keyword 0.20 vs learned 0.60 (trained without hard negatives) and 0.27 (with hard negatives; indistinguishable from keyword at this n). With hard negatives the learned router *rejects* 60% of adversarial tasks (keyword: 13% rejected, 67% flagged UNCERTAIN).
+- Cost: 16,708 parameters / 67 KB (more than 10x any capability module), +13 us per task (43 vs 30 us), +0.8 MB RSS.
+- **New capability after training:** the stale learned router could not route to it at all (0/4); retraining took 2.1 s and reached only 2/4 on paraphrases; the keyword router handled it immediately (3/4) from package metadata with no training.
+Conclusion: under this system's growth model (capabilities arrive dynamically) the learned router as built is not a clear win; its advantage is paraphrase recall. A hybrid (keyword adaptivity + learned recall) is untested. Learned routing is not being scaled further without evidence.
+
+## F17 (Phase 7): route optimisation works but is narrow
+Common-subexpression and dead-node elimination removed half of the capability calls in two plans with injected redundancy (8->4 and 10->5), with identical outputs and ~2x lower latency. Applies only to straight-line plans with unique output slots (plans with loops/branches are left alone, enforced by a test after a crash found there). Redundancy was injected by me, so this shows the optimiser works, not that real plans are redundant.
+
+## F18 (Phase 7): bugs and pitfalls found by checking the work
+1. Admin/verification probes were incrementing usage statistics, hiding unused capabilities from the archive policy -> `--no-stats` for forced-capability runs.
+2. My experiment script re-installed distilled models after a rollback test *regardless of the gate*, silently installing the rejected compare_numbers student; found by reading the output, removed; rollback is now tested on a copy.
+3. The plan optimiser crashed on plans containing loops/branches (found by tests).
+4. Merge-duplicate checked routing before archiving the duplicate, so both matched and every route looked ambiguous; order fixed (archive, check, restore on failure).
+5. A canonical evaluation intent also appeared in the learned router's training templates (train/eval leak) and my in-script leak check was wrong; found by a test, fixed, one shared overlap check now guards both.

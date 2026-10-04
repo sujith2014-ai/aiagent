@@ -49,7 +49,15 @@ pub struct CapabilityRecord {
     pub input_stats: Option<InputStats>,
     #[serde(default)]
     pub calibration: Option<Calibration>,
+    /// "capability" (default) or "router"
+    #[serde(default = "default_role")]
+    pub role: String,
+    /// Archived capabilities stay in the store (restorable) but are invisible to routing.
+    #[serde(default)]
+    pub archived: bool,
 }
+
+fn default_role() -> String { "capability".into() }
 
 impl CapabilityRecord {
     pub fn active(&self) -> &VersionRecord {
@@ -83,7 +91,16 @@ impl Registry {
         Ok(())
     }
     pub fn get(&self, id: &str) -> Option<&CapabilityRecord> { self.disk.capabilities.get(id) }
-    pub fn all(&self) -> impl Iterator<Item = &CapabilityRecord> { self.disk.capabilities.values() }
+    /// Routable capabilities only (not archived, not routers).
+    pub fn all(&self) -> impl Iterator<Item = &CapabilityRecord> { self.disk.capabilities.values().filter(|r| !r.archived && r.role == "capability") }
+    /// Everything, including archived capabilities and router artifacts.
+    pub fn all_including_hidden(&self) -> impl Iterator<Item = &CapabilityRecord> { self.disk.capabilities.values() }
+    pub fn router_record(&self) -> Option<&CapabilityRecord> { self.disk.capabilities.values().find(|r| r.role == "router" && !r.archived) }
+    pub fn set_archived(&mut self, id: &str, archived: bool) -> Result<()> {
+        let rec = self.disk.capabilities.get_mut(id).ok_or_else(|| anyhow::anyhow!("unknown capability {id}"))?;
+        rec.archived = archived;
+        self.save()
+    }
     pub fn len(&self) -> usize { self.disk.capabilities.len() }
     pub fn is_empty(&self) -> bool { self.disk.capabilities.is_empty() }
 
@@ -102,6 +119,7 @@ impl Registry {
                 existing.provenance = rec.provenance;
                 existing.input_stats = rec.input_stats;
                 existing.calibration = rec.calibration;
+                existing.role = rec.role;
                 existing.stats.last_trained = now_secs();
             }
             None => {

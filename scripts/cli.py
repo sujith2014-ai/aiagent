@@ -49,10 +49,10 @@ Cli.plan_batch = _plan_batch
 Cli.plan_validate = _plan_validate
 
 
-def _run_detect(self, mode, *args, capability=None):
+def _run_detect(self, mode, *args, capability=None, router=None):
     """Run a command under a given detection mode and parse its JSON output."""
     import json as _json
-    cmd = self.prefix + [str(AICLI), "--root", str(self.root), "--trust", str(self.trust), "--device", self.device, "--detect", mode, *(["--capability", capability] if capability else []), *map(str, args)]
+    cmd = self.prefix + [str(AICLI), "--root", str(self.root), "--trust", str(self.trust), "--device", self.device, "--detect", mode, *(["--capability", capability, "--no-stats"] if capability else []), *(["--router", router] if router else []), *map(str, args)]
     p = subprocess.run(cmd, capture_output=True, text=True)
     if p.returncode != 0:
         raise RuntimeError(f"aicli failed: {p.stderr}")

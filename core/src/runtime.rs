@@ -5,7 +5,7 @@ use crate::device::DeviceProfile;
 use crate::graph::{NodeRecord, Node, Plan, PlanError, PlanResult, Ref, MAX_STEPS};
 use crate::package::{CapPackage, PackageError};
 use crate::registry::{now_secs, CapabilityRecord, Registry, Stats, VersionRecord};
-use crate::router::{KeywordRouter, Router, Status, Task};
+use crate::router::{hash_features, KeywordRouter, LearnedRouter, Router, Status, Task};
 use crate::trace::Trace;
 use crate::trust::TrustStore;
 use crate::workspace::{Step, Workspace};
@@ -96,6 +96,8 @@ pub struct Runtime {
     pub detect: Detection,
     /// When set, the router is bypassed and this capability handles every task (used for verification).
     pub force_capability: Option<String>,
+    /// When false, usage statistics are not recorded (admin probes / verification must not look like real usage).
+    pub record_stats: bool,
 }
 
 impl Runtime {
@@ -107,7 +109,7 @@ impl Runtime {
             backend: Box::new(OnnxBackend),
             router: Box::new(KeywordRouter::default()),
             loaded: HashMap::new(), lru: vec![],
-            trace: Trace::open(root), task_counter: 0, detect: Detection::by_name("full").unwrap(), force_capability: None,
+            trace: Trace::open(root), task_counter: 0, detect: Detection::by_name("full").unwrap(), force_capability: None, record_stats: true,
         })
     }
 
@@ -207,6 +209,7 @@ impl Runtime {
             labels: m.io.output.labels.clone(), device_caps: m.requires.device_caps.clone(),
             dependencies: m.dependencies.clone(), provenance: m.provenance.clone(), stats: Stats::default(),
             input_stats: m.input_stats.clone(), calibration: m.calibration.clone(),
+            role: m.role.clone().unwrap_or_else(|| "capability".into()), archived: false,
         };
         let ver = VersionRecord { version: m.version.clone(), package_id: m.package_id.clone(), store_file,
             params: m.resources.params, model_bytes: m.resources.model_bytes, test_accuracy: acc, activated_at: now_secs() };
@@ -301,7 +304,7 @@ impl Runtime {
                 }
                 ws.uncertainty = Some(1.0 - confidence);
                 ws.history.push(Step { capability_id: cap.clone(), version: ver.clone(), output_label: label.clone(), probs: probs.clone(), latency_us });
-                self.registry.record_call(&cap, latency_us)?;
+                if self.record_stats { self.registry.record_call(&cap, latency_us)?; }
                 Outcome::Answer { status: st, capability_id: cap, version: ver, label, label_index: idx, probs, confidence, raw_confidence, route_score, novelty, flags, latency_us, task_id: task_id.clone() }
             }
         };
@@ -396,12 +399,38 @@ impl Runtime {
                     slots.insert(format!("{out}.conf"), vec![probs[idx]]);
                     *st.calls.entry(cap.clone()).or_insert(0) += 1;
                     st.rec(&id, "cap", Some(cap.clone()), Some(ver), Some(idx), us);
-                    let _ = self.registry.record_call(&cap, us);
+                    if self.record_stats { let _ = self.registry.record_call(&cap, us); }
                 }
             }
         }
         Ok(())
     }
+
+    /// Switch to the learned router stored in the registry (role "router"). Fails if none is installed.
+    pub fn use_learned_router(&mut self) -> Result<()> {
+        let rec = self.registry.router_record().ok_or_else(|| anyhow!("no learned router installed"))?.clone();
+        let pkg = CapPackage::open(&self.root.join("store").join(&rec.active().store_file))?;
+        pkg.verify_signature(&self.trust)?;
+        pkg.verify_hashes()?;
+        let model = self.backend.load(&pkg.manifest.model.format, pkg.model_bytes(), pkg.manifest.io.input.dim)?;
+        self.router = Box::new(LearnedRouter { model, classes: pkg.manifest.io.output.labels.clone(), dim: pkg.manifest.io.input.dim, known_p: 0.80, uncertain_p: 0.50 });
+        Ok(())
+    }
+
+    pub fn use_keyword_router(&mut self) { self.router = Box::new(KeywordRouter::default()); }
+
+    /// Hide a capability from routing without deleting anything. Refused if an active capability depends on it.
+    pub fn archive(&mut self, cap: &str) -> Result<()> {
+        let dependents: Vec<String> = self.registry.all().filter(|r| r.capability_id != cap && r.dependencies.iter().any(|d| d == cap)).map(|r| r.capability_id.clone()).collect();
+        if !dependents.is_empty() { return Err(anyhow!("cannot archive '{cap}': required by {dependents:?}")); }
+        self.registry.set_archived(cap, true)?;
+        self.unload(cap);
+        Ok(())
+    }
+
+    pub fn restore(&mut self, cap: &str) -> Result<()> { self.registry.set_archived(cap, false) }
+
+    pub fn features(text: &str, dim: usize) -> Vec<f32> { hash_features(text, dim) }
 
     pub fn report_outcome(&mut self, cap: &str, success: bool) -> Result<()> { self.registry.record_outcome(cap, success) }
 

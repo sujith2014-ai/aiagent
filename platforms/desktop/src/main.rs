@@ -26,6 +26,8 @@ fn main() -> Result<()> {
     let mut device = "PC_FULL".to_string();
     let mut detect = "full".to_string();
     let mut force: Option<String> = None;
+    let mut router_kind = "keyword".to_string();
+    let mut no_stats = false;
     let mut rest = vec![];
     let mut i = 0;
     while i < args.len() {
@@ -35,6 +37,8 @@ fn main() -> Result<()> {
             "--device" => { device = args[i + 1].clone(); i += 2 }
             "--detect" => { detect = args[i + 1].clone(); i += 2 }
             "--capability" => { force = Some(args[i + 1].clone()); i += 2 }
+            "--router" => { router_kind = args[i + 1].clone(); i += 2 }
+            "--no-stats" => { no_stats = true; i += 1 }
             _ => { rest.push(args[i].clone()); i += 1 }
         }
     }
@@ -42,7 +46,9 @@ fn main() -> Result<()> {
     let trust_store = TrustStore::from_file(&trust)?;
     let mut rt = Runtime::open(&root, dev, trust_store)?;
     rt.detect = aicore::runtime::Detection::by_name(&detect).ok_or_else(|| anyhow!("unknown --detect {detect}"))?;
+    rt.record_stats = !no_stats;
     rt.force_capability = force;
+    if router_kind == "learned" { rt.use_learned_router()?; }
     let cmd = rest.first().map(|s| s.as_str()).unwrap_or("help");
     match cmd {
         "import" => {
@@ -50,11 +56,25 @@ fn main() -> Result<()> {
             for f in &rest[1..] { reports.push(serde_json::to_value(rt.import(&PathBuf::from(f)))?); }
             println!("{}", serde_json::to_string_pretty(&reports)?);
         }
+        "archive" => { let c = rest.get(1).ok_or_else(|| anyhow!("capability id"))?; rt.archive(c)?; println!("{}", json!({"archived": c})); }
+        "restore" => { let c = rest.get(1).ok_or_else(|| anyhow!("capability id"))?; rt.restore(c)?; println!("{}", json!({"restored": c})); }
+        "features" => {
+            let dim: usize = flag(&rest, "--dim").and_then(|d| d.parse().ok()).unwrap_or(256);
+            let text = flag(&rest, "--text").ok_or_else(|| anyhow!("--text"))?;
+            println!("{}", serde_json::to_string(&aicore::runtime::Runtime::features(&text, dim))?);
+        }
+        "list-all" => {
+            let v: Vec<_> = rt.registry.all_including_hidden().map(|r| json!({"capability_id": r.capability_id, "role": r.role, "archived": r.archived,
+                "active_version": r.active_version, "params": r.active().params, "model_bytes": r.active().model_bytes, "calls": r.stats.calls, "last_used": r.stats.last_used,
+                "last_trained": r.stats.last_trained, "store_file": r.active().store_file})).collect();
+            println!("{}", serde_json::to_string_pretty(&v)?);
+        }
         "list" => {
             let v: Vec<_> = rt.registry.all().map(|r| json!({
                 "capability_id": r.capability_id, "active_version": r.active_version, "store_file": r.active().store_file, "keywords": r.keywords,
                 "versions": r.versions.iter().map(|v| &v.version).collect::<Vec<_>>(),
-                "params": r.active().params, "model_bytes": r.active().model_bytes,
+                "params": r.active().params, "model_bytes": r.active().model_bytes, "calls": r.stats.calls,
+                "input_dim": r.input_dim, "labels": r.labels, "input_stats": r.input_stats, "dependencies": r.dependencies,
                 "test_accuracy": r.active().test_accuracy, "stats": r.stats,
             })).collect();
             println!("{}", serde_json::to_string_pretty(&v)?);

@@ -19,6 +19,9 @@ pub struct Manifest {
     pub tests: TestsSpec,
     pub routing_file: String,
     pub created: String,
+    /// Optional (additive to cap/1): "capability" (default) or "router" (a learned router artifact, never routed to).
+    #[serde(default)]
+    pub role: Option<String>,
     /// Optional (additive to cap/1): training-input statistics for novelty detection.
     #[serde(default)]
     pub input_stats: Option<InputStats>,
