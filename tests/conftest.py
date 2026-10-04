@@ -52,3 +52,17 @@ def make_cap(env, out, key="build-svc-1", **over):
               description="d", signer_id=key, signer_key=env["keyfn"](key), provenance={"source": "test"}, min_accuracy=0.9)
     kw.update(over)
     return build_cap(out, **kw)
+
+
+@pytest.fixture(scope="session")
+def rt3(env, tmp_path_factory):
+    """Runtime with the three learned capabilities installed."""
+    d = tmp_path_factory.mktemp("rt3")
+    cli = Cli(d / "rt", env["trust"])
+    known = set()
+    for intent, dim in [("compare numbers relation", 2), ("point inside region", 2), ("largest value position", 4)]:
+        lp = env["teacher"].respond(HelpRequest(intent, dim))
+        b = env["svc"].build(lp, "0.1.0", known)
+        assert cli.import_caps(str(b.cap_path))[0]["activated"]
+        known.add(lp.capability_id)
+    return cli

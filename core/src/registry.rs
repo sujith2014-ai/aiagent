@@ -60,6 +60,8 @@ struct Disk {
 pub struct Registry {
     path: PathBuf,
     disk: Disk,
+    /// usage statistics changed in memory but not yet written (structural changes always save immediately)
+    stats_dirty: bool,
 }
 
 impl Registry {
@@ -67,7 +69,7 @@ impl Registry {
         std::fs::create_dir_all(root)?;
         let path = root.join("registry.json");
         let disk = if path.exists() { serde_json::from_slice(&std::fs::read(&path)?)? } else { Disk::default() };
-        Ok(Self { path, disk })
+        Ok(Self { path, disk, stats_dirty: false })
     }
     fn save(&self) -> Result<()> {
         let tmp = self.path.with_extension("json.tmp");
@@ -115,20 +117,33 @@ impl Registry {
         Ok(v)
     }
 
+    /// Stats are buffered in memory (writing the registry on every inference cost ~10x the inference itself,
+    /// see docs/FINDINGS.md); call `flush` to persist. Also flushed on drop.
     pub fn record_call(&mut self, id: &str, latency_us: u64) -> Result<()> {
         if let Some(r) = self.disk.capabilities.get_mut(id) {
             r.stats.calls += 1;
             r.stats.total_latency_us += latency_us;
             r.stats.max_latency_us = r.stats.max_latency_us.max(latency_us);
             r.stats.last_used = now_secs();
+            self.stats_dirty = true;
         }
-        self.save()
+        Ok(())
     }
 
     pub fn record_outcome(&mut self, id: &str, success: bool) -> Result<()> {
         if let Some(r) = self.disk.capabilities.get_mut(id) {
             if success { r.stats.success += 1 } else { r.stats.failure += 1 }
+            self.stats_dirty = true;
         }
-        self.save()
+        Ok(())
     }
+
+    pub fn flush(&mut self) -> Result<()> {
+        if self.stats_dirty { self.save()?; self.stats_dirty = false; }
+        Ok(())
+    }
+}
+
+impl Drop for Registry {
+    fn drop(&mut self) { let _ = self.flush(); }
 }

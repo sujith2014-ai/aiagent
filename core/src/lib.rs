@@ -5,6 +5,7 @@
 pub mod backend;
 pub mod capability;
 pub mod device;
+pub mod graph;
 pub mod package;
 pub mod registry;
 pub mod router;

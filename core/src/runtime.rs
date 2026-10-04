@@ -2,6 +2,7 @@
 use crate::backend::{Backend, Model, OnnxBackend};
 use crate::capability::Manifest;
 use crate::device::DeviceProfile;
+use crate::graph::{NodeRecord, Node, Plan, PlanError, PlanResult, Ref, MAX_STEPS};
 use crate::package::{CapPackage, PackageError};
 use crate::registry::{now_secs, CapabilityRecord, Registry, Stats, VersionRecord};
 use crate::router::{KeywordRouter, Router, Status, Task};
@@ -10,7 +11,7 @@ use crate::trust::TrustStore;
 use crate::workspace::{Step, Workspace};
 use anyhow::{anyhow, Result};
 use serde::Serialize;
-use std::collections::HashMap;
+use std::collections::{BTreeMap, HashMap};
 use std::path::{Path, PathBuf};
 use std::time::Instant;
 
@@ -243,6 +244,97 @@ impl Runtime {
         Ok(out)
     }
 
+    /// Execute a validated plan. Capability nodes resolve by id or by intent through the router
+    /// (intent resolution must be KNOWN; otherwise the whole plan stops with NEEDS_HELP).
+    pub fn run_plan(&mut self, plan: &Plan, inputs: &BTreeMap<String, Vec<f32>>) -> Result<PlanResult, PlanError> {
+        plan.validate()?;
+        let mut slots: BTreeMap<String, Vec<f32>> = BTreeMap::new();
+        for (name, dim) in &plan.inputs {
+            let v = inputs.get(name).ok_or_else(|| PlanError::Invalid(format!("missing input '{name}'")))?;
+            if v.len() != *dim { return Err(PlanError::Invalid(format!("input '{name}' has {} values, plan declares {dim}", v.len()))); }
+            slots.insert(name.clone(), v.clone());
+        }
+        let t0 = Instant::now();
+        let mut st = ExecState { records: vec![], steps: 0, module_us: 0, calls: BTreeMap::new() };
+        self.exec_nodes(&plan.nodes, &mut slots, &mut st)?;
+        let outputs = resolve_all(&plan.outputs, &slots).map_err(|e| PlanError::Exec { node: "outputs".into(), reason: e })?;
+        let total_us = t0.elapsed().as_micros() as u64;
+        let res = PlanResult { plan_id: plan.id.clone(), outputs, node_executions: st.steps, total_us, module_us: st.module_us,
+            overhead_us: total_us.saturating_sub(st.module_us), parallel_levels: plan.parallel_levels(),
+            capability_calls: st.calls, records: st.records };
+        let _ = self.trace.append(&serde_json::json!({"event": "plan", "ts": now_secs(), "plan": plan.id,
+            "records": res.records, "total_us": total_us, "module_us": res.module_us}));
+        Ok(res)
+    }
+
+    fn exec_nodes(&mut self, nodes: &[Node], slots: &mut BTreeMap<String, Vec<f32>>, st: &mut ExecState) -> Result<(), PlanError> {
+        for n in nodes {
+            st.steps += 1;
+            if st.steps > MAX_STEPS { return Err(PlanError::Budget(MAX_STEPS)); }
+            let id = n.id().to_string();
+            let ex = |e: String| PlanError::Exec { node: id.clone(), reason: e };
+            match n {
+                Node::Gather { args, out, .. } => { let v = resolve_all(args, slots).map_err(ex)?; slots.insert(out.clone(), v); st.rec(&id, "gather", None, None, None, 0); }
+                Node::Affine { args, scale, offset, out, .. } => {
+                    let s: f32 = resolve_all(args, slots).map_err(ex)?.iter().sum();
+                    slots.insert(out.clone(), vec![scale * s + offset]); st.rec(&id, "affine", None, None, None, 0);
+                }
+                Node::Select { index, options, out, .. } => {
+                    let i = resolve_all(std::slice::from_ref(index), slots).map_err(ex)?;
+                    let i = *i.first().ok_or_else(|| PlanError::Exec { node: id.clone(), reason: "empty index".into() })? as usize;
+                    let opt = options.get(i).ok_or_else(|| PlanError::Exec { node: id.clone(), reason: format!("index {i} out of range") })?;
+                    let v = resolve_all(std::slice::from_ref(opt), slots).map_err(|e| PlanError::Exec { node: id.clone(), reason: e })?;
+                    slots.insert(out.clone(), v); st.rec(&id, "select", None, None, Some(i), 0);
+                }
+                Node::CondSwap { pair, flag, swap_if, out, .. } => {
+                    let f = resolve_all(std::slice::from_ref(flag), slots).map_err(ex)?[0] as usize;
+                    let a = resolve_all(&pair[..1], slots).map_err(|e| PlanError::Exec { node: id.clone(), reason: e })?;
+                    let b = resolve_all(&pair[1..], slots).map_err(|e| PlanError::Exec { node: id.clone(), reason: e })?;
+                    let v = if swap_if.contains(&f) { [b, a].concat() } else { [a, b].concat() };
+                    slots.insert(out.clone(), v); st.rec(&id, "cond_swap", None, None, Some(f), 0);
+                }
+                Node::If { cond, in_set, then, otherwise, .. } => {
+                    let c = resolve_all(std::slice::from_ref(cond), slots).map_err(ex)?[0] as usize;
+                    let take = in_set.contains(&c);
+                    st.rec(&id, if take { "if:then" } else { "if:else" }, None, None, Some(c), 0);
+                    self.exec_nodes(if take { then } else { otherwise }, slots, st)?;
+                }
+                Node::Repeat { times, body, .. } => {
+                    for _ in 0..*times { self.exec_nodes(body, slots, st)?; }
+                }
+                Node::Cap { capability, intent, args, out, .. } => {
+                    let input = resolve_all(args, slots).map_err(ex)?;
+                    let cap = match (capability, intent) {
+                        (Some(c), _) => c.clone(),
+                        (None, Some(i)) => {
+                            let d = self.router.route(&self.registry, &Task { intent: i.clone(), input: input.clone() });
+                            match (d.status, d.chosen) {
+                                (Status::Known, Some(c)) => c,
+                                (s, _) => return Err(PlanError::NeedsHelp { node: id.clone(), reason: format!("intent '{i}' resolved as {s:?}") }),
+                            }
+                        }
+                        _ => unreachable!("validated"),
+                    };
+                    self.ensure_loaded(&cap).map_err(|e| PlanError::Exec { node: id.clone(), reason: e.to_string() })?;
+                    let (ver, model) = self.loaded.get(&cap).unwrap();
+                    let ver = ver.clone();
+                    let t = Instant::now();
+                    let logits = model.run(&input).map_err(|e| PlanError::Exec { node: id.clone(), reason: e.to_string() })?;
+                    let us = t.elapsed().as_micros() as u64;
+                    st.module_us += us;
+                    let probs = softmax(&logits);
+                    let idx = argmax(&probs);
+                    slots.insert(out.clone(), vec![idx as f32]);
+                    slots.insert(format!("{out}.conf"), vec![probs[idx]]);
+                    *st.calls.entry(cap.clone()).or_insert(0) += 1;
+                    st.rec(&id, "cap", Some(cap.clone()), Some(ver), Some(idx), us);
+                    let _ = self.registry.record_call(&cap, us);
+                }
+            }
+        }
+        Ok(())
+    }
+
     pub fn report_outcome(&mut self, cap: &str, success: bool) -> Result<()> { self.registry.record_outcome(cap, success) }
 
     /// Run bundled tests of the active version against the stored package (regression check).
@@ -289,4 +381,27 @@ mod tests {
         assert!((p.iter().sum::<f32>() - 1.0).abs() < 1e-6);
         assert_eq!(argmax(&p), 2);
     }
+}
+
+struct ExecState { records: Vec<NodeRecord>, steps: usize, module_us: u64, calls: BTreeMap<String, usize> }
+impl ExecState {
+    fn rec(&mut self, node: &str, op: &'static str, capability: Option<String>, version: Option<String>, label: Option<usize>, latency_us: u64) {
+        self.records.push(NodeRecord { node: node.into(), op, capability, version, label, latency_us });
+    }
+}
+
+fn resolve(r: &Ref, slots: &BTreeMap<String, Vec<f32>>) -> Result<Vec<f32>, String> {
+    match r {
+        Ref::Const { value } => Ok(vec![*value]),
+        Ref::Slot { slot, index } => {
+            let v = slots.get(slot).ok_or_else(|| format!("slot '{slot}' not set"))?;
+            match index { None => Ok(v.clone()), Some(i) => v.get(*i).map(|x| vec![*x]).ok_or_else(|| format!("slot '{slot}' has no index {i}")) }
+        }
+    }
+}
+
+fn resolve_all(rs: &[Ref], slots: &BTreeMap<String, Vec<f32>>) -> Result<Vec<f32>, String> {
+    let mut out = vec![];
+    for r in rs { out.extend(resolve(r, slots)?); }
+    Ok(out)
 }

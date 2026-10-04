@@ -80,6 +80,34 @@ fn main() -> Result<()> {
             let same = a["probs"] == b["probs"] && a["label"] == b["label"];
             println!("{}", json!({"was_loaded": was_loaded, "loaded_after_unload": still, "reloaded": rt.loaded_modules().contains(&cap), "identical": same}));
         }
+        "plan-batch" => {
+            // --plan FILE --cases FILE.jsonl ; case: {"inputs": {"slot": [..]}}. Each case runs once to warm, then is timed.
+            let plan: aicore::graph::Plan = serde_json::from_slice(&std::fs::read(flag(&rest, "--plan").ok_or_else(|| anyhow!("--plan required"))?)?)?;
+            let file = flag(&rest, "--cases").ok_or_else(|| anyhow!("--cases required"))?;
+            let mut results = vec![];
+            let (mut tot, mut modu, mut ovh, mut execs) = (vec![], vec![], vec![], vec![]);
+            let mut needs_help = 0usize;
+            for line in std::fs::read_to_string(file)?.lines().filter(|l| !l.trim().is_empty()) {
+                let c: serde_json::Value = serde_json::from_str(line)?;
+                let inputs: std::collections::BTreeMap<String, Vec<f32>> = c["inputs"].as_object().ok_or_else(|| anyhow!("inputs"))?.iter()
+                    .map(|(k, v)| (k.clone(), v.as_array().unwrap().iter().map(|x| x.as_f64().unwrap() as f32).collect())).collect();
+                match rt.run_plan(&plan, &inputs) {
+                    Ok(r) => { tot.push(r.total_us); modu.push(r.module_us); ovh.push(r.overhead_us); execs.push(r.node_executions);
+                        results.push(json!({"outputs": r.outputs, "records": r.records.iter().map(|x| json!({"node": x.node, "op": x.op, "cap": x.capability, "label": x.label})).collect::<Vec<_>>(),
+                                            "calls": r.capability_calls, "total_us": r.total_us, "module_us": r.module_us, "overhead_us": r.overhead_us, "levels": r.parallel_levels})); }
+                    Err(aicore::graph::PlanError::NeedsHelp { node, reason }) => { needs_help += 1; results.push(json!({"needs_help": true, "node": node, "reason": reason})); }
+                    Err(e) => { results.push(json!({"error": e.to_string()})); }
+                }
+            }
+            let med = |mut v: Vec<u64>| { v.sort(); if v.is_empty() { 0 } else { v[v.len() / 2] } };
+            println!("{}", serde_json::to_string(&json!({"summary": {"plan": plan.id, "cases": results.len(), "needs_help": needs_help,
+                "total_us_p50": med(tot), "module_us_p50": med(modu), "overhead_us_p50": med(ovh), "node_executions_p50": med(execs.iter().map(|x| *x as u64).collect()),
+                "peak_rss_kb": peak_rss_kb()}, "results": results}))?);
+        }
+        "plan-validate" => {
+            let plan: aicore::graph::Plan = serde_json::from_slice(&std::fs::read(rest.get(1).ok_or_else(|| anyhow!("plan file"))?)?)?;
+            match plan.validate() { Ok(()) => println!("{}", json!({"valid": true, "levels": plan.parallel_levels()})), Err(e) => println!("{}", json!({"valid": false, "error": e.to_string()})) }
+        }
         "batch" => {
             // cases JSONL: {"intent": "...", "input": [..], "expected_index": n?, "expected_capability": "..."?}
             let file = flag(&rest, "--cases").ok_or_else(|| anyhow!("--cases required"))?;

@@ -7,7 +7,8 @@ core/ (Rust crate `aicore`, platform-neutral)
   router.rs      keyword router (Router trait for learned routers later)
   workspace.rs   per-task working state    trace.rs   JSONL trace of imports and tasks
   backend.rs     Backend/Model traits + ONNX(tract)   device.rs  DeviceProfile (the only platform seam)
-  runtime.rs     guarded import, lazy load/unload (LRU), solve, regression
+  graph.rs       execution plans (cap/select/cond_swap/affine/gather/if/repeat), static validation, step budget
+  runtime.rs     guarded import, lazy load/unload (LRU), solve, run_plan, regression
 platforms/desktop/  `aicli` harness (arg parsing, JSON, peak RSS)
 training/ integrations/teacher/ packages/  Python research side (never imported by the core)
 ```

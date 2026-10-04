@@ -35,3 +35,15 @@ class Cli:
 
     def regression(self, cap):
         return self.json("regression", cap)
+
+
+def _plan_batch(self, plan_path, cases_path):
+    return self.json("plan-batch", "--plan", plan_path, "--cases", cases_path)
+
+
+def _plan_validate(self, plan_path):
+    return self.json("plan-validate", plan_path)
+
+
+Cli.plan_batch = _plan_batch
+Cli.plan_validate = _plan_validate

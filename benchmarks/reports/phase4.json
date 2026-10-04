@@ -1,0 +1,681 @@
+{
+ "benchmark_format": "bench/1",
+ "experiment": "phase4-composition",
+ "platform": "Linux-6.18.44-fc-v64-x86_64-with-glibc2.39",
+ "date": "2026-10-04",
+ "module_heldout_accuracy": {
+  "compare_numbers": 1.0,
+  "point_region": 0.9919999837875366,
+  "argmax_position": 0.9879999756813049
+ },
+ "composites": {
+  "sort4": {
+   "variants": {
+    "network/intent": {
+     "accuracy": 1.0,
+     "needs_help": 0,
+     "errors": 0,
+     "node_executions_p50": 16,
+     "capability_calls_per_task": {
+      "compare_numbers": 5
+     },
+     "latency_us_p50": {
+      "total": 88,
+      "modules": 37,
+      "overhead": 50
+     },
+     "parallel_levels_example": [
+      [
+       "w0"
+      ],
+      [
+       "f0"
+      ],
+      [
+       "p0"
+      ],
+      [
+       "g0"
+      ],
+      [
+       "f1"
+      ],
+      [
+       "p1"
+      ],
+      [
+       "g1"
+      ],
+      [
+       "f2"
+      ],
+      [
+       "p2"
+      ],
+      [
+       "g2"
+      ],
+      [
+       "f3"
+      ],
+      [
+       "p3"
+      ],
+      [
+       "g3"
+      ],
+      [
+       "f4"
+      ],
+      [
+       "p4"
+      ],
+      [
+       "g4"
+      ]
+     ],
+     "peak_rss_kb": 30112
+    },
+    "network/id": {
+     "accuracy": 1.0,
+     "needs_help": 0,
+     "errors": 0,
+     "node_executions_p50": 16,
+     "capability_calls_per_task": {
+      "compare_numbers": 5
+     },
+     "latency_us_p50": {
+      "total": 76,
+      "modules": 43,
+      "overhead": 32
+     },
+     "parallel_levels_example": [
+      [
+       "w0"
+      ],
+      [
+       "f0"
+      ],
+      [
+       "p0"
+      ],
+      [
+       "g0"
+      ],
+      [
+       "f1"
+      ],
+      [
+       "p1"
+      ],
+      [
+       "g1"
+      ],
+      [
+       "f2"
+      ],
+      [
+       "p2"
+      ],
+      [
+       "g2"
+      ],
+      [
+       "f3"
+      ],
+      [
+       "p3"
+      ],
+      [
+       "g3"
+      ],
+      [
+       "f4"
+      ],
+      [
+       "p4"
+      ],
+      [
+       "g4"
+      ]
+     ],
+     "peak_rss_kb": 30384
+    },
+    "bubble_loop/intent": {
+     "accuracy": 1.0,
+     "needs_help": 0,
+     "errors": 0,
+     "node_executions_p50": 29,
+     "capability_calls_per_task": {
+      "compare_numbers": 9
+     },
+     "latency_us_p50": {
+      "total": 165,
+      "modules": 70,
+      "overhead": 93
+     },
+     "parallel_levels_example": [
+      [
+       "w0",
+       "passes"
+      ]
+     ],
+     "peak_rss_kb": 39048
+    },
+    "bubble_loop/id": {
+     "accuracy": 1.0,
+     "needs_help": 0,
+     "errors": 0,
+     "node_executions_p50": 29,
+     "capability_calls_per_task": {
+      "compare_numbers": 9
+     },
+     "latency_us_p50": {
+      "total": 112,
+      "modules": 63,
+      "overhead": 49
+     },
+     "parallel_levels_example": [
+      [
+       "w0",
+       "passes"
+      ]
+     ],
+     "peak_rss_kb": 39056
+    }
+   },
+   "example_trace": [
+    {
+     "cap": null,
+     "label": null,
+     "node": "w0",
+     "op": "gather"
+    },
+    {
+     "cap": "compare_numbers",
+     "label": 2,
+     "node": "f0",
+     "op": "cap"
+    },
+    {
+     "cap": null,
+     "label": 2,
+     "node": "p0",
+     "op": "cond_swap"
+    },
+    {
+     "cap": null,
+     "label": null,
+     "node": "g0",
+     "op": "gather"
+    },
+    {
+     "cap": "compare_numbers",
+     "label": 2,
+     "node": "f1",
+     "op": "cap"
+    },
+    {
+     "cap": null,
+     "label": 2,
+     "node": "p1",
+     "op": "cond_swap"
+    },
+    {
+     "cap": null,
+     "label": null,
+     "node": "g1",
+     "op": "gather"
+    },
+    {
+     "cap": "compare_numbers",
+     "label": 2,
+     "node": "f2",
+     "op": "cap"
+    }
+   ],
+   "baseline_end_to_end_mlp": {
+    "train_examples": 3000,
+    "hidden": [
+     64,
+     64
+    ],
+    "params": 6040,
+    "accuracy_seeds": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "accuracy_mean": 1.0
+   }
+  },
+  "count_inside": {
+   "variants": {
+    "main/intent": {
+     "accuracy": 0.957,
+     "needs_help": 0,
+     "errors": 0,
+     "node_executions_p50": 5,
+     "capability_calls_per_task": {
+      "point_region": 4
+     },
+     "latency_us_p50": {
+      "total": 78,
+      "modules": 34,
+      "overhead": 43
+     },
+     "parallel_levels_example": [
+      [
+       "b0",
+       "b1",
+       "b2",
+       "b3"
+      ],
+      [
+       "count"
+      ]
+     ],
+     "peak_rss_kb": 19440
+    },
+    "main/id": {
+     "accuracy": 0.957,
+     "needs_help": 0,
+     "errors": 0,
+     "node_executions_p50": 5,
+     "capability_calls_per_task": {
+      "point_region": 4
+     },
+     "latency_us_p50": {
+      "total": 52,
+      "modules": 30,
+      "overhead": 22
+     },
+     "parallel_levels_example": [
+      [
+       "b0",
+       "b1",
+       "b2",
+       "b3"
+      ],
+      [
+       "count"
+      ]
+     ],
+     "peak_rss_kb": 19436
+    }
+   },
+   "example_trace": [
+    {
+     "cap": "point_region",
+     "label": 1,
+     "node": "b0",
+     "op": "cap"
+    },
+    {
+     "cap": "point_region",
+     "label": 1,
+     "node": "b1",
+     "op": "cap"
+    },
+    {
+     "cap": "point_region",
+     "label": 1,
+     "node": "b2",
+     "op": "cap"
+    },
+    {
+     "cap": "point_region",
+     "label": 1,
+     "node": "b3",
+     "op": "cap"
+    },
+    {
+     "cap": null,
+     "label": null,
+     "node": "count",
+     "op": "affine"
+    }
+   ],
+   "baseline_end_to_end_mlp": {
+    "train_examples": 3000,
+    "hidden": [
+     64,
+     64
+    ],
+    "params": 5061,
+    "accuracy_seeds": [
+     0.5630000233650208,
+     0.5730000138282776,
+     0.5720000267028809
+    ],
+    "accuracy_mean": 0.5693333546320597
+   }
+  },
+  "mixed_C_select_B_A": {
+   "variants": {
+    "main/intent": {
+     "accuracy": 0.987,
+     "needs_help": 0,
+     "errors": 0,
+     "node_executions_p50": 6,
+     "capability_calls_per_task": {
+      "argmax_position": 1,
+      "compare_numbers": 1,
+      "point_region": 1
+     },
+     "latency_us_p50": {
+      "total": 66,
+      "modules": 30,
+      "overhead": 35
+     },
+     "parallel_levels_example": [
+      [
+       "c"
+      ],
+      [
+       "m",
+       "x",
+       "y"
+      ],
+      [
+       "b",
+       "a"
+      ]
+     ],
+     "peak_rss_kb": 20640
+    },
+    "main/id": {
+     "accuracy": 0.987,
+     "needs_help": 0,
+     "errors": 0,
+     "node_executions_p50": 6,
+     "capability_calls_per_task": {
+      "argmax_position": 1,
+      "compare_numbers": 1,
+      "point_region": 1
+     },
+     "latency_us_p50": {
+      "total": 52,
+      "modules": 32,
+      "overhead": 20
+     },
+     "parallel_levels_example": [
+      [
+       "c"
+      ],
+      [
+       "m",
+       "x",
+       "y"
+      ],
+      [
+       "b",
+       "a"
+      ]
+     ],
+     "peak_rss_kb": 20648
+    }
+   },
+   "example_trace": [
+    {
+     "cap": "argmax_position",
+     "label": 0,
+     "node": "c",
+     "op": "cap"
+    },
+    {
+     "cap": null,
+     "label": 0,
+     "node": "m",
+     "op": "select"
+    },
+    {
+     "cap": null,
+     "label": 0,
+     "node": "x",
+     "op": "select"
+    },
+    {
+     "cap": null,
+     "label": 0,
+     "node": "y",
+     "op": "select"
+    },
+    {
+     "cap": "point_region",
+     "label": 1,
+     "node": "b",
+     "op": "cap"
+    },
+    {
+     "cap": "compare_numbers",
+     "label": 2,
+     "node": "a",
+     "op": "cap"
+    }
+   ],
+   "baseline_end_to_end_mlp": {
+    "train_examples": 3000,
+    "hidden": [
+     64,
+     64
+    ],
+    "params": 5126,
+    "accuracy_seeds": [
+     0.8259999752044678,
+     0.8379999995231628,
+     0.8349999785423279
+    ],
+    "accuracy_mean": 0.8329999844233195
+   }
+  },
+  "branch": {
+   "variants": {
+    "main/intent": {
+     "accuracy": 0.998,
+     "needs_help": 0,
+     "errors": 0,
+     "node_executions_p50": 3,
+     "capability_calls_per_task": {
+      "compare_numbers": 1,
+      "point_region": 1,
+      "argmax_position": 1
+     },
+     "latency_us_p50": {
+      "total": 35,
+      "modules": 16,
+      "overhead": 19
+     },
+     "parallel_levels_example": [
+      [
+       "ca"
+      ],
+      [
+       "br"
+      ]
+     ],
+     "peak_rss_kb": 17908
+    },
+    "main/id": {
+     "accuracy": 0.998,
+     "needs_help": 0,
+     "errors": 0,
+     "node_executions_p50": 3,
+     "capability_calls_per_task": {
+      "compare_numbers": 1,
+      "point_region": 1,
+      "argmax_position": 1
+     },
+     "latency_us_p50": {
+      "total": 27,
+      "modules": 16,
+      "overhead": 11
+     },
+     "parallel_levels_example": [
+      [
+       "ca"
+      ],
+      [
+       "br"
+      ]
+     ],
+     "peak_rss_kb": 17748
+    }
+   },
+   "branch_exclusive": true,
+   "branch_taken_then_fraction": 0.483,
+   "example_trace": [
+    {
+     "cap": "compare_numbers",
+     "label": 2,
+     "node": "ca",
+     "op": "cap"
+    },
+    {
+     "cap": null,
+     "label": 2,
+     "node": "br",
+     "op": "if:then"
+    },
+    {
+     "cap": "point_region",
+     "label": 0,
+     "node": "tb",
+     "op": "cap"
+    }
+   ],
+   "baseline_end_to_end_mlp": {
+    "train_examples": 3000,
+    "hidden": [
+     64,
+     64
+    ],
+    "params": 5516,
+    "accuracy_seeds": [
+     0.9769999980926514,
+     0.9789999723434448,
+     0.9829999804496765
+    ],
+    "accuracy_mean": 0.9796666502952576
+   }
+  },
+  "path_ABAC": {
+   "variants": {
+    "main/intent": {
+     "accuracy": 0.993,
+     "needs_help": 0,
+     "errors": 0,
+     "node_executions_p50": 4,
+     "capability_calls_per_task": {
+      "argmax_position": 1,
+      "compare_numbers": 2,
+      "point_region": 1
+     },
+     "latency_us_p50": {
+      "total": 75,
+      "modules": 34,
+      "overhead": 42
+     },
+     "parallel_levels_example": [
+      [
+       "A1",
+       "B",
+       "A2",
+       "C"
+      ]
+     ],
+     "peak_rss_kb": 18764
+    },
+    "main/id": {
+     "accuracy": 0.993,
+     "needs_help": 0,
+     "errors": 0,
+     "node_executions_p50": 4,
+     "capability_calls_per_task": {
+      "argmax_position": 1,
+      "compare_numbers": 2,
+      "point_region": 1
+     },
+     "latency_us_p50": {
+      "total": 50,
+      "modules": 30,
+      "overhead": 20
+     },
+     "parallel_levels_example": [
+      [
+       "A1",
+       "B",
+       "A2",
+       "C"
+      ]
+     ],
+     "peak_rss_kb": 18780
+    }
+   },
+   "path_order_ok": true,
+   "example_trace": [
+    {
+     "cap": "compare_numbers",
+     "label": 2,
+     "node": "A1",
+     "op": "cap"
+    },
+    {
+     "cap": "point_region",
+     "label": 1,
+     "node": "B",
+     "op": "cap"
+    },
+    {
+     "cap": "compare_numbers",
+     "label": 0,
+     "node": "A2",
+     "op": "cap"
+    },
+    {
+     "cap": "argmax_position",
+     "label": 2,
+     "node": "C",
+     "op": "cap"
+    }
+   ],
+   "baseline_end_to_end_mlp": {
+    "train_examples": 3000,
+    "hidden": [
+     64,
+     64
+    ],
+    "params": 9544,
+    "accuracy_seeds": [
+     0.8539999723434448,
+     0.8679999709129333,
+     0.8650000095367432
+    ],
+    "accuracy_mean": 0.8623333175977071
+   }
+  }
+ },
+ "latency_modular_vs_monolithic": {
+  "count_inside": {
+   "monolithic_inference_us_p50": 9,
+   "modular_plan_total_us_p50": 78,
+   "latency_ratio_modular_over_monolithic": 8.666666666666666
+  },
+  "mixed_C_select_B_A": {
+   "monolithic_inference_us_p50": 7,
+   "modular_plan_total_us_p50": 66,
+   "latency_ratio_modular_over_monolithic": 9.428571428571429
+  }
+ },
+ "expected_accuracy_if_errors_independent": {
+  "count_inside": 0.9683818927901265,
+  "mixed_C_select_B_A": 0.9800959598579411,
+  "path_ABAC": 0.9800959598579411,
+  "branch": "see note: depends on branch taken",
+  "sort4": "a**5 (network), a**9 (bubble) upper-bound estimate: 1.000 / 1.000"
+ },
+ "loop_safety": {
+  "repeat_1e6_rejected_at_validation": true,
+  "nested_1000x1000_aborted_by_step_budget": true
+ }
+}
