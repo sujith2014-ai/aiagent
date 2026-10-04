@@ -46,7 +46,7 @@ def test_teacher_identifies_by_noun_or_noun_synonym_and_follows_the_current_worl
     before = ask("check the boiler alarm", known=["boiler_alarm"], failure="drift")["spec"]["label_expr"]
     assert ask("check the boiler alarm", known=["boiler_alarm"])["action"] == "reroute"
     w.drift("boiler_alarm"); after = ask("check the boiler alarm", known=["boiler_alarm"], failure="drift: feedback accuracy dropped")["spec"]["label_expr"]
-    assert before != after and t.calls == 6 and t.bytes_in > 0 and t.bytes_out > 0
+    assert before != after and t.calls == 7 and t.bytes_in > 0 and t.bytes_out > 0
 
 
 def test_drift_monitor_needs_enough_evidence_and_resets():

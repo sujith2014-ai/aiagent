@@ -128,3 +128,10 @@ Status: accepted. Skills are instructions; plugins execute inside OpenClaw's pro
 
 ## ADR-042: Tools are a PC/server feature
 Status: accepted. Tools are Python and run through the sandbox on PC/server; Android keeps neural capabilities only (no Python on the device, ADR-001). A phone can request a tool from the PC/server through the hybrid path; not built.
+
+
+## ADR-043: Router aliases skip frame words
+Status: accepted (F46). `router_update` removes words that already occur in intents served by other capabilities before aliasing, and refuses the update if nothing discriminative is left. `Escalator.filter_frame_words` (default on) can be switched off for experiments.
+
+## ADR-044: Applications escalate UNCERTAIN routes; consolidation never replaces drift monitoring
+Status: accepted for the benchmark and recommended for deployments (F47, F48, F50). The core is unchanged (it still returns ANSWER/UNCERTAIN); the escalation wrapper treats UNCERTAIN as NEEDS_HELP. A negative cache for refusals and rejected builds is available (`CachingEscalator`) and recommended. Drift detection by passive feedback is NOT considered solved (F48).

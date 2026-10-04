@@ -15,4 +15,5 @@
 | 11 Hybrid local/server execution, signed capability delivery, offline mode | done on loopback (no real network, no TLS); delivery attacks defended 6/6; single signing key for catalog and packages is a stated weakness | benchmarks/reports/phase11.*, tests/test_phase11.py, apps/server, apps/hybrid |
 | 12 On-device learning | done on PC (Rust trainer, device-key signing, adapt/alias gates, server endorsement, JNI/Kotlin bindings tested on the JVM); accuracy at parity with server training, adaptation gated and sometimes refused (F36-F39); **phone battery/thermal/NPU PENDING (R4); Android Keystore not implemented** | benchmarks/reports/phase12.*, tests/test_phase12.py |
 | 13 OpenClaw tools/skills, controlled tool growth | done locally: gates, sandbox, operator-bound approval, signed install, skill export validated against real OpenClaw; **generator is scripted (live model PENDING, R5)**; CPython sandbox is research-grade (F41) | benchmarks/reports/phase13.*, tests/test_phase13.py |
-| 14-15 | not started | |
+| 14 Long-running continual-learning benchmark, teacher dependence, growth/consolidation | done with teacher simulator; found and fixed the router-alias bug (F46); drift detection by feedback is a documented negative result (F48); **live teacher PENDING (R1)** | benchmarks/reports/phase14.*, tests/test_phase14.py |
+| 15 | not started | |
