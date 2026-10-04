@@ -19,6 +19,12 @@ pub struct Manifest {
     pub tests: TestsSpec,
     pub routing_file: String,
     pub created: String,
+    /// Optional (additive to cap/1): training-input statistics for novelty detection.
+    #[serde(default)]
+    pub input_stats: Option<InputStats>,
+    /// Optional (additive to cap/1): confidence calibration fitted on validation data.
+    #[serde(default)]
+    pub calibration: Option<Calibration>,
     pub signer: Signer,
     /// relative path -> sha256 hex, for every file except manifest.json/signature.json
     pub contents: BTreeMap<String, String>,
@@ -95,4 +101,18 @@ pub struct RoutingHints {
 pub struct TestCase {
     pub input: Vec<f32>,
     pub expected: usize,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct InputStats {
+    pub min: Vec<f32>,
+    pub max: Vec<f32>,
+    pub mean: Vec<f32>,
+    pub std: Vec<f32>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct Calibration {
+    pub method: String, // "temperature"
+    pub temperature: f32,
 }

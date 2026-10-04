@@ -4,6 +4,8 @@ LearningPackage. The student's modules never see the generator code, only exampl
 from __future__ import annotations
 import random, time
 from typing import Callable
+import json
+from dataclasses import asdict
 from integrations.teacher.provider import TeacherProvider, HelpRequest, TeacherCannotHelp
 from training.learning_package.schema import LearningPackage
 
@@ -119,3 +121,25 @@ class TeacherSimulator(TeacherProvider):
             provenance={"source": "teacher-simulator", "teacher": self.name, "created": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
                         "verified": True, "verification": "synthetic ground-truth generator", "request_intent": req.task_intent},
         )
+
+
+    # ---- structured advice (what a real LLM teacher would return as JSON) ----
+    MEMORY_MARKERS = {"remember", "my", "where", "parked", "reminder"}
+    RESEARCH_MARKERS = {"weather", "latest", "news", "price", "today", "current", "forecast"}
+    TOOL_MARKERS = {"send", "email", "open", "download", "delete", "install", "browse", "search"}
+
+    def advise(self, req: HelpRequest) -> str:
+        toks = set(req.task_intent.lower().replace(",", " ").split())
+        try:
+            lp = self.respond(req)
+            return json.dumps({"action": "new_capability", "rationale": "teachable synthetic capability", "learning_package": asdict(lp)})
+        except TeacherCannotHelp:
+            pass
+        # tool and research requests are checked before the memory markers ("my" appears in many tool requests)
+        if toks & self.TOOL_MARKERS:
+            return json.dumps({"action": "request_tool", "rationale": "needs an external action", "tool": sorted(toks & self.TOOL_MARKERS)[0]})
+        if toks & self.RESEARCH_MARKERS:
+            return json.dumps({"action": "external_research", "rationale": "needs current external evidence", "research_query": req.task_intent})
+        if toks & self.MEMORY_MARKERS:
+            return json.dumps({"action": "use_memory", "rationale": "personal fact, not a skill", "memory_text": req.task_intent})
+        return json.dumps({"action": "cannot_help", "rationale": "simulator has no knowledge of this task"})

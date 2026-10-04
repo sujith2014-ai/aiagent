@@ -27,3 +27,12 @@ Status: accepted for Phases 1-3. Deterministic; scores registry metadata (intent
 
 ## ADR-009: tract-based "sandbox"
 Status: accepted with a stated limitation. "Sandbox load" in Phase 1 means: model parsed by a memory-safe pure-Rust backend after signature/hash/compat checks, with declared-vs-actual size verification and a probe inference. It is NOT OS-level isolation. See SECURITY.md.
+
+## ADR-010: Additive optional manifest fields stay within `cap/1`
+Status: accepted. `input_stats` (training input min/max/mean/std) and `calibration` (temperature) were added as optional fields: old packages still load (tested by the earlier acceptance tests, which build packages without them); runtimes ignoring them still work. Because they are covered by the manifest signature they cannot be stripped or altered in transit. A change that older runtimes cannot ignore would require `cap/2`.
+
+## ADR-011: Unknown handling policy
+Status: accepted. Out-of-domain input (outside training range + 10% margin on any feature) returns NEEDS_HELP(OUT_OF_DISTRIBUTION); low calibrated confidence, ambiguous routing, or poor history downgrade to UNCERTAIN (answer returned but flagged); no match returns NEEDS_HELP. Uncertain answers do not trigger the teacher automatically. Signals are individually switchable (`--detect keyword|novelty|confidence|calibrated|full`) so they can be ablated.
+
+## ADR-012: Teacher output is untrusted text
+Status: accepted. `TeacherProvider.advise` returns raw JSON text; `parse_response` validates it strictly (known action, required fields, referenced capabilities must be installed); LearningPackages are validated again before any training. One teacher call per task maximum; offline requests are queued; research/tool actions are reported as NEEDS_EXTERNAL until OpenClaw exists.

@@ -1,5 +1,6 @@
 //! Persistent capability registry. Routing never switches on capability names;
 //! it scores records by their declared metadata (see `router`).
+use crate::capability::{Calibration, InputStats};
 use anyhow::Result;
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
@@ -44,6 +45,10 @@ pub struct CapabilityRecord {
     pub dependencies: Vec<String>,
     pub provenance: serde_json::Value,
     pub stats: Stats,
+    #[serde(default)]
+    pub input_stats: Option<InputStats>,
+    #[serde(default)]
+    pub calibration: Option<Calibration>,
 }
 
 impl CapabilityRecord {
@@ -95,6 +100,8 @@ impl Registry {
                 existing.device_caps = rec.device_caps;
                 existing.dependencies = rec.dependencies;
                 existing.provenance = rec.provenance;
+                existing.input_stats = rec.input_stats;
+                existing.calibration = rec.calibration;
                 existing.stats.last_trained = now_secs();
             }
             None => {

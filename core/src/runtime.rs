@@ -35,11 +35,51 @@ pub enum Outcome {
     #[serde(rename = "ANSWER")]
     Answer {
         status: Status, capability_id: String, version: String,
-        label: String, label_index: usize, probs: Vec<f32>, confidence: f32,
-        route_score: f64, latency_us: u64, task_id: String,
+        label: String, label_index: usize, probs: Vec<f32>, confidence: f32, raw_confidence: f32,
+        route_score: f64, novelty: Option<Novelty>, flags: Vec<&'static str>, latency_us: u64, task_id: String,
     },
     #[serde(rename = "NEEDS_HELP")]
-    NeedsHelp { reason: String, task_id: String },
+    NeedsHelp { reason_code: &'static str, reason: String, task_id: String },
+}
+
+/// Which unknown/novelty signals are active (ablatable in experiments).
+#[derive(Clone, Debug, Serialize)]
+pub struct Detection {
+    pub use_novelty: bool,
+    pub use_calibration: bool,
+    pub use_confidence: bool,
+    pub use_history: bool,
+    pub conf_threshold: f32,
+}
+
+impl Detection {
+    pub fn by_name(n: &str) -> Option<Self> {
+        let (nov, cal, conf, hist) = match n {
+            "keyword" => (false, false, false, false),
+            "novelty" => (true, false, false, false),
+            "confidence" => (true, false, true, false),   // raw (uncalibrated) softmax confidence
+            "calibrated" => (true, true, true, false),
+            "full" => (true, true, true, true),
+            _ => return None,
+        };
+        Some(Self { use_novelty: nov, use_calibration: cal, use_confidence: conf, use_history: hist, conf_threshold: 0.7 })
+    }
+}
+
+#[derive(Serialize, Debug, Clone)]
+pub struct Novelty { pub out_of_range_frac: f32, pub max_z: f32 }
+
+fn novelty_of(rec: &CapabilityRecord, x: &[f32]) -> Option<Novelty> {
+    let st = rec.input_stats.as_ref()?;
+    if st.min.len() != x.len() { return None; }
+    let mut oor = 0usize;
+    let mut max_z = 0f32;
+    for i in 0..x.len() {
+        let range = (st.max[i] - st.min[i]).abs().max(1e-6);
+        if x[i] < st.min[i] - 0.1 * range || x[i] > st.max[i] + 0.1 * range { oor += 1; }
+        max_z = max_z.max((x[i] - st.mean[i]).abs() / st.std[i].max(1e-6));
+    }
+    Some(Novelty { out_of_range_frac: oor as f32 / x.len() as f32, max_z })
 }
 
 pub struct Runtime {
@@ -53,7 +93,7 @@ pub struct Runtime {
     lru: Vec<String>,
     trace: Trace,
     task_counter: u64,
-    pub conf_threshold: f32,
+    pub detect: Detection,
 }
 
 impl Runtime {
@@ -65,7 +105,7 @@ impl Runtime {
             backend: Box::new(OnnxBackend),
             router: Box::new(KeywordRouter::default()),
             loaded: HashMap::new(), lru: vec![],
-            trace: Trace::open(root), task_counter: 0, conf_threshold: 0.6,
+            trace: Trace::open(root), task_counter: 0, detect: Detection::by_name("full").unwrap(),
         })
     }
 
@@ -164,6 +204,7 @@ impl Runtime {
             description: hints.description, keywords: hints.keywords, input_dim: m.io.input.dim,
             labels: m.io.output.labels.clone(), device_caps: m.requires.device_caps.clone(),
             dependencies: m.dependencies.clone(), provenance: m.provenance.clone(), stats: Stats::default(),
+            input_stats: m.input_stats.clone(), calibration: m.calibration.clone(),
         };
         let ver = VersionRecord { version: m.version.clone(), package_id: m.package_id.clone(), store_file,
             params: m.resources.params, model_bytes: m.resources.model_bytes, test_accuracy: acc, activated_at: now_secs() };
@@ -212,8 +253,11 @@ impl Runtime {
         let task_id = format!("t{}-{}", now_secs(), self.task_counter);
         let decision = self.router.route(&self.registry, task);
         let out = match (&decision.status, &decision.chosen) {
-            (Status::Unknown, _) | (_, None) => Outcome::NeedsHelp {
-                reason: "no registered capability matches this task".into(), task_id: task_id.clone() },
+            (Status::Unknown, _) | (_, None) => {
+                let shape_any = decision.candidates.iter().any(|c| c.shape_ok);
+                Outcome::NeedsHelp { reason_code: if shape_any { "NO_MATCH" } else { "SHAPE_OR_EMPTY" },
+                    reason: "no registered capability matches this task".into(), task_id: task_id.clone() }
+            }
             (status, Some(cap)) => {
                 let cap = cap.clone();
                 self.ensure_loaded(&cap)?;
@@ -223,18 +267,36 @@ impl Runtime {
                 let logits = model.run(&task.input)?;
                 let latency_us = t0.elapsed().as_micros() as u64;
                 let ver = ver.clone();
-                let probs = softmax(&logits);
+                let raw_probs = softmax(&logits);
+                let rec = self.registry.get(&cap).unwrap();
+                let temp = if self.detect.use_calibration { rec.calibration.as_ref().map(|c| c.temperature).unwrap_or(1.0) } else { 1.0 };
+                let probs = if temp != 1.0 { softmax(&logits.iter().map(|l| l / temp).collect::<Vec<_>>()) } else { raw_probs.clone() };
                 let idx = argmax(&probs);
                 let confidence = probs[idx];
-                let rec = self.registry.get(&cap).unwrap();
+                let raw_confidence = raw_probs[argmax(&raw_probs)];
                 let label = rec.labels.get(idx).cloned().unwrap_or_else(|| idx.to_string());
                 let route_score = decision.candidates.iter().find(|c| c.capability_id == cap).map(|c| c.score).unwrap_or(0.0);
+                let novelty = novelty_of(rec, &task.input);
+                let mut flags: Vec<&'static str> = vec![];
                 let mut st = status.clone();
-                if confidence < self.conf_threshold { st = Status::Uncertain; }
+                if let (true, Some(n)) = (self.detect.use_novelty, &novelty) {
+                    if n.out_of_range_frac > 0.0 { flags.push("OUT_OF_DISTRIBUTION"); }
+                }
+                if self.detect.use_confidence && confidence < self.detect.conf_threshold { flags.push("LOW_CONFIDENCE"); st = Status::Uncertain; }
+                if self.detect.use_history {
+                    let (s_, f_) = (rec.stats.success, rec.stats.failure);
+                    if s_ + f_ >= 20 && (s_ as f64) / ((s_ + f_) as f64) < 0.5 { flags.push("POOR_HISTORY"); st = Status::Uncertain; }
+                }
+                if flags.contains(&"OUT_OF_DISTRIBUTION") {
+                    // out-of-domain input: refuse rather than extrapolate
+                    let o = Outcome::NeedsHelp { reason_code: "OUT_OF_DISTRIBUTION", reason: format!("input outside the learned domain of '{cap}'"), task_id: task_id.clone() };
+                    self.trace.append(&serde_json::json!({"event": "task", "task_id": task_id, "ts": now_secs(), "intent": task.intent, "routing": decision, "outcome": &o}))?;
+                    return Ok(o);
+                }
                 ws.uncertainty = Some(1.0 - confidence);
                 ws.history.push(Step { capability_id: cap.clone(), version: ver.clone(), output_label: label.clone(), probs: probs.clone(), latency_us });
                 self.registry.record_call(&cap, latency_us)?;
-                Outcome::Answer { status: st, capability_id: cap, version: ver, label, label_index: idx, probs, confidence, route_score, latency_us, task_id: task_id.clone() }
+                Outcome::Answer { status: st, capability_id: cap, version: ver, label, label_index: idx, probs, confidence, raw_confidence, route_score, novelty, flags, latency_us, task_id: task_id.clone() }
             }
         };
         self.trace.append(&serde_json::json!({

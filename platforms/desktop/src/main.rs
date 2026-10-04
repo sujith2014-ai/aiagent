@@ -24,6 +24,7 @@ fn main() -> Result<()> {
     let mut root = PathBuf::from("./runtime-state");
     let mut trust = PathBuf::from("./trust.json");
     let mut device = "PC_FULL".to_string();
+    let mut detect = "full".to_string();
     let mut rest = vec![];
     let mut i = 0;
     while i < args.len() {
@@ -31,12 +32,14 @@ fn main() -> Result<()> {
             "--root" => { root = args[i + 1].clone().into(); i += 2 }
             "--trust" => { trust = args[i + 1].clone().into(); i += 2 }
             "--device" => { device = args[i + 1].clone(); i += 2 }
+            "--detect" => { detect = args[i + 1].clone(); i += 2 }
             _ => { rest.push(args[i].clone()); i += 1 }
         }
     }
     let dev = DeviceProfile::by_name(&device).ok_or_else(|| anyhow!("unknown device profile {device}"))?;
     let trust_store = TrustStore::from_file(&trust)?;
     let mut rt = Runtime::open(&root, dev, trust_store)?;
+    rt.detect = aicore::runtime::Detection::by_name(&detect).ok_or_else(|| anyhow!("unknown --detect {detect}"))?;
     let cmd = rest.first().map(|s| s.as_str()).unwrap_or("help");
     match cmd {
         "import" => {
@@ -121,14 +124,14 @@ fn main() -> Result<()> {
                     input: c["input"].as_array().ok_or_else(|| anyhow!("input"))?.iter().map(|x| x.as_f64().unwrap() as f32).collect() };
                 let out = rt.solve(&task)?;
                 match &out {
-                    Outcome::Answer { capability_id, label_index, latency_us, probs, label, status, .. } => {
+                    Outcome::Answer { capability_id, label_index, latency_us, probs, label, status, confidence, raw_confidence, flags, .. } => {
                         lat.push(*latency_us);
                         let cap_ok = c.get("expected_capability").and_then(|v| v.as_str()).map(|e| e == capability_id);
                         let idx_ok = c.get("expected_index").and_then(|v| v.as_u64()).map(|e| e as usize == *label_index);
                         if let Some(ok) = idx_ok { scored += 1; if ok { correct += 1 }; rt.report_outcome(capability_id, ok)?; }
-                        results.push(json!({"capability": capability_id, "label": label, "status": status, "probs": probs, "latency_us": latency_us, "index_ok": idx_ok, "capability_ok": cap_ok}));
+                        results.push(json!({"capability": capability_id, "label": label, "label_index": label_index, "status": status, "confidence": confidence, "raw_confidence": raw_confidence, "flags": flags, "probs": probs, "latency_us": latency_us, "index_ok": idx_ok, "capability_ok": cap_ok}));
                     }
-                    Outcome::NeedsHelp { reason, .. } => { needs_help += 1; results.push(json!({"needs_help": true, "reason": reason})); }
+                    Outcome::NeedsHelp { reason, reason_code, .. } => { needs_help += 1; results.push(json!({"needs_help": true, "reason": reason, "reason_code": reason_code})); }
                 }
             }
             lat.sort();

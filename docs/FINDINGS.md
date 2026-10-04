@@ -15,3 +15,20 @@ Through the same ONNX backend a monolithic end-to-end MLP takes 7-9 us per task;
 
 ## F5 (Phase 4): scheduling
 Independent branches are identified (`parallel_levels`) but executed sequentially; no parallel speedup is claimed or measured.
+
+## F6 (Phase 5): what the detection signals do and do not catch
+Ablation on 1,500 labelled cases (benchmarks/reports/phase5.*):
+- **Input-novelty (training-range stats shipped in the package) removes out-of-domain fabrication**: in-scope intent with OOD inputs was answered KNOWN 100% of the time by the keyword router alone and 0% with the novelty signal.
+- **Keyword routing is the weak point.** Out-of-scope tasks that share words with a capability were answered KNOWN 6.7% (generic out-of-scope set) and **35% (adversarial keyword overlap set)**, e.g. "compare prices of two shops" routed to compare_numbers. None of the numeric signals can catch these because their inputs are in-distribution. Fixing this needs a better routing signal (learned router, evaluator prediction, or teacher verification), not more thresholds. Not solved.
+- **Paraphrase brittleness**: 25% of in-scope paraphrases had no keyword overlap and were sent to the teacher as unknown. In the task stream 2 of 12 related re-encounters re-triggered the teacher (and the simulator could not help), so teacher dependency on related tasks was 17%, not 0%.
+- **Calibration**: temperature scaling reduced held-out ECE for all three capabilities (e.g. compare_numbers 0.058 -> 0.006), but two fits landed on the lower grid edge (T=0.05): these models are accuracy-saturated and early-stopped on accuracy, so their raw logits are under-confident. At a fixed 0.7 threshold, calibrated confidence flagged fewer boundary cases (5%) than raw confidence (15%), giving 4.9% vs 2.4% error among accepted answers at 94.7% vs 85% coverage. These are different operating points, not a clear win; a risk-coverage curve was not computed.
+- Confidence gating helps only inside the learned domain (boundary points); it did nothing for unknown tasks.
+
+## F7 (Phase 5): escalation-loop behaviour
+Worked as designed: first encounters 3/3 resolved via teacher -> LearningPackage -> new module -> retry; related re-encounters mostly local; hostile or malformed teacher output (non-JSON, unknown action, bad package, reroute to nonexistent capability) activated nothing (4/4); offline unknown tasks were queued without contacting the teacher while known capabilities kept working; research/tool requests are reported as NEEDS_EXTERNAL (OpenClaw does not exist yet) instead of being faked. A bug found in my teacher simulator during the run ("send email to my colleague" classified as a memory update because of the word "my") was fixed; it also shows that nothing downstream validates the teacher's *choice of action* beyond schema checks.
+
+## F8 (Phase 5): information classification is not solved
+The rule baseline scores 20/20 on the set written alongside it (meaningless) and 5/10 on a harder set ("The sort function in this library is stable" -> CAPABILITY, "Improve at spotting fraudulent invoices" -> KNOWLEDGE, ...). It is only a placeholder gate; the schema still blocks neural training for MEMORY/KNOWLEDGE labelled packages, but a wrong label would bypass it.
+
+## F9 (Phase 5): privacy filter limits
+Regex-based redaction (emails, key=value secrets, token-like strings, paths, long numbers) plus whitelisted request fields; raw input values are never sent. Unknown secret formats or free-text personal data in an intent would pass through. The model never sees credentials only if they are not typed into the intent.
