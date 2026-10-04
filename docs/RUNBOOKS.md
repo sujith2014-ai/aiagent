@@ -36,3 +36,11 @@ Blocked here by: no Android device, no NDK. Everything below the physical layer 
 4. NPU/GPU: not used. The trainer is CPU-only and inference is the mlp-lite CPU backend; NNAPI/LiteRT would need a separate backend (not built). Do not claim NPU results.
 5. Keystore: wrap the 32-byte seed with an Android Keystore AES key in the Kotlin shell before `setDeviceKey` (not implemented).
 6. Compare against F36 (PC, one pinned core) and record the phone numbers and device model in docs/FINDINGS.md.
+
+
+## R5. Live tool generation and an OpenClaw agent turn (PENDING)
+Blocked here by: no model credentials or egress for a generator, no OpenClaw model provider. Validated: gates, sandbox, approval, installation, skill export and loading by the real OpenClaw 2026.6.35.
+1. Implement `ToolGenerator.generate` (integrations/toolgrowth/generator.py) over a `TeacherProvider`: send only the `ToolRequest` (description, visible examples, the allowed-module list and the `run(inp)` contract) and, on retries, `Report.feedback()`. Never send the hidden spec cases, credentials or registry contents. Redact as for the Teacher (R1).
+2. Run `scripts/run_phase13.py` with that generator in place of `ScriptedGenerator` for the ten tasks, 5 repeats; record per-task attempts, the stage that rejected each attempt, how often the model's code needs a module outside the allowlist, and the operator's time to review. Report rejected-by-static rates honestly (F42 predicts many).
+3. OpenClaw: configure a model provider in the OpenClaw profile (not in this repo), install the exported skill (`openclaw skills install <dir>`), run `openclaw agent --message "..."`, and check from the audit log that the agent called `scripts/aitool.py` and nothing else, that a denied or refused call was not retried around the host, and that it never tried to install or approve a tool.
+4. Before any production use replace the CPython sandbox with an OS-level one (seccomp/gVisor/WASM) and re-run the attack matrix.

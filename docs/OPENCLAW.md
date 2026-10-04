@@ -22,5 +22,11 @@ Escalator -> ActionBroker -> policy (Rust, deterministic) -> OpenClawActionProvi
 | Search/fetch **success** parsing | source-derived envelope, defensive inner parsing; **not validated live** |
 | Live web research | **PENDING** (egress proxy returns 403 for the search provider; no provider credentials) |
 | `infer model run` as a teacher channel | implemented, **not validated** (needs model auth) |
-| `openclaw agent`, gateway, channels, skills/plugins | not used (plugins/skills are Phase 13) |
+| `openclaw agent`, gateway, channels | not used |
+| Skills (Phase 13) | approved tools exported as `SKILL.md`; real 2026.6.35 installs them and lists them eligible and model-visible; **agent turn using one PENDING (R5)** |
+| Plugins | deliberately not used (ADR-041) |
 Runbook: docs/RUNBOOKS.md R3.
+
+
+## Tool growth and OpenClaw (Phase 13)
+OpenClaw skills are markdown files (`name`, `description`, optional single-line `metadata` JSON for gating) that teach the agent how to use tools; `openclaw skills install ./dir`, `list --json`, `info` and `check` work offline. Our integration exports an approved tool as a skill that tells the agent to run `scripts/aitool.py --root <registry> run <tool> --input <json>` and nothing else; that host enforces policy, signature/hash verification and the sandbox, so the skill grants no extra power. Skills are preferred over plugins because a plugin runs inside OpenClaw with its own permissions. See FINDINGS F40-F44, ADR-038..042 and docs/RUNBOOKS.md R5.

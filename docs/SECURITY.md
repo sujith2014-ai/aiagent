@@ -33,3 +33,11 @@ Devices hold public keys only; the server signs. Catalog: signed, monotonic sequ
 - Learning refuses non-finite or malformed examples, too few examples, too few per class and models below `min_accuracy`; adaptation refuses regressions (ADR-035). All installs go through the normal activation sequence.
 - Server endorsement (ADR-036) verifies signer, hashes, bundled tests and supplied examples; it does not prove the data are honest (F39).
 - Weaknesses: the device key is a 0600 file on PC and is not wrapped by the Android Keystore (PENDING, R4); a device that loses its key cannot use its learned models; training data never leave the device unless the operator sends them to `/endorse`.
+
+
+## Phase 13: tool growth
+- Generated code never installs itself: compile, static analysis, sandboxed run, tests, independent spec, properties, routing conflicts, then an operator approval bound to code/tests/keywords/permissions digests; the installer re-runs everything on the exact candidate (ADR-038, ADR-040).
+- The generator cannot grant itself permissions: v1 grants none, any requested permission is refused, code that needs undeclared permissions is rejected, and no Python object in the tool path can write an approval.
+- The install-record signing key lives in `apps/toolhost`, not under `integrations/` (acceptance guard).
+- Tampering with an installed tool's code or record makes every call a refusal (`TOOL_UNAVAILABLE`); policy limits runs per task; everything is audit-logged.
+- Weaknesses: the CPython sandbox is not a production boundary (F41); attacks and defences share an author; the static allowlist rejects 6 of 10 benign snippets (F42); approval is only as good as the operator's reading of the code; a malicious operator or compromised registry key defeats it; tools can burn CPU up to the wall/CPU limits; no live model has been tried (R5).

@@ -106,7 +106,11 @@ fn check_params(rule: &Rule, req: &Request) -> Result<(), String> {
         texts.push(url.query().unwrap_or("").into()); texts.push(url.path().into());
     }
     for (k, v) in &req.params {
-        if k != "query" && k != "url" { if let Some(s) = v.as_str() { texts.push(s.into()); } }
+        if k != "query" && k != "url" { if let Some(s) = v.as_str() {
+            // a value under a `*_sha256` key that is exactly 64 hex digits is a content digest, not a credential (tool approvals bind to code digests)
+            if k.ends_with("_sha256") && s.len() == 64 && s.chars().all(|c| c.is_ascii_hexdigit()) { continue; }
+            texts.push(s.into());
+        } }
     }
     for t in texts { if let Some(m) = contains_secret(&t, &rule.deny_patterns) { return Err(format!("secret-looking content ({m})")); } }
     Ok(())
@@ -187,6 +191,14 @@ mod tests {
         let p: Policy = serde_json::from_str(r#"{"version":1,"default":"deny","rules":[
           {"id":"a","action":"web.fetch","effect":"allow","domains":["good.com"]},{"id":"b","action":"web.fetch","effect":"allow"}]}"#).unwrap();
         assert_eq!(eff(&p, &req("web.fetch", "url", "https://other.com/")), Effect::Deny);
+    }
+    #[test] fn content_digests_are_not_mistaken_for_credentials_but_other_long_tokens_still_are() {
+        let p: Policy = serde_json::from_str(r#"{"version":1,"default":"deny","rules":[{"id":"t","action":"tool.install","effect":"allow"}]}"#).unwrap();
+        let h = "a".repeat(64);
+        assert_eq!(eff(&p, &req("tool.install", "code_sha256", &h)), Effect::Allow);
+        assert_eq!(eff(&p, &req("tool.install", "code_sha256", &"a".repeat(63))), Effect::Deny);       // not a full digest
+        assert_eq!(eff(&p, &req("tool.install", "note", &h)), Effect::Deny);                          // same string under another key
+        assert_eq!(eff(&p, &req("tool.install", "code_sha256", &"g".repeat(64))), Effect::Deny);       // not hex
     }
     #[test] fn unknown_policy_version_denies_everything() {
         let mut p = pol(); p.version = 2;

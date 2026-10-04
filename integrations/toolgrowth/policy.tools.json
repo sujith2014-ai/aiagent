@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "default": "deny",
+  "rules": [
+    {"id": "tool-install-needs-operator", "action": "tool.install", "effect": "require_approval"},
+    {"id": "tool-run", "action": "tool.run", "effect": "allow", "max_per_task": 50},
+    {"id": "no-other-tool-actions", "action": "tool.*", "effect": "deny"},
+    {"id": "no-shell", "action": "shell.*", "effect": "deny"}
+  ]
+}

@@ -112,3 +112,19 @@ Status: accepted. `/endorse` accepts only packages signed by enrolled device key
 
 ## ADR-037: Trainer hygiene found by tests
 Status: accepted. Early stopping ties on validation accuracy are broken by validation loss; calibration temperature is restricted to T >= 1.
+
+
+## ADR-038: Generated tools are pure functions with no permissions in v1; fixed gate order
+Status: accepted. A tool is `def run(inp: dict) -> dict` in Python with an allow-listed set of pure modules; it is granted no files, network, processes or native code. A manifest that requests any permission is refused at the schema stage. Gate order: schema, compile, static analysis, sandboxed run, generator's bundled tests, independent spec cases (never shown to the generator), properties (repeatability within and across processes, object outputs), routing-keyword conflicts, operator approval. Feedback to the generator contains the failed stage and a generic message only.
+
+## ADR-039: Defence in depth, measured layer by layer
+Status: accepted. Static analysis (allowlist, forbidden names/attributes/strings, derived permissions) rejects early and explains; the sandbox is the boundary: restricted builtins and guarded imports, PEP 578 audit hook that kills on file/network/process/native access, rlimits, network namespace, scrubbed environment, empty cwd. Each layer can be switched off for experiments (F41). `__name__` is allowed because `type(x).__name__` is an everyday idiom. The sandbox is research-grade (CPython-level), not a production boundary.
+
+## ADR-040: Approval is operator-only, bound to digests, and the installer re-checks everything
+Status: accepted. The only approval writer is the Rust `aicli approve`; no Python object in the tool path can create one (tested by introspection). The approved request covers tool id, version, code digest, tests digest, keywords and permissions, so any edit voids it. `install` re-runs the whole pipeline on the exact candidate (no trusted earlier report) and requires an approval whose hash matches; versions must increase; install records are Ed25519-signed by the registry key and verified, with the code digest, on every call. The policy engine exempts an exact 64-hex value under a `*_sha256` key from the token heuristic (a digest is not a credential; a 64-hex string under any other key is still refused).
+
+## ADR-041: OpenClaw integration is through exported skills calling the guarded host, not plugins
+Status: accepted. Skills are instructions; plugins execute inside OpenClaw's process with its permissions, which would bypass our policy and sandbox. A skill grants nothing and ships no code. Agent turns remain unused until a model provider is configured (R5).
+
+## ADR-042: Tools are a PC/server feature
+Status: accepted. Tools are Python and run through the sandbox on PC/server; Android keeps neural capabilities only (no Python on the device, ADR-001). A phone can request a tool from the PC/server through the hybrid path; not built.

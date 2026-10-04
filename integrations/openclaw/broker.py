@@ -27,6 +27,10 @@ class ActionBroker:
             return {"effect": "deny", "rule_id": "policy-engine-error", "reason": p.stderr.strip()[:200]}   # fail closed
         return json.loads(p.stdout)
 
+    def audit(self, **kw):
+        """Append an audit line (public so other action surfaces, e.g. the tool host, share one log)."""
+        self._audit(**kw)
+
     def _audit(self, **kw):
         with open(self.audit_path, "a") as f:
             f.write(json.dumps({"ts": time.time(), **kw}) + "\n")
