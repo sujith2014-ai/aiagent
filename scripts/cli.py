@@ -10,9 +10,10 @@ AICLI = ROOT / "target" / "release" / "aicli"
 class Cli:
     def __init__(self, root: Path, trust: Path, device="PC_FULL", prefix=None):
         self.root, self.trust, self.device, self.prefix = Path(root), Path(trust), device, prefix or []
+        self.extra = []   # extra global flags, e.g. ["--device-key", file]
 
     def _run(self, *args, check=True):
-        cmd = self.prefix + [str(AICLI), "--root", str(self.root), "--trust", str(self.trust), "--device", self.device, *map(str, args)]
+        cmd = self.prefix + [str(AICLI), "--root", str(self.root), "--trust", str(self.trust), "--device", self.device, *self.extra, *map(str, args)]
         p = subprocess.run(cmd, capture_output=True, text=True)
         if check and p.returncode != 0:
             raise RuntimeError(f"aicli failed: {p.stderr}")
@@ -52,7 +53,7 @@ Cli.plan_validate = _plan_validate
 def _run_detect(self, mode, *args, capability=None, router=None, novelty=None, backend=None):
     """Run a command under a given detection mode and parse its JSON output."""
     import json as _json
-    cmd = self.prefix + [str(AICLI), "--root", str(self.root), "--trust", str(self.trust), "--device", self.device, "--detect", mode, *(["--capability", capability, "--no-stats"] if capability else []), *(["--router", router] if router else []), *(["--novelty", novelty] if novelty else []), *(["--backend", backend] if backend else []), *map(str, args)]
+    cmd = self.prefix + [str(AICLI), "--root", str(self.root), "--trust", str(self.trust), "--device", self.device, *self.extra, "--detect", mode, *(["--capability", capability, "--no-stats"] if capability else []), *(["--router", router] if router else []), *(["--novelty", novelty] if novelty else []), *(["--backend", backend] if backend else []), *map(str, args)]
     p = subprocess.run(cmd, capture_output=True, text=True)
     if p.returncode != 0:
         raise RuntimeError(f"aicli failed: {p.stderr}")

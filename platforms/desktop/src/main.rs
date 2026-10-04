@@ -30,6 +30,7 @@ fn main() -> Result<()> {
     let mut no_stats = false;
     let mut novelty = "balanced".to_string();
     let mut backend = "auto".to_string();
+    let mut device_key: Option<String> = None;
     let mut rest = vec![];
     let mut i = 0;
     while i < args.len() {
@@ -43,6 +44,7 @@ fn main() -> Result<()> {
             "--no-stats" => { no_stats = true; i += 1 }
             "--novelty" => { novelty = args[i + 1].clone(); i += 2 }
             "--backend" => { backend = args[i + 1].clone(); i += 2 }
+            "--device-key" => { device_key = Some(args[i + 1].clone()); i += 2 }
             _ => { rest.push(args[i].clone()); i += 1 }
         }
     }
@@ -52,6 +54,10 @@ fn main() -> Result<()> {
     let mut rt = Runtime::open(&root, dev, trust_store)?;
     rt.detect = aicore::runtime::Detection::by_name(&detect).ok_or_else(|| anyhow!("unknown --detect {detect}"))?;
     rt.set_backend(&backend)?;
+    if let Some(f) = &device_key {
+        let k: serde_json::Value = serde_json::from_slice(&std::fs::read(f)?)?;
+        rt.set_device_signer(aicore::pack::DeviceSigner::from_seed_hex(k["key_id"].as_str().ok_or_else(|| anyhow!("key_id"))?, k["seed_hex"].as_str().ok_or_else(|| anyhow!("seed_hex"))?)?)?;
+    }
     rt.record_stats = !no_stats;
     rt.detect.novelty_rule = aicore::runtime::NoveltyRule::by_name(&novelty).ok_or_else(|| anyhow!("unknown --novelty {novelty} (strict|balanced)"))?;
     rt.force_capability = force;
@@ -62,6 +68,18 @@ fn main() -> Result<()> {
             let mut reports = vec![];
             for f in &rest[1..] { reports.push(serde_json::to_value(rt.import(&PathBuf::from(f)))?); }
             println!("{}", serde_json::to_string_pretty(&reports)?);
+        }
+        "learn" | "adapt" => {
+            let raw = std::fs::read(flag(&rest, "--spec").ok_or_else(|| anyhow!("--spec FILE required"))?)?;
+            let t0 = Instant::now();
+            let mut rep = if cmd == "learn" { serde_json::to_value(rt.learn(&serde_json::from_slice::<aicore::learn::LearnRequest>(&raw)?)?)? } else { serde_json::to_value(rt.adapt(&serde_json::from_slice::<aicore::learn::AdaptRequest>(&raw)?)?)? };
+            rep["wall_seconds"] = json!(t0.elapsed().as_secs_f64()); rep["peak_rss_kb"] = json!(peak_rss_kb());
+            println!("{}", serde_json::to_string_pretty(&rep)?);
+        }
+        "alias" => {
+            let cap = rest.get(1).filter(|c| !c.starts_with("--")).cloned().ok_or_else(|| anyhow!("usage: alias <capability_id> --keywords a,b"))?;   // --capability is a global flag
+            let kws: Vec<String> = flag(&rest, "--keywords").ok_or_else(|| anyhow!("--keywords"))?.split(',').map(|k| k.trim().to_string()).filter(|k| !k.is_empty()).collect();
+            println!("{}", serde_json::to_string_pretty(&rt.alias(&cap, &kws)?)?);
         }
         "archive" => { let c = rest.get(1).ok_or_else(|| anyhow!("capability id"))?; rt.archive(c)?; println!("{}", json!({"archived": c})); }
         "restore" => { let c = rest.get(1).ok_or_else(|| anyhow!("capability id"))?; rt.restore(c)?; println!("{}", json!({"restored": c})); }
@@ -209,10 +227,22 @@ fn stateless(cmd: &str, rest: &[String]) -> Result<bool> {
             let text = flag(&rest, "--text").ok_or_else(|| anyhow!("--text"))?;
             println!("{}", serde_json::to_string(&aicore::runtime::Runtime::features(&text, dim))?);
         }
+        "keygen" => {
+            // --out FILE --key-id ID : writes {"key_id","seed_hex"} (mode 0600 where supported) and prints the public key
+            use std::io::Read;
+            let mut seed = [0u8; 32]; std::fs::File::open("/dev/urandom")?.read_exact(&mut seed)?;
+            let id = flag(&rest, "--key-id").unwrap_or_else(|| "device-key-1".into()); let out = flag(&rest, "--out").ok_or_else(|| anyhow!("--out"))?;
+            std::fs::write(&out, serde_json::to_vec(&json!({"key_id": id, "seed_hex": hex_encode(&seed)}))?)?;
+            #[cfg(unix)] { use std::os::unix::fs::PermissionsExt; std::fs::set_permissions(&out, std::fs::Permissions::from_mode(0o600))?; }
+            let signer = aicore::pack::DeviceSigner::from_seed_hex(&id, &hex_encode(&seed))?;
+            println!("{}", json!({"key_id": id, "public_b64": signer.public_b64()}));
+        }
         _ => return Ok(false),
     }
     Ok(true)
 }
+
+fn hex_encode(b: &[u8]) -> String { b.iter().map(|x| format!("{x:02x}")).collect() }
 
 fn flag(args: &[String], name: &str) -> Option<String> {
     args.iter().position(|a| a == name).and_then(|i| args.get(i + 1).cloned())

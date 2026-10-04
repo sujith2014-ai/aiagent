@@ -98,9 +98,9 @@ fn novelty_of(rec: &CapabilityRecord, x: &[f32], rule: &NoveltyRule) -> Option<N
 }
 
 pub struct Runtime {
-    root: PathBuf,
+    pub(crate) root: PathBuf,
     pub device: DeviceProfile,
-    trust: TrustStore,
+    pub(crate) trust: TrustStore,
     pub registry: Registry,
     backend: Box<dyn Backend>,
     router: Box<dyn Router + Send>,
@@ -111,6 +111,8 @@ pub struct Runtime {
     pub detect: Detection,
     /// When set, the router is bypassed and this capability handles every task (used for verification).
     pub force_capability: Option<String>,
+    /// Local signing identity for on-device learning (see `learn`).
+    pub(crate) signer: Option<crate::pack::DeviceSigner>,
     /// When false, usage statistics are not recorded (admin probes / verification must not look like real usage).
     pub record_stats: bool,
 }
@@ -124,7 +126,7 @@ impl Runtime {
             backend: default_backend("auto")?,
             router: Box::new(KeywordRouter::default()),
             loaded: HashMap::new(), lru: vec![],
-            trace: Trace::open(root), task_counter: 0, detect: Detection::by_name("full").unwrap(), force_capability: None, record_stats: true,
+            trace: Trace::open(root), task_counter: 0, detect: Detection::by_name("full").unwrap(), force_capability: None, signer: None, record_stats: true,
         })
     }
 

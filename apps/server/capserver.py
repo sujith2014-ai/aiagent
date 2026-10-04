@@ -61,6 +61,50 @@ class CapServer:
         self._bump()
         return rep
 
+    # ---- endorsement of device-learned packages ----------------------------------------------------------------------
+    def enroll_device(self, key_id: str, public_b64: str):
+        """Operator action (no HTTP endpoint): trust this device key *for endorsement only*."""
+        f = self.d / "devices.json"; cur = json.loads(f.read_text()) if f.exists() else {}
+        cur[key_id] = public_b64; f.write_text(json.dumps(cur))
+
+    def endorse(self, package: bytes, examples: dict, min_acc: float = 0.9) -> dict:
+        """Verify a device-signed package with the core (device trust roots only), evaluate it on the supplied examples, and, if it passes, re-sign it
+        with the server key so other devices (which trust the server, not this device) can install it. Endorsement certifies integrity and
+        consistency with the examples; it does not prove that the examples' labels are true."""
+        import tempfile, zipfile, io
+        devs = self.d / "devices.json"
+        if not devs.exists() or not json.loads(devs.read_text()):
+            return {"endorsed": False, "reason": "no devices are enrolled"}
+        with self.lock, tempfile.TemporaryDirectory() as td:
+            td = Path(td); (td / "in.cap").write_bytes(package); (td / "trust.json").write_text(devs.read_text())
+            sandbox = Cli(td / "rt", td / "trust.json", "PC_FULL")
+            rep = sandbox.import_caps(str(td / "in.cap"))[0]
+            if not rep["activated"]:
+                return {"endorsed": False, "reason": f"core rejected the package at step '{rep['failed_step']}'", "steps": [s["step"] + (":ok" if s["ok"] else ":FAILED") for s in rep["steps"]]}
+            cap, ver = rep["capability_id"], rep["version"]
+            xs, ys = examples["x"], examples["y"]
+            cases = td / "cases.jsonl"; cases.write_text("\n".join(json.dumps({"intent": "x", "input": x, "expected_index": int(y)}) for x, y in zip(xs, ys)) + "\n")
+            summ = sandbox._run_detect("keyword", "batch", "--cases", str(cases), capability=cap)["summary"]
+            acc = summ["accuracy"]
+            if not (acc >= min_acc):
+                return {"endorsed": False, "reason": f"accuracy {acc:.3f} on the supplied examples < {min_acc}", "accuracy": acc}
+            z = zipfile.ZipFile(io.BytesIO(package)); m = json.loads(z.read("manifest.json"))
+            minor_patch = lambda v: tuple(map(int, v.split(".")))
+            for p in self.packages.values():
+                if p["capability_id"] == cap and minor_patch(p["version"]) >= minor_patch(ver):
+                    return {"endorsed": False, "reason": f"server already has {cap} {p['version']}; a device-learned version must be newer than {p['version']}"}
+            from packages.capbuild import build_cap
+            tests = [(json.loads(l)["input"], json.loads(l)["expected"]) for l in z.read("tests/cases.jsonl").decode().splitlines() if l.strip()]
+            hints = json.loads(z.read("routing/hints.json"))
+            prov = {**m.get("provenance", {}), "endorsed_by": self.signer, "device_signer": m["signer"]["key_id"], "device_package_id": m["package_id"],
+                    "endorsement_evaluation": {"examples": len(xs), "accuracy": acc, "min_acc": min_acc, "note": "integrity and consistency with the examples; label truth not verified"}}
+            out = self.d / "build" / f"{cap}-{ver}-endorsed.cap"; out.parent.mkdir(exist_ok=True)
+            build_cap(out, capability_id=cap, version=ver, model_bytes=z.read("model/model.onnx"), params=m["resources"]["params"], input_dim=m["io"]["input"]["dim"], labels=m["io"]["output"]["labels"],
+                      tests=tests, keywords=hints["keywords"], description=hints["description"], signer_id=self.signer, signer_key=self.key, provenance=prov, min_accuracy=m["tests"]["min_accuracy"],
+                      device_caps=m["requires"]["device_caps"], dependencies=m["dependencies"], input_stats=m.get("input_stats"), calibration=m.get("calibration"))
+            r = self.register_package(out)
+            return {"endorsed": r["activated"], "package_id": r["package_id"], "capability_id": cap, "version": ver, "accuracy": acc, "reason": None if r["activated"] else f"server import failed at {r.get('failed_step')}"}
+
     def _bump(self):
         self.state["sequence"] += 1; self.state_file.write_text(json.dumps(self.state))
 
@@ -127,7 +171,7 @@ def make_handler(app: CapServer, token: str, port: int):
                 self._send(404, {"error": "not found"})
         def do_POST(self):
             if not self._guard(): return
-            if self.path not in ("/train", "/solve"): self._send(404, {"error": "not found"}); return
+            if self.path not in ("/train", "/solve", "/endorse"): self._send(404, {"error": "not found"}); return
             try: n = int(self.headers.get("Content-Length") or 0)
             except ValueError: self._send(400, {"error": "bad content-length"}); return
             if n <= 0 or n > MAX_BODY: self._send(413 if n > MAX_BODY else 400, {"error": "body size not acceptable"}); return
@@ -136,7 +180,12 @@ def make_handler(app: CapServer, token: str, port: int):
             except Exception:
                 self._send(400, {"error": "malformed JSON"}); return
             try:
-                if self.path == "/solve":
+                if self.path == "/endorse":
+                    pkg = base64.b64decode(body["package_b64"], validate=True)
+                    ex = body["examples"]
+                    if not (isinstance(ex.get("x"), list) and isinstance(ex.get("y"), list) and len(ex["x"]) == len(ex["y"]) and 0 < len(ex["x"]) <= MAX_ROWS): raise ValueError("invalid examples")
+                    self._send(200, app.endorse(pkg, ex, float(body.get("min_acc", 0.9))))
+                elif self.path == "/solve":
                     x = body["input"]
                     if not isinstance(body.get("intent"), str) or not isinstance(x, list) or not all(isinstance(v, (int, float)) for v in x) or len(x) > 4096: raise ValueError("intent (string) and input (numbers) required")
                     self._send(200, app.solve(body["intent"], [float(v) for v in x]))

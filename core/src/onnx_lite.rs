@@ -165,6 +165,25 @@ pub fn parse(bytes: &[u8], input_dim: usize) -> Result<MlpLiteModel> {
     Ok(MlpLiteModel { dim: input_dim, slots: len_of.len(), out_len: len_of[out_slot], out_slot, steps })
 }
 
+impl MlpLiteModel {
+    /// Recover plain-MLP structure ([Sub, Div]? then Gemm(transB)/Relu stack) so an installed capability can be fine-tuned on-device.
+    pub fn to_mlp(&self) -> Option<crate::train_lite::Mlp> {
+        use crate::train_lite::{Layer, Mlp};
+        let mut norm: Option<(Vec<f32>, Vec<f32>)> = None; let mut layers: Vec<Layer> = vec![]; let mut i = 0;
+        if let (Some(Step::Ew { op: '-', c: mean, .. }), Some(Step::Ew { op: '/', c: std, .. })) = (self.steps.get(0), self.steps.get(1)) {
+            if mean.len() != self.dim || std.len() != self.dim { return None; }
+            norm = Some((mean.clone(), std.clone())); i = 2;
+        }
+        while i < self.steps.len() {
+            match &self.steps[i] { Step::Gemm { w, m, k, trans_b: true, bias: Some(b), alpha, beta, .. } if *alpha == 1.0 && *beta == 1.0 => layers.push(Layer { w: w.clone(), b: b.clone(), inp: *k, out: *m }), _ => return None }
+            i += 1;
+            if i < self.steps.len() { if matches!(self.steps[i], Step::Relu { .. }) { i += 1; } else { return None; } }   // a Relu after every layer but the last
+        }
+        if layers.is_empty() || layers[0].inp != self.dim { return None; }
+        Some(Mlp { in_dim: self.dim, layers, norm })
+    }
+}
+
 impl Model for MlpLiteModel {
     fn run(&self, input: &[f32]) -> Result<Vec<f32>> {
         if input.len() != self.dim { return Err(anyhow!("input has {} values, model expects {}", input.len(), self.dim)); }

@@ -32,6 +32,9 @@ impl TrustStore {
         }
         Ok(Self { keys, revoked })
     }
+    /// Trust a key for this runtime only (e.g. the device's own signing key). Other runtimes still do not trust it.
+    pub fn add_key(&mut self, key_id: &str, public: &[u8; 32]) -> Result<()> { self.keys.insert(key_id.to_string(), VerifyingKey::from_bytes(public)?); Ok(()) }
+
     pub fn verify(&self, key_id: &str, msg: &[u8], sig_b64: &str) -> Result<()> {
         if self.revoked.contains(key_id) { return Err(anyhow!("signer key '{key_id}' has been revoked")); }
         let key = self.keys.get(key_id).ok_or_else(|| anyhow!("untrusted signer key_id '{key_id}'"))?;

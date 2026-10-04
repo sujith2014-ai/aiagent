@@ -6,13 +6,16 @@ pub mod backend;
 pub mod capability;
 pub mod device;
 pub mod graph;
+pub mod learn;
 pub mod onnx_lite;
+pub mod pack;
 pub mod package;
 pub mod policy;
 pub mod registry;
 pub mod router;
 pub mod runtime;
 pub mod trace;
+pub mod train_lite;
 pub mod trust;
 pub mod workspace;
 
