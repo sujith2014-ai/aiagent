@@ -27,6 +27,7 @@ class Escalator:
         self.routing_suite: list[tuple[str, list[float], str]] = []   # (intent, input, capability) served KNOWN: regression suite for routing changes
         self.router_updates = 0
         self.persist_router_updates = True
+        self.filter_frame_words = True            # Phase 14: do not alias words that also occur in intents served by other capabilities (F46)
 
     def _queue(self, entry):
         with open(self.workdir / "pending_help.jsonl", "a") as f:
@@ -171,6 +172,12 @@ class Escalator:
         if b["summary"]["accuracy"] < 0.95:
             return False, f"capability fails environment examples ({b['summary']['accuracy']:.3f})"
         words = [w for w in intent.lower().replace(",", " ").split() if w not in self._STOP and w.isalpha()]
+        if self.filter_frame_words:
+            # frame words ("check", "run", "test") shared with intents already served by OTHER capabilities are not discriminative: aliasing them makes later, unrelated intents route here
+            seen = [(i, c) for i, _, c in self.routing_suite] + [(r["intent"], r.get("capability")) for r in self.log if r.get("result") == "ANSWER" and r.get("capability")]
+            other = {w for i, c in seen if c != cap for w in i.lower().replace(",", " ").split()}
+            words = [w for w in words if w not in other]
+            if not words: return False, "no discriminative words left after removing frame words shared with other capabilities' intents"
         self.versions[cap] = self.versions.get(cap, 0)
         cur = next(c for c in self.cli.list() if c["capability_id"] == cap)["active_version"]
         ma, mi, pa = map(int, cur.split("."))

@@ -152,12 +152,24 @@ def test_router_update_that_hijacks_other_intents_is_rolled_back(world):
     T, svc, cli, esc = world("hijack", learn=2)
     esc.solve(*INTENTS["point_region"])    # ensure routing suite holds the region intent
     esc.teacher = Scripted({"action": "reroute", "reroute_intent": "compare numbers relation", "capability_id": "compare_numbers", "rationale": "x"})
+    esc.filter_frame_words = False        # exercise the regression gate itself; the frame-word filter would refuse this earlier (next test)
     before = {c["capability_id"]: c["active_version"] for c in cli.list()}
     long_intent = ("point inside circular region " + " ".join(f"filler{i}x" for i in range(18)))   # contains region words but dilutes coverage below the routing threshold
     r = esc.solve(long_intent, [0.2, 0.8], examples=env("compare_numbers"))
     assert r["router_update"]["accepted"] is False and "routing regression" in r["router_update"]["why"]
     assert {c["capability_id"]: c["active_version"] for c in cli.list()} == before
     assert cli.solve(*INTENTS["point_region"])["capability_id"] == "point_region"
+
+
+def test_frame_words_shared_with_other_capabilities_intents_are_never_aliased(world):
+    T, svc, cli, esc = world("frame", learn=2)
+    esc.solve(*INTENTS["point_region"])                                   # point_region's intent is now in the served-intent history
+    ok, why = esc._router_update("point inside circular region wavelength", "compare_numbers", env("compare_numbers"))
+    kw = {c["capability_id"]: set(c["keywords"]) for c in cli.list()}
+    assert not {"point", "inside", "circular", "region"} & kw["compare_numbers"]            # nothing borrowed from point_region's intent
+    assert ok is False or "wavelength" in why                                               # either rolled back by the routing gate or only the discriminative word was aliased
+    ok2, why2 = esc._router_update("point inside circular region", "compare_numbers", env("compare_numbers"))
+    assert ok2 is False and "no discriminative words" in why2                                # nothing left to alias: refused without touching the registry
 
 
 WIDE = {"capability_id": "compare_numbers", "description": "Compare two numbers (wide range)", "keywords": ["compare", "numbers"], "labels": ["LESS", "EQUAL", "GREATER"],
