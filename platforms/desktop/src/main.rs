@@ -42,6 +42,7 @@ fn main() -> Result<()> {
             _ => { rest.push(args[i].clone()); i += 1 }
         }
     }
+    if stateless(rest.first().map(|s| s.as_str()).unwrap_or(""), &rest)? { return Ok(()); }
     let dev = DeviceProfile::by_name(&device).ok_or_else(|| anyhow!("unknown device profile {device}"))?;
     let trust_store = TrustStore::from_file(&trust)?;
     let mut rt = Runtime::open(&root, dev, trust_store)?;
@@ -58,11 +59,6 @@ fn main() -> Result<()> {
         }
         "archive" => { let c = rest.get(1).ok_or_else(|| anyhow!("capability id"))?; rt.archive(c)?; println!("{}", json!({"archived": c})); }
         "restore" => { let c = rest.get(1).ok_or_else(|| anyhow!("capability id"))?; rt.restore(c)?; println!("{}", json!({"restored": c})); }
-        "features" => {
-            let dim: usize = flag(&rest, "--dim").and_then(|d| d.parse().ok()).unwrap_or(256);
-            let text = flag(&rest, "--text").ok_or_else(|| anyhow!("--text"))?;
-            println!("{}", serde_json::to_string(&aicore::runtime::Runtime::features(&text, dim))?);
-        }
         "list-all" => {
             let v: Vec<_> = rt.registry.all_including_hidden().map(|r| json!({"capability_id": r.capability_id, "role": r.role, "archived": r.archived,
                 "active_version": r.active_version, "params": r.active().params, "model_bytes": r.active().model_bytes, "calls": r.stats.calls, "last_used": r.stats.last_used,
@@ -174,6 +170,42 @@ fn main() -> Result<()> {
         _ => eprintln!("commands: import <cap...> | list | solve --intent S --input a,b | regression CAP | rollback CAP | reload-check CAP --intent S --input a,b | batch --cases FILE\nglobal: --root DIR --trust FILE --device PC_FULL|PC_CONSTRAINED"),
     }
     Ok(())
+}
+
+
+/// Commands that need no runtime state (no trust store, no registry): they must work with nothing but their arguments.
+fn stateless(cmd: &str, rest: &[String]) -> Result<bool> {
+    let rest = rest.to_vec();
+    match cmd {
+        "policy-check" => {
+            // --policy FILE --request JSON [--approvals FILE] ; prints the decision as JSON (exit 0 always; the effect is in the output)
+            let policy: aicore::policy::Policy = serde_json::from_slice(&std::fs::read(flag(&rest, "--policy").ok_or_else(|| anyhow!("--policy"))?)?)?;
+            let req: aicore::policy::Request = serde_json::from_str(&flag(&rest, "--request").ok_or_else(|| anyhow!("--request"))?)?;
+            let approvals: Vec<aicore::policy::Approval> = match flag(&rest, "--approvals") { Some(f) if std::path::Path::new(&f).exists() => serde_json::from_slice(&std::fs::read(f)?)?, _ => vec![] };
+            let now = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH)?.as_secs();
+            let mut d = serde_json::to_value(aicore::policy::evaluate(&policy, &req, &approvals, now))?;
+            d["request_hash"] = json!(aicore::policy::request_hash(&req));
+            println!("{}", d);
+        }
+        "approve" => {
+            // operator-only: --approvals FILE --request JSON --approver NAME --ttl SECONDS
+            let req: aicore::policy::Request = serde_json::from_str(&flag(&rest, "--request").ok_or_else(|| anyhow!("--request"))?)?;
+            let file = flag(&rest, "--approvals").ok_or_else(|| anyhow!("--approvals"))?;
+            let ttl: u64 = flag(&rest, "--ttl").and_then(|t| t.parse().ok()).unwrap_or(300);
+            let now = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH)?.as_secs();
+            let mut list: Vec<aicore::policy::Approval> = if std::path::Path::new(&file).exists() { serde_json::from_slice(&std::fs::read(&file)?)? } else { vec![] };
+            list.push(aicore::policy::Approval { request_hash: aicore::policy::request_hash(&req), approver: flag(&rest, "--approver").unwrap_or_else(|| "operator".into()), approved_at: now, expires_at: now + ttl });
+            std::fs::write(&file, serde_json::to_vec_pretty(&list)?)?;
+            println!("{}", json!({"approved": aicore::policy::request_hash(&req), "expires_at": now + ttl}));
+        }
+        "features" => {
+            let dim: usize = flag(&rest, "--dim").and_then(|d| d.parse().ok()).unwrap_or(256);
+            let text = flag(&rest, "--text").ok_or_else(|| anyhow!("--text"))?;
+            println!("{}", serde_json::to_string(&aicore::runtime::Runtime::features(&text, dim))?);
+        }
+        _ => return Ok(false),
+    }
+    Ok(true)
 }
 
 fn flag(args: &[String], name: &str) -> Option<String> {

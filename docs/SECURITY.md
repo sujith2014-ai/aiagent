@@ -14,3 +14,6 @@ Teacher requests carry only: redacted intent (<=200 chars), input dimension, ins
 
 ## Phase 6-7 additions
 Teacher rules are evaluated by a whitelist AST interpreter (no eval/exec; node and magnitude limits; 15 hostile expressions rejected in tests) and promoted only after environment verification. Learned routers are signed packages. Consolidation never deletes (archive is reversible), refuses to archive capabilities others depend on, and every compaction/merge is gated and rollback-able. Limits: a teacher rule wrong on a small region passes any tolerance-level gate (FINDINGS F10); routing-regression checks only cover intents seen so far (F11).
+
+## Phase 8: external actions
+Policy layer (Rust, default deny, hard guards, approvals bound to request hash, fail closed), action broker with audit log (parameters hashed, redacted previews, no raw secrets), OpenClaw adapter with isolated profile/HOME and minimal environment, evidence as untrusted data with provenance. Limits (FINDINGS F20): string-based host checks (no DNS/redirect resolution), logical-only approval separation inside one OS user, unsigned policy file, heuristic secret detection. Prompt-injection containment is tested with a scripted obedient teacher only, not a real LLM.

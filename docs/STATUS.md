@@ -9,4 +9,5 @@
 | 5 Unknown/novelty detection, NEEDS_HELP flow, TeacherProvider, simulator | done, with documented failures (FINDINGS F6-F9) | benchmarks/reports/phase5.*, tests/test_phase5.py |
 | 6 Real-teacher integration, selective learning, automated candidate evaluation | done locally; live teacher PENDING (R1) | benchmarks/reports/phase6.*, tests/test_phase6.py |
 | 7 Consolidation/pruning, learned routing, baseline comparison | done; small-LLM baseline PENDING (no weights/egress) | benchmarks/reports/phase7.*, tests/test_phase7.py |
-| 8-15 | not started | |
+| 8 OpenClaw integration, research/tool escalation, provenance, retry-after-learning | boundary + policy + adapter done and contract-validated against the real binary; **live research PENDING (R3)**; research results use a simulated provider/teacher | benchmarks/reports/phase8.*, tests/test_phase8.py, docs/OPENCLAW.md |
+| 9-15 | not started | |

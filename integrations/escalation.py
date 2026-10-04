@@ -10,17 +10,19 @@ from training.learning_package.spec import TaskSpec, InvalidSpec, spec_to_learni
 from training.safe_expr import UnsafeExpression
 from training.learning_package.schema import validate, InvalidLearningPackage
 from training.information import classify_information
+from integrations.openclaw.action import ActionDenied, NeedsApproval, ActionUnavailable
 
 
 class Escalator:
-    def __init__(self, cli, teacher: TeacherProvider, service, workdir: Path, online=True, max_teacher_calls_per_task=1):
-        self.cli, self.teacher, self.service = cli, teacher, service
+    def __init__(self, cli, teacher: TeacherProvider, service, workdir: Path, online=True, max_teacher_calls_per_task=1, broker=None):
+        self.cli, self.teacher, self.service, self.broker = cli, teacher, service, broker
         self.workdir = Path(workdir); self.workdir.mkdir(parents=True, exist_ok=True)
         self.online, self.max_calls = online, max_teacher_calls_per_task
         self.known: set[str] = {c["capability_id"] for c in cli.list()}
         self.memory: list[dict] = []
         self.log: list[dict] = []
         self.teacher_calls = 0
+        self.openclaw_calls = 0                  # successful external research actions
         self.versions: dict[str, int] = {}
         self.routing_suite: list[tuple[str, list[float], str]] = []   # (intent, input, capability) served KNOWN: regression suite for routing changes
         self.router_updates = 0
@@ -30,10 +32,25 @@ class Escalator:
         with open(self.workdir / "pending_help.jsonl", "a") as f:
             f.write(json.dumps(entry) + "\n")
 
+    def _ask(self, req, rec):
+        """One teacher call. Returns the validated response, or None after filling `rec` with the failure."""
+        self.teacher_calls += 1; rec["teacher_called"] = True; rec["teacher_calls"] = rec.get("teacher_calls", 0) + 1
+        if "teacher" not in rec["path"]:
+            rec["path"].append("teacher")
+        try:
+            return parse_response(self.teacher.advise(req), self.known)
+        except TeacherUnavailable as e:
+            self.teacher_calls -= 1; rec["teacher_calls"] -= 1; rec["teacher_called"] = rec["teacher_calls"] > 0
+            self._queue({"ts": time.time(), "request": json.loads(req.to_json()), "why": f"teacher unavailable: {e}"})
+            rec.update(result="QUEUED_OFFLINE", path=rec["path"] + ["queued"], reason=str(e))
+        except InvalidTeacherResponse as e:
+            rec.update(result="NEEDS_HELP", reason=f"teacher response rejected: {e}")
+        return None
+
     def solve(self, intent: str, x: list[float], examples: tuple | None = None) -> dict:
         """`examples`: optional (xs, ys) labelled examples supplied by the environment/user, used to verify teacher rules."""
         r = self.cli.solve(intent, x)
-        rec = {"intent": intent, "path": ["local"], "teacher_called": False}
+        rec = {"intent": intent, "path": ["local"], "teacher_called": False, "task_id": f"esc{len(self.log)}"}
         if r["result"] == "ANSWER":
             rec.update(result="ANSWER", status=r["status"], capability=r["capability_id"], label=r["label"], flags=r.get("flags", []))
             if r["status"] == "KNOWN" and len(self.routing_suite) < 200:
@@ -44,43 +61,72 @@ class Escalator:
         if not self.online:
             self._queue({"ts": time.time(), "request": json.loads(req.to_json())})
             rec.update(result="QUEUED_OFFLINE", path=["local", "queued"]); self.log.append(rec); return rec
-        self.teacher_calls += 1; rec["teacher_called"] = True; rec["path"].append("teacher")
+        resp = self._ask(req, rec)
+        if resp is not None and resp.action == "external_research":
+            resp = self._research(resp, req, intent, x, rec)
+        if resp is not None:
+            self._act(resp, intent, x, examples, rec)
+        self.log.append(rec)
+        return rec
+
+    # ---- external research through the broker (policy -> provider -> audit) --------------------------------
+    def _research(self, resp, req, intent, x, rec):
+        if self.broker is None:
+            rec.update(result="NEEDS_EXTERNAL", needs="external_research", detail=resp.research_query); return None
         try:
-            resp = parse_response(self.teacher.advise(req), self.known)
-        except TeacherUnavailable as e:
-            self.teacher_calls -= 1; rec["teacher_called"] = False
-            self._queue({"ts": time.time(), "request": json.loads(req.to_json()), "why": f"teacher unavailable: {e}"})
-            rec.update(result="QUEUED_OFFLINE", path=["local", "queued"], reason=str(e)); self.log.append(rec); return rec
-        except InvalidTeacherResponse as e:
-            rec.update(result="NEEDS_HELP", reason=f"teacher response rejected: {e}"); self.log.append(rec); return rec
+            evidence = self.broker.search(rec["task_id"], resp.research_query)
+        except ActionDenied as e:
+            rec.update(result="NEEDS_HELP", reason=f"research denied by policy: {e.decision['reason']}", research={"denied": e.decision}); return None
+        except NeedsApproval as e:
+            rec.update(result="NEEDS_APPROVAL", reason=str(e), research={"approval": e.decision}); return None
+        except ActionUnavailable as e:
+            self._queue({"ts": time.time(), "request": json.loads(req.to_json()), "why": f"research unavailable: {e.kind}", "query": resp.research_query})
+            rec.update(result="QUEUED_EXTERNAL", reason=f"external research unavailable ({e.kind}); request queued, nothing was researched", path=rec["path"] + ["queued"],
+                       research={"unavailable": e.kind}); return None
+        self.openclaw_calls += 1; rec["openclaw_called"] = True; rec["path"].append("openclaw")
+        rec["research"] = {"query": resp.research_query, "evidence": [{"id": e.id, "source": e.source, "sha256": e.sha256, "simulated": e.simulated} for e in evidence],
+                           "simulated": any(e.simulated for e in evidence)}
+        self._evidence = evidence
+        req2 = make_help_request(intent, len(x), list(self.known), req.attempted_route, req.failure, evidence=[e.public() for e in evidence])
+        resp2 = self._ask(req2, rec)
+        if resp2 is not None and resp2.action == "external_research":
+            rec.update(result="NEEDS_HELP", reason="teacher asked for a second research round; limit is one per task"); return None
+        return resp2
+
+    # ---- act on a validated teacher response ----------------------------------------------------------------
+    def _act(self, resp, intent, x, examples, rec):
         rec["teacher_action"] = resp.action
+        evidence = getattr(self, "_evidence", None) if rec.get("openclaw_called") else None
         if resp.action in ("new_capability", "new_capability_spec"):
             heldout = None
             if resp.action == "new_capability_spec":
                 if examples is None:
-                    rec.update(result="NEEDS_HELP", reason="teacher rule cannot be verified: environment examples required"); self.log.append(rec); return rec
+                    rec.update(result="NEEDS_HELP", reason="teacher rule cannot be verified: environment examples required"); return
                 try:
                     spec = TaskSpec.from_dict(resp.spec)
                     lp = spec_to_learning_package(spec, self.teacher.name)
                     used = set(map(tuple, lp.train_x)) | set(map(tuple, lp.validation_x))
                     heldout = sample_spec(spec, 400 if not all("grid" in d for d in spec.domain) else 80, 7, exclude=used, unique=True)
                 except (InvalidSpec, UnsafeExpression) as e:
-                    rec.update(result="NEEDS_HELP", reason=f"teacher spec rejected: {e}"); self.log.append(rec); return rec
+                    rec.update(result="NEEDS_HELP", reason=f"teacher spec rejected: {e}"); return
             else:
                 lp = resp.learning_package
+            if evidence:   # preserve provenance; internet content is never ground truth
+                lp.provenance["evidence"] = [{"id": e.id, "provider": e.provider, "source": e.source, "retrieved_at": e.retrieved_at, "sha256": e.sha256, "simulated": e.simulated} for e in evidence]
+                lp.provenance["unverified_internet_content"] = True
             if classify_information(lp.description) == "MEMORY" or lp.info_kind != "CAPABILITY":
-                rec.update(result="NEEDS_HELP", reason="teacher proposed neural training for non-capability information"); self.log.append(rec); return rec
+                rec.update(result="NEEDS_HELP", reason="teacher proposed neural training for non-capability information"); return
             try:
                 validate(lp, self.known)
             except InvalidLearningPackage as e:
-                rec.update(result="NEEDS_HELP", reason=f"learning package rejected: {e}"); self.log.append(rec); return rec
+                rec.update(result="NEEDS_HELP", reason=f"learning package rejected: {e}"); return
             ver = self.versions.get(lp.capability_id, 0) + 1
             built = self.service.build(lp, f"0.{ver}.0", self.known, heldout=heldout, verification=examples)
             if not built.promoted:
-                rec.update(result="NEEDS_HELP", reason=built.reason); self.log.append(rec); return rec
+                rec.update(result="NEEDS_HELP", reason=built.reason); return
             imp = self.cli.import_caps(str(built.cap_path))[0]
             if not imp["activated"]:
-                rec.update(result="NEEDS_HELP", reason=f"import failed at {imp['failed_step']}"); self.log.append(rec); return rec
+                rec.update(result="NEEDS_HELP", reason=f"import failed at {imp['failed_step']}"); return
             self.versions[lp.capability_id] = ver; self.known.add(lp.capability_id); rec["path"].append("learn")
             again = self.cli.solve(intent, x)
             if again["result"] == "ANSWER":
@@ -98,14 +144,19 @@ class Escalator:
                 rec["router_update"] = {"accepted": ok, "why": why}
                 if ok:
                     rec["path"].append("router_update")
-        elif resp.action in ("external_research", "request_tool"):
-            # OpenClaw is not integrated before Phase 8: report honestly, do not pretend research happened
-            rec.update(result="NEEDS_EXTERNAL", needs=resp.action, detail=resp.research_query or resp.tool)
+        elif resp.action == "request_tool":
+            if self.broker is None:
+                rec.update(result="NEEDS_EXTERNAL", needs="request_tool", detail=resp.tool); return
+            dec = self.broker.check(rec["task_id"], f"tool.{resp.tool}", {})
+            self.broker._audit(task=rec["task_id"], action=f"tool.{resp.tool}", decision=dec["effect"], rule=dec["rule_id"], reason=dec["reason"], result="not_executed")
+            if dec["effect"] == "deny":
+                rec.update(result="NEEDS_HELP", reason=f"tool '{resp.tool}' denied by policy: {dec['reason']}")
+            else:
+                rec.update(result="NEEDS_EXTERNAL", needs="request_tool", detail=resp.tool, reason="tool execution is not implemented yet (Phase 13)")
+        elif resp.action == "external_research":
+            rec.update(result="NEEDS_EXTERNAL", needs="external_research", detail=resp.research_query)
         else:
             rec.update(result="NEEDS_HELP", reason="teacher cannot help")
-        self.log.append(rec)
-        return rec
-
 
     _STOP = {"a", "an", "the", "of", "to", "and", "or", "is", "are", "two", "this", "that", "please", "for", "in", "on", "these", "those", "with", "from", "which", "what", "given", "me", "it", "my"}
 

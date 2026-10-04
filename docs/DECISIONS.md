@@ -54,3 +54,15 @@ Status: accepted. Evidence in FINDINGS F16: the learned router improves paraphra
 
 ## ADR-018: Consolidation gates
 Status: accepted. Merge: keeper must pass the duplicate's bundled tests, inherit its keywords, and all previously served routes must still resolve KNOWN to the same (or merged) capability with the duplicate archived; otherwise restore + rollback. Compaction (distillation/pruning): held-out accuracy within 1 point of the original, bundled tests pass, version kept for rollback. Admin/probe traffic never counts as usage. Duplicate detection compares only capabilities with equal input dimension and label set, on in-distribution probes.
+
+## ADR-019: OpenClaw is used through its narrow `infer` CLI, as a PC/server component
+Status: accepted. `openclaw infer web search|fetch` (and optionally `infer model run`) via an isolated subprocess (own profile and HOME, minimal environment, output size cap, timeout). No `openclaw agent` turns, no OpenClaw shell/browser/file/channel tools, no credentials or internal state shared. The ~389 MB Node package cannot run on Android; mobile devices delegate research to a PC/server.
+
+## ADR-020: Deterministic default-deny policy in the Rust core; operator-only approvals
+Status: accepted. Every external action is evaluated by `core/src/policy.rs` before any provider runs. First matching rule wins; a matched rule whose constraints fail denies (no fall-through). Hard guards: embedded URL credentials, non-http(s), loopback/private/link-local/metadata hosts (unless the operator sets `allow_private_hosts`), secret-looking text, per-task limits. Approvals are bound to the exact request hash and expire; they can only be created through the operator CLI command `approve`, which no AI-facing code references (tested). Engine errors fail closed. Every decision is audit-logged.
+
+## ADR-021: External evidence is untrusted data
+Status: accepted. Retrieved text is passed to the teacher as delimited data with an explicit instruction not to follow it; it is stored with hash and provenance; learning from it still requires environment verification (ADR-014); one research round per task; simulated evidence is flagged `simulated: true` end to end.
+
+## ADR-022: Pin the OpenClaw version used for validation
+Status: accepted. Version drift (npm latest vs tarball, Node requirements) is a known risk; contract tests run against a pinned install via `OPENCLAW_BIN`; the adapter parses results defensively and maps every failure to a typed `ActionUnavailable`.

@@ -90,7 +90,7 @@ def test_teacher_request_contains_minimum_context_and_no_secrets():
     s = rq.to_json()
     for leak in ["bob@example.com", "hunter2", "sk-abcdef1234567890", "/home/bob"]:
         assert leak not in s
-    assert set(json.loads(s)) == {"task_intent", "input_dim", "known_capabilities", "attempted_route", "failure", "available_tools"}
+    assert set(json.loads(s)) == {"task_intent", "input_dim", "known_capabilities", "attempted_route", "failure", "available_tools", "evidence"}
 
 
 def test_redact_truncates_and_masks_long_tokens():

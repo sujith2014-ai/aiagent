@@ -62,7 +62,7 @@ def test_openai_compatible_provider_end_to_end_over_http(world):
     assert seen[0]["headers"]["authorization"] == "Bearer sk-test-secret-value"
     body = seen[0]["body"]
     assert "sk-test-secret-value" not in json.dumps(body)
-    assert set(json.loads(body["messages"][-1]["content"])) == {"task_intent", "input_dim", "known_capabilities", "attempted_route", "failure", "available_tools"}
+    assert set(json.loads(body["messages"][-1]["content"])) == {"task_intent", "input_dim", "known_capabilities", "attempted_route", "failure", "available_tools", "evidence"}
 
 
 def test_anthropic_style_provider_end_to_end_over_http(world):

@@ -17,6 +17,7 @@ class HelpRequest:
     attempted_route: dict[str, Any] = field(default_factory=dict)
     failure: str = ""
     available_tools: list[str] = field(default_factory=list)
+    evidence: list[dict[str, Any]] = field(default_factory=list)   # untrusted external text: [{"id","source","excerpt"}]
 
     def to_json(self) -> str:
         import json
@@ -41,10 +42,11 @@ def redact(text: str, max_len: int = 200) -> str:
 
 
 def make_help_request(intent: str, input_dim: int, known: list[str], decision: dict | None = None, failure: str = "",
-                      tools: list[str] | None = None) -> HelpRequest:
+                      tools: list[str] | None = None, evidence: list[dict] | None = None) -> HelpRequest:
     d = decision or {}
+    ev = [{"id": e["id"], "source": redact(str(e["source"]), 200), "excerpt": redact(str(e["excerpt"]), 600)} for e in (evidence or [])]
     route = {"status": d.get("status") or d.get("reason_code"), "candidates": [c.get("capability_id") for c in d.get("candidates", [])][:3]}
-    return HelpRequest(redact(intent), int(input_dim), sorted(known), route, redact(failure, 120), list(tools or []))
+    return HelpRequest(redact(intent), int(input_dim), sorted(known), route, redact(failure, 120), list(tools or []), ev)
 
 
 class TeacherProvider(ABC):

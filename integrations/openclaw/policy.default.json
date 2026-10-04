@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "default": "deny",
+  "rules": [
+    {"id": "search-limited", "action": "web.search", "effect": "allow", "max_per_task": 1, "max_query_len": 120},
+    {"id": "fetch-allowlist", "action": "web.fetch", "effect": "allow", "domains": ["docs.example.org", "*.wikipedia.org"], "max_per_task": 2},
+    {"id": "files-need-approval", "action": "fs.read", "effect": "require_approval"},
+    {"id": "no-shell", "action": "shell.*", "effect": "deny"},
+    {"id": "no-tools", "action": "tool.*", "effect": "deny"}
+  ]
+}

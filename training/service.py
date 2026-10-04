@@ -97,7 +97,7 @@ class BuildService:
             description=lp.description, signer_id=self.signer_id, signer_key=self.key, device_caps=lp.device_caps,
             dependencies=lp.existing_dependencies, input_stats=input_stats(lp.train_x + lp.edge_cases_x),
             calibration={"method": "temperature", "temperature": T}, min_accuracy=PROMOTE_MIN_TEST_ACC - 0.05,
-            provenance={"learning_package": {k: lp.provenance.get(k) for k in ("source", "teacher", "created", "verified")},
+            provenance={"learning_package": {k: lp.provenance.get(k) for k in ("source", "teacher", "created", "verified", "evidence", "unverified_internet_content", "label_expr")},
                         "training": {k: tr[k] for k in ("epochs", "hidden", "seed", "train_seconds", "val_accuracy")},
                         "heldout_accuracy": test_acc, "strategy": lp.strategy,
                         "verification_accuracy": rep.get("verification_accuracy"), "verified_by_environment": verification is not None})

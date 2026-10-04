@@ -149,6 +149,9 @@ class TeacherSimulator(TeacherProvider):
 
     def advise(self, req: HelpRequest) -> str:
         toks = set(req.task_intent.lower().replace(",", " ").split())
+        research = self._research_flow(req)
+        if research is not None:
+            return research
         try:
             known_name = self._identify(req.task_intent, req.input_dim)
         except TeacherCannotHelp:
@@ -213,3 +216,30 @@ class TeacherSimulator(TeacherProvider):
         return {"capability_id": name, "description": t["description"], "keywords": t["keywords"], "labels": t["labels"], "input_dim": t["dim"],
                 "domain": self.SPEC_DOMAIN[name], "label_expr": expr, "worked_examples": [{"x": x, "y": y} for x, y in ex],
                 "n_train": t["n_train"], "n_val": t["n_val"]}
+
+
+    # ---- a capability whose rule exists only in external documents (research flow) ----
+    RESEARCH_MARKERS_TASK = {"grade", "band", "bands"}
+
+    def _research_flow(self, req: HelpRequest):
+        """Stands in for an LLM that does not know a task's thresholds until it has read evidence. It "reads" evidence with a regex
+        (plumbing/provenance test only: no claim about real language understanding) and ignores any instructions inside it."""
+        toks = set(req.task_intent.lower().replace(",", " ").split())
+        if req.input_dim != 1 or not (toks & self.RESEARCH_MARKERS_TASK):
+            return None
+        self.calls += 1
+        if not req.evidence:
+            return json.dumps({"action": "external_research", "rationale": "thresholds are defined in an external document",
+                               "research_query": "grade band thresholds LOW MID HIGH score ranges"})
+        import re
+        for ev in req.evidence:
+            m1 = re.search(r"below\s+([0-9]*\.?[0-9]+)\s+(?:are|is)\s+LOW", ev["excerpt"], re.I)
+            m2 = re.search(r"up to\s+([0-9]*\.?[0-9]+)\s+(?:are|is)\s+MID", ev["excerpt"], re.I)
+            if m1 and m2:
+                t1, t2 = float(m1.group(1)), float(m2.group(1))
+                spec = {"capability_id": "grade_band", "description": "Classify a score into LOW, MID or HIGH bands", "keywords": ["grade", "band", "score", "low", "mid", "high", "bands", "thresholds"],
+                        "labels": ["LOW", "MID", "HIGH"], "input_dim": 1, "domain": [{"lo": 0.0, "hi": 1.0}], "label_expr": f"0 if x0 < {t1} else 1 if x0 < {t2} else 2",
+                        "worked_examples": [{"x": [t1 / 2], "y": 0}, {"x": [(t1 + t2) / 2], "y": 1}, {"x": [min(1.0, t2 + (1 - t2) / 2)], "y": 2}],
+                        "n_train": 1500, "n_val": 300, "evidence_ids": [ev["id"]]}
+                return json.dumps({"action": "new_capability_spec", "rationale": f"thresholds read from evidence {ev['id']}", "spec": spec})
+        return json.dumps({"action": "cannot_help", "rationale": "evidence did not contain parseable thresholds"})

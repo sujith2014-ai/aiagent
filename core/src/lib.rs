@@ -7,6 +7,7 @@ pub mod capability;
 pub mod device;
 pub mod graph;
 pub mod package;
+pub mod policy;
 pub mod registry;
 pub mod router;
 pub mod runtime;
