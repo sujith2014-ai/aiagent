@@ -1,0 +1,498 @@
+{
+ "benchmark_format": "bench/1",
+ "experiment": "phase3-sequential-learning",
+ "platform": "Linux-6.18.44-fc-v64-x86_64-with-glibc2.39",
+ "date": "2026-10-04",
+ "stages": [
+  {
+   "learned": "compare_numbers",
+   "teacher_calls_for_stage": 1,
+   "learn_seconds": 1.4107136726379395,
+   "build": {
+    "capability_id": "compare_numbers",
+    "attempts": [
+     {
+      "epochs": 129,
+      "val_accuracy": 1.0,
+      "train_accuracy": 1.0,
+      "train_seconds": 0.22619891166687012,
+      "params": 1251,
+      "hidden": [
+       32,
+       32
+      ],
+      "seed": 0,
+      "heldout_accuracy": 1.0,
+      "heldout_n": 80
+     }
+    ],
+    "onnx_max_abs_diff": 0.0,
+    "package_id": "compare_numbers-0.1.0-e12c489b"
+   },
+   "import_steps": [
+    {
+     "detail": "manifest readable",
+     "ok": true,
+     "step": "parse"
+    },
+    {
+     "detail": "trusted signer build-svc-1",
+     "ok": true,
+     "step": "signature"
+    },
+    {
+     "detail": "3 files verified",
+     "ok": true,
+     "step": "hashes"
+    },
+    {
+     "detail": "device PC_FULL",
+     "ok": true,
+     "step": "compatibility"
+    },
+    {
+     "detail": "onnx-tract",
+     "ok": true,
+     "step": "sandbox_load"
+    },
+    {
+     "detail": "accuracy 1.0000 on 80 cases",
+     "ok": true,
+     "step": "bundled_tests"
+    },
+    {
+     "detail": "probe 6 us",
+     "ok": true,
+     "step": "resource_check"
+    },
+    {
+     "detail": "registered",
+     "ok": true,
+     "step": "activate"
+    }
+   ],
+   "related_encounter": {
+    "intent": "comparison relation of numbers",
+    "result": "ANSWER",
+    "status": "KNOWN",
+    "capability": "compare_numbers",
+    "teacher_called": false
+   },
+   "accuracy_all_known": {
+    "compare_numbers": {
+     "accuracy": 1.0,
+     "needs_help": 0,
+     "latency_us_p50": 17,
+     "peak_rss_kb": 12744
+    }
+   },
+   "bundled_regression": {
+    "compare_numbers": 1.0
+   }
+  },
+  {
+   "learned": "point_region",
+   "teacher_calls_for_stage": 1,
+   "learn_seconds": 1.0544459819793701,
+   "build": {
+    "capability_id": "point_region",
+    "attempts": [
+     {
+      "epochs": 114,
+      "val_accuracy": 0.996666669845581,
+      "train_accuracy": 0.9973333477973938,
+      "train_seconds": 1.0176849365234375,
+      "params": 1218,
+      "hidden": [
+       32,
+       32
+      ],
+      "seed": 0,
+      "heldout_accuracy": 0.9919999837875366,
+      "heldout_n": 1000
+     }
+    ],
+    "onnx_max_abs_diff": 0.0,
+    "package_id": "point_region-0.1.0-90ccb5c4"
+   },
+   "import_steps": [
+    {
+     "detail": "manifest readable",
+     "ok": true,
+     "step": "parse"
+    },
+    {
+     "detail": "trusted signer build-svc-1",
+     "ok": true,
+     "step": "signature"
+    },
+    {
+     "detail": "3 files verified",
+     "ok": true,
+     "step": "hashes"
+    },
+    {
+     "detail": "device PC_FULL",
+     "ok": true,
+     "step": "compatibility"
+    },
+    {
+     "detail": "onnx-tract",
+     "ok": true,
+     "step": "sandbox_load"
+    },
+    {
+     "detail": "accuracy 1.0000 on 300 cases",
+     "ok": true,
+     "step": "bundled_tests"
+    },
+    {
+     "detail": "probe 6 us",
+     "ok": true,
+     "step": "resource_check"
+    },
+    {
+     "detail": "registered",
+     "ok": true,
+     "step": "activate"
+    }
+   ],
+   "related_encounter": {
+    "intent": "geometry check point inside circle",
+    "result": "ANSWER",
+    "status": "KNOWN",
+    "capability": "point_region",
+    "teacher_called": false
+   },
+   "accuracy_all_known": {
+    "compare_numbers": {
+     "accuracy": 1.0,
+     "needs_help": 0,
+     "latency_us_p50": 30,
+     "peak_rss_kb": 13348
+    },
+    "point_region": {
+     "accuracy": 0.992,
+     "needs_help": 0,
+     "latency_us_p50": 21,
+     "peak_rss_kb": 14468
+    }
+   },
+   "bundled_regression": {
+    "compare_numbers": 1.0,
+    "point_region": 1.0
+   }
+  },
+  {
+   "learned": "argmax_position",
+   "teacher_calls_for_stage": 1,
+   "learn_seconds": 1.6162071228027344,
+   "build": {
+    "capability_id": "argmax_position",
+    "attempts": [
+     {
+      "epochs": 161,
+      "val_accuracy": 1.0,
+      "train_accuracy": 0.9960026741027832,
+      "train_seconds": 1.5847911834716797,
+      "params": 1348,
+      "hidden": [
+       32,
+       32
+      ],
+      "seed": 0,
+      "heldout_accuracy": 0.9879999756813049,
+      "heldout_n": 1000
+     }
+    ],
+    "onnx_max_abs_diff": 0.0,
+    "package_id": "argmax_position-0.1.0-21182e0f"
+   },
+   "import_steps": [
+    {
+     "detail": "manifest readable",
+     "ok": true,
+     "step": "parse"
+    },
+    {
+     "detail": "trusted signer build-svc-1",
+     "ok": true,
+     "step": "signature"
+    },
+    {
+     "detail": "3 files verified",
+     "ok": true,
+     "step": "hashes"
+    },
+    {
+     "detail": "device PC_FULL",
+     "ok": true,
+     "step": "compatibility"
+    },
+    {
+     "detail": "onnx-tract",
+     "ok": true,
+     "step": "sandbox_load"
+    },
+    {
+     "detail": "accuracy 0.9867 on 300 cases",
+     "ok": true,
+     "step": "bundled_tests"
+    },
+    {
+     "detail": "probe 6 us",
+     "ok": true,
+     "step": "resource_check"
+    },
+    {
+     "detail": "registered",
+     "ok": true,
+     "step": "activate"
+    }
+   ],
+   "related_encounter": {
+    "intent": "which index holds the maximum",
+    "result": "ANSWER",
+    "status": "KNOWN",
+    "capability": "argmax_position",
+    "teacher_called": false
+   },
+   "accuracy_all_known": {
+    "argmax_position": {
+     "accuracy": 0.987,
+     "needs_help": 0,
+     "latency_us_p50": 25,
+     "peak_rss_kb": 13996
+    },
+    "compare_numbers": {
+     "accuracy": 1.0,
+     "needs_help": 0,
+     "latency_us_p50": 34,
+     "peak_rss_kb": 13356
+    },
+    "point_region": {
+     "accuracy": 0.992,
+     "needs_help": 0,
+     "latency_us_p50": 24,
+     "peak_rss_kb": 14280
+    }
+   },
+   "bundled_regression": {
+    "argmax_position": 0.9866666666666667,
+    "compare_numbers": 1.0,
+    "point_region": 1.0
+   }
+  }
+ ],
+ "registry": [
+  {
+   "active_version": "0.1.0",
+   "capability_id": "argmax_position",
+   "model_bytes": 6041,
+   "params": 1348,
+   "stats": {
+    "calls": 1002,
+    "failure": 13,
+    "last_trained": 1791136656,
+    "last_used": 1791136656,
+    "max_latency_us": 159,
+    "success": 987,
+    "total_latency_us": 31331
+   },
+   "test_accuracy": 0.9866666666666668,
+   "versions": [
+    "0.1.0"
+   ]
+  },
+  {
+   "active_version": "0.1.0",
+   "capability_id": "compare_numbers",
+   "model_bytes": 5653,
+   "params": 1251,
+   "stats": {
+    "calls": 242,
+    "failure": 0,
+    "last_trained": 1791136653,
+    "last_used": 1791136656,
+    "max_latency_us": 144,
+    "success": 240,
+    "total_latency_us": 7439
+   },
+   "test_accuracy": 1.0,
+   "versions": [
+    "0.1.0"
+   ]
+  },
+  {
+   "active_version": "0.1.0",
+   "capability_id": "point_region",
+   "model_bytes": 5521,
+   "params": 1218,
+   "stats": {
+    "calls": 2002,
+    "failure": 16,
+    "last_trained": 1791136654,
+    "last_used": 1791136657,
+    "max_latency_us": 5335,
+    "success": 1984,
+    "total_latency_us": 62106
+   },
+   "test_accuracy": 1.0,
+   "versions": [
+    "0.1.0"
+   ]
+  }
+ ],
+ "forgetting": [
+  {
+   "stage": "compare_numbers",
+   "capability": "compare_numbers",
+   "acc": 1.0,
+   "drop_vs_first": 0.0
+  },
+  {
+   "stage": "point_region",
+   "capability": "compare_numbers",
+   "acc": 1.0,
+   "drop_vs_first": 0.0
+  },
+  {
+   "stage": "point_region",
+   "capability": "point_region",
+   "acc": 0.992,
+   "drop_vs_first": 0.0
+  },
+  {
+   "stage": "argmax_position",
+   "capability": "argmax_position",
+   "acc": 0.987,
+   "drop_vs_first": 0.0
+  },
+  {
+   "stage": "argmax_position",
+   "capability": "compare_numbers",
+   "acc": 1.0,
+   "drop_vs_first": 0.0
+  },
+  {
+   "stage": "argmax_position",
+   "capability": "point_region",
+   "acc": 0.992,
+   "drop_vs_first": 0.0
+  }
+ ],
+ "max_forgetting_drop": 0.0,
+ "clean_restart": {
+  "fresh_runtime_imports": 3,
+  "per_capability": {
+   "compare_numbers": {
+    "accuracy": 1.0,
+    "identical_probs_to_pre_restart": true
+   },
+   "point_region": {
+    "accuracy": 0.992,
+    "identical_probs_to_pre_restart": true
+   },
+   "argmax_position": {
+    "accuracy": 0.987,
+    "identical_probs_to_pre_restart": true
+   }
+  },
+  "all_identical": true
+ },
+ "constrained": {
+  "profile": "PC_CONSTRAINED (512MB RAM budget, 8MB model limit, 4 loaded modules; process: 1 CPU, 1GiB AS limit)",
+  "per_capability": {
+   "compare_numbers": {
+    "accuracy": 1.0,
+    "latency_us_p50": 24,
+    "peak_rss_kb": 13284,
+    "max_prob_diff_vs_full": 0.0
+   },
+   "point_region": {
+    "accuracy": 0.992,
+    "latency_us_p50": 27,
+    "peak_rss_kb": 13640,
+    "max_prob_diff_vs_full": 0.0
+   },
+   "argmax_position": {
+    "accuracy": 0.987,
+    "latency_us_p50": 21,
+    "peak_rss_kb": 14244,
+    "max_prob_diff_vs_full": 0.0
+   }
+  },
+  "full": {
+   "compare_numbers": {
+    "accuracy": 1.0,
+    "latency_us_p50": 30,
+    "peak_rss_kb": 12836
+   },
+   "point_region": {
+    "accuracy": 0.992,
+    "latency_us_p50": 21,
+    "peak_rss_kb": 13828
+   },
+   "argmax_position": {
+    "accuracy": 0.987,
+    "latency_us_p50": 24,
+    "peak_rss_kb": 14436
+   }
+  },
+  "max_prob_diff_vs_full": 0.0,
+  "note": "simulation only; physical Android validation pending"
+ },
+ "baselines": {
+  "hidden": [
+   48,
+   48
+  ],
+  "params": 2932,
+  "joint": {
+   "compare_numbers": 1.0,
+   "point_region": 0.9919999837875366,
+   "argmax_position": 0.9829999804496765
+  },
+  "sequential": [
+   {
+    "after": "compare_numbers",
+    "acc": {
+     "compare_numbers": 1.0
+    }
+   },
+   {
+    "after": "point_region",
+    "acc": {
+     "compare_numbers": 0.03750000149011612,
+     "point_region": 0.9929999709129333
+    }
+   },
+   {
+    "after": "argmax_position",
+    "acc": {
+     "compare_numbers": 0.03750000149011612,
+     "point_region": 0.6050000190734863,
+     "argmax_position": 0.9819999933242798
+    }
+   }
+  ]
+ },
+ "teacher_dependency": {
+  "stages": [
+   {
+    "task": "compare_numbers",
+    "teacher_calls_total": 1
+   },
+   {
+    "task": "point_region",
+    "teacher_calls_total": 2
+   },
+   {
+    "task": "argmax_position",
+    "teacher_calls_total": 3
+   }
+  ],
+  "teacher_calls_total": 3,
+  "related_encounters_without_teacher": 3
+ }
+}

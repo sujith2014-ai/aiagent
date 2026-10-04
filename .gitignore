@@ -2,3 +2,8 @@ __pycache__/
 *.pyc
 target/
 .venv/
+runs/
+.pytest_cache/
+*.private
+keys/
+*.log

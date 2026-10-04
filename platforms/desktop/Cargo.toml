@@ -1,0 +1,9 @@
+[package]
+name = "aicli"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+aicore = { path = "../../core" }
+serde_json = "1"
+anyhow = "1"

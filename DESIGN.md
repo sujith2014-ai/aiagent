@@ -66,12 +66,10 @@ Rules:
 - Core (router, workspace, registry logic) is pure Python with no OS-specific calls; all of it goes through the two interfaces above.
 
 ## 6. Phased plan
-1. **Phase 1: PC proof of concept.** Registry, package format + validator, Backend (ONNX), Router with a learned component, one small capability learned end to end, benchmark harness. Goal: show the neural-learning loop works and is measurable.
-2. **Phase 2: Portability proof without Android.** Export a package, re-import it in a clean process/other OS, run its tests. Add a "constrained device" simulator (small variant, RAM cap).
-3. **Phase 3: Android runtime.** Implement Backend + DeviceTools for Android; consume Phase 1 packages unchanged; sync both ways.
-4. **Phase 4: Server / offload.** OpenClaw + Teacher AI; offload protocol from Android and PC.
-
-Phase 3 must require no changes to the core or the package format. If it does, Phase 2 failed.
+Superseded by the 16-phase master plan (Phases 0-15) in docs/ARCHITECTURE.md section "Phases". Reconciliation notes:
+- v0.1 said "core is pure Python"; **superseded**: the core is Rust (ADR-001). Python is research/training only.
+- v0.1 manifest sketch had hashes only; **superseded**: Ed25519-signed manifest with trust roots (ADR-006, docs/CAPABILITY_FORMAT.md).
+- v0.1 Phase 1 excluded OpenClaw; **kept**: OpenClaw arrives in Phase 8, after the core learning loop is proven.
 
 ## 7. Locked decisions (Phase 1)
 1. **First capability:** synthetic relation/comparison classification (two feature vectors + relation request -> LESS/EQUAL/GREATER). The comparison algorithm is never hard-coded in the module. Then learn capabilities B and C sequentially and verify A has not degraded. Loop: unknown task -> capability detector -> teacher simulator -> learning package -> PyTorch training -> candidate -> evaluation -> ONNX export -> signed `.cap` -> registry -> dynamic router -> solve unseen examples without the teacher.
