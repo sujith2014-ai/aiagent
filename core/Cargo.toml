@@ -15,5 +15,10 @@ zip = { version = "2", default-features = false, features = ["deflate"] }
 semver = "1"
 anyhow = "1"
 thiserror = "1"
-tract-onnx = "0.21"
 url = "2"
+tract-onnx = { version = "0.21", optional = true }
+
+[features]
+default = ["backend-tract"]
+# The general ONNX runtime (pure Rust, but its ARM kernels need a C/assembler toolchain on Android). The built-in mlp-lite backend needs neither.
+backend-tract = ["dep:tract-onnx"]

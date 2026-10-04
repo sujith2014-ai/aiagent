@@ -75,3 +75,15 @@ Status: accepted. Real features have arbitrary scales, so training statistics (t
 
 ## ADR-025: The desktop application is a thin local service, not a new architecture
 Status: accepted. `apps/desktop/app.py` wires the existing pieces (Rust runtime via the CLI harness, build service, escalation, optional broker/OpenClaw) behind a token-protected loopback JSON API and a REPL. It adds no business logic of its own. Deviation from the repository sketch: application code lives in `apps/`, platform harness in `platforms/`.
+
+## ADR-026: A pure-Rust "mlp-lite" backend is the default; tract is an optional fallback
+Status: accepted. Every module we export uses four ONNX operators (Gemm, Relu, Sub, Div). `core/src/onnx_lite.rs` executes exactly that subset (plus Mul/Add/Identity) over float32 initializers with a hand-written protobuf reader, no dependencies and no native code. The `ChainBackend` tries mlp-lite first and falls back to tract (cargo feature `backend-tract`, on by default) for anything mlp-lite cannot prove it understands. Evidence (FINDINGS F29-F30): <1e-4 relative parity with ONNX Runtime, 8,000 mutated inputs without a panic, 7x smaller native library, and the lite build compiles for every Android target (including armv7) with no C toolchain, which tract's ARM assembly kernels require. Format stays ONNX (ADR-003 unchanged); the model format is still declared in the manifest. Limitation: architectures beyond MLPs (conv, normalisation layers, softmax graphs...) need tract (full build) or a new lite operator.
+
+## ADR-027: Backends are panic-isolated
+Status: accepted. Loading and running a model happen under `catch_unwind`; a panic inside a third-party parser or kernel becomes a rejected import or an inference error, never a process crash. Motivation: a validly signed but malformed model made tract panic and crash the whole runtime (hashes and signatures protect integrity, not sanity). `panic = "unwind"` is therefore required in all profiles.
+
+## ADR-028: JNI bridge contract; Android-specific code is confined to the app module
+Status: accepted. The bridge is JSON-in/JSON-out over a handle table; domain outcomes are never exceptions; panics and errors are returned as `{"error": ...}`. `core-bridge` is pure Kotlin/JVM so it can be built and tested without the Android SDK (against the host build of the same Rust library); the app module compiles those sources unchanged and adds only UI, permissions, lifecycle and DeviceTool implementations. Trust roots are public keys shipped in assets; signing keys never reach the device.
+
+## ADR-029: Non-finite values are refused everywhere
+Status: accepted. NaN and infinity compare false against every guard, so they used to pass novelty checks and yield an answer with a garbage confidence. Single-task solve, plan inputs, intermediate values reaching a capability and model outputs are now refused (`INVALID_INPUT` / `NON_FINITE_OUTPUT`).

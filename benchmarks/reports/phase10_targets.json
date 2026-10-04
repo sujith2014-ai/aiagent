@@ -1,0 +1,77 @@
+{
+ "toolchain_standin": "zig 0.16.0 (cc + ar); NOT the Android NDK",
+ "targets": {
+  "aarch64-linux-android": {
+   "lite (mlp-lite backend only, NO C toolchain) / release-small": {
+    "ok": true,
+    "seconds": 0.2,
+    "static_lib_bytes": 11391038,
+    "first_errors": []
+   },
+   "full (adds tract; needs a C/asm toolchain, zig stand-in) / release": {
+    "ok": true,
+    "seconds": 119.2,
+    "static_lib_bytes": 63357670,
+    "first_errors": []
+   },
+   "full (adds tract; needs a C/asm toolchain, zig stand-in) / release-small": {
+    "ok": true,
+    "seconds": 159.0,
+    "static_lib_bytes": 34807498,
+    "first_errors": []
+   }
+  },
+  "x86_64-linux-android": {
+   "lite (mlp-lite backend only, NO C toolchain) / release-small": {
+    "ok": true,
+    "seconds": 0.1,
+    "static_lib_bytes": 10939714,
+    "first_errors": []
+   },
+   "full (adds tract; needs a C/asm toolchain, zig stand-in) / release": {
+    "ok": true,
+    "seconds": 117.8,
+    "static_lib_bytes": 65809506,
+    "first_errors": []
+   },
+   "full (adds tract; needs a C/asm toolchain, zig stand-in) / release-small": {
+    "ok": true,
+    "seconds": 152.5,
+    "static_lib_bytes": 29518784,
+    "first_errors": []
+   }
+  },
+  "armv7-linux-androideabi": {
+   "lite (mlp-lite backend only, NO C toolchain) / release-small": {
+    "ok": true,
+    "seconds": 0.2,
+    "static_lib_bytes": 8805354,
+    "first_errors": []
+   },
+   "full (adds tract; needs a C/asm toolchain, zig stand-in) / release": {
+    "ok": false,
+    "seconds": 0.9,
+    "static_lib_bytes": null,
+    "first_errors": [
+     "warning: tract-linalg@0.21.18: /home/user/ai-system/target/armv7-linux-androideabi/release/build/tract-linalg-d84bab108ab25a7b/out/armvfpv2_mmm_f32_4x4.S:36:5: error: instruction requires: fp registers",
+     "warning: tract-linalg@0.21.18: /home/user/ai-system/target/armv7-linux-androideabi/release/build/tract-linalg-d84bab108ab25a7b/out/armvfpv2_mmm_f32_4x4.S:38:5: error: instruction requires: fp registers",
+     "warning: tract-linalg@0.21.18: /home/user/ai-system/target/armv7-linux-androideabi/release/build/tract-linalg-d84bab108ab25a7b/out/armvfpv2_mmm_f32_4x4.S:40:5: error: instruction requires: fp registers"
+    ]
+   },
+   "full (adds tract; needs a C/asm toolchain, zig stand-in) / release-small": {
+    "ok": false,
+    "seconds": 9.5,
+    "static_lib_bytes": null,
+    "first_errors": [
+     "warning: tract-linalg@0.21.18: /home/user/ai-system/target/armv7-linux-androideabi/release-small/build/tract-linalg-b967c99511a643c7/out/armvfpv2_mmm_f32_4x4.S:36:5: error: instruction requires: fp registers",
+     "warning: tract-linalg@0.21.18: /home/user/ai-system/target/armv7-linux-androideabi/release-small/build/tract-linalg-b967c99511a643c7/out/armvfpv2_mmm_f32_4x4.S:38:5: error: instruction requires: fp registers",
+     "warning: tract-linalg@0.21.18: /home/user/ai-system/target/armv7-linux-androideabi/release-small/build/tract-linalg-b967c99511a643c7/out/armvfpv2_mmm_f32_4x4.S:40:5: error: instruction requires: fp registers"
+    ]
+   }
+  }
+ },
+ "host_stripped_size_optimised_so_bytes": {
+  "full (with tract)": 9077768,
+  "lite (mlp-lite only)": 1250440
+ }
+}

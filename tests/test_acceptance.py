@@ -139,3 +139,10 @@ def test_teacher_side_has_no_signing_access():
                 assert not (n.module or "").startswith(banned_mods), f
             elif isinstance(n, ast.Name):
                 assert n.id not in banned_names, f
+
+
+@pytest.mark.parametrize("bad", [float("nan"), float("inf"), float("-inf")])
+def test_non_finite_inputs_are_refused_never_answered(env, cli, bad):
+    import1(cli, env["good"])
+    out = cli.solve("compare numbers", [0.2, bad])
+    assert out["result"] == "NEEDS_HELP" and out["reason_code"] == "INVALID_INPUT" and "label" not in out

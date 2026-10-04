@@ -40,7 +40,7 @@
     "params": 4675,
     "teacher_used": false
    },
-   "teach_seconds": 1.5361535549163818,
+   "teach_seconds": 1.7226035594940186,
    "runtime": {
     "accuracy_overall": 1.0,
     "ci95_overall": [
@@ -51,11 +51,11 @@
     "n_test": 30,
     "accuracy_answered": 1.0,
     "refused_as_out_of_range": 0,
-    "latency_us_p50": 11,
+    "latency_us_p50": 4,
     "params": 4675,
     "model_bytes": 19528,
     "ece_calibrated_answered": 1.079638799028615e-05,
-    "ece_raw_answered": 0.03654315869013471
+    "ece_raw_answered": 0.036543148756027224
    },
    "accuracy_of_all_earlier_after_this_stage": {
     "iris_species": 1.0
@@ -96,7 +96,7 @@
     "params": 1603,
     "teacher_used": false
    },
-   "teach_seconds": 0.1460428237915039,
+   "teach_seconds": 0.14986181259155273,
    "runtime": {
     "accuracy_overall": 1.0,
     "ci95_overall": [
@@ -107,11 +107,11 @@
     "n_test": 36,
     "accuracy_answered": 1.0,
     "refused_as_out_of_range": 0,
-    "latency_us_p50": 12,
+    "latency_us_p50": 2,
     "params": 1603,
     "model_bytes": 7309,
-    "ece_calibrated_answered": 0.0001810474528206596,
-    "ece_raw_answered": 0.036994094649950675
+    "ece_calibrated_answered": 0.00018104414145148073,
+    "ece_raw_answered": 0.036994084715843215
    },
    "accuracy_of_all_earlier_after_this_stage": {
     "iris_species": 1.0,
@@ -153,7 +153,7 @@
     "params": 3466,
     "teacher_used": false
    },
-   "teach_seconds": 0.8711192607879639,
+   "teach_seconds": 1.0621027946472168,
    "runtime": {
     "accuracy_overall": 0.95,
     "ci95_overall": [
@@ -164,11 +164,11 @@
     "n_test": 360,
     "accuracy_answered": 0.9799426934097422,
     "refused_as_out_of_range": 11,
-    "latency_us_p50": 9,
+    "latency_us_p50": 3,
     "params": 3466,
     "model_bytes": 15173,
-    "ece_calibrated_answered": 0.00983710471743493,
-    "ece_raw_answered": 0.009856144473340937
+    "ece_calibrated_answered": 0.009837101984843784,
+    "ece_raw_answered": 0.009856146095816939
    },
    "accuracy_of_all_earlier_after_this_stage": {
     "iris_species": 1.0,
@@ -211,7 +211,7 @@
     "params": 2114,
     "teacher_used": false
    },
-   "teach_seconds": 0.3743290901184082,
+   "teach_seconds": 0.35845303535461426,
    "runtime": {
     "accuracy_overall": 0.9649122807017544,
     "ci95_overall": [
@@ -222,10 +222,10 @@
     "n_test": 114,
     "accuracy_answered": 0.9734513274336283,
     "refused_as_out_of_range": 1,
-    "latency_us_p50": 8,
+    "latency_us_p50": 3,
     "params": 2114,
     "model_bytes": 9491,
-    "ece_calibrated_answered": 0.02753489576609791,
+    "ece_calibrated_answered": 0.02753489418367364,
     "ece_raw_answered": 0.024634625004456123
    },
    "accuracy_of_all_earlier_after_this_stage": {
@@ -299,29 +299,29 @@
     "fresh_identical_to_before": true,
     "constrained_max_prob_diff": 0.0,
     "same_refusals_constrained": true,
-    "constrained_latency_us_p50": 11,
-    "constrained_peak_rss_kb": 13752
+    "constrained_latency_us_p50": 6,
+    "constrained_peak_rss_kb": 6132
    },
    "wine_cultivar": {
     "fresh_identical_to_before": true,
     "constrained_max_prob_diff": 0.0,
     "same_refusals_constrained": true,
-    "constrained_latency_us_p50": 10,
-    "constrained_peak_rss_kb": 14024
+    "constrained_latency_us_p50": 2,
+    "constrained_peak_rss_kb": 6192
    },
    "digit_recognition": {
     "fresh_identical_to_before": true,
     "constrained_max_prob_diff": 0.0,
     "same_refusals_constrained": true,
-    "constrained_latency_us_p50": 11,
-    "constrained_peak_rss_kb": 14728
+    "constrained_latency_us_p50": 3,
+    "constrained_peak_rss_kb": 6680
    },
    "tumor_malignancy": {
     "fresh_identical_to_before": true,
     "constrained_max_prob_diff": 0.0,
     "same_refusals_constrained": true,
-    "constrained_latency_us_p50": 7,
-    "constrained_peak_rss_kb": 14404
+    "constrained_latency_us_p50": 4,
+    "constrained_peak_rss_kb": 6196
    }
   }
  }

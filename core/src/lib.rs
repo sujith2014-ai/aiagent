@@ -6,6 +6,7 @@ pub mod backend;
 pub mod capability;
 pub mod device;
 pub mod graph;
+pub mod onnx_lite;
 pub mod package;
 pub mod policy;
 pub mod registry;

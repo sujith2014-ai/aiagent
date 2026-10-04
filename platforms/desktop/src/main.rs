@@ -29,6 +29,7 @@ fn main() -> Result<()> {
     let mut router_kind = "keyword".to_string();
     let mut no_stats = false;
     let mut novelty = "balanced".to_string();
+    let mut backend = "auto".to_string();
     let mut rest = vec![];
     let mut i = 0;
     while i < args.len() {
@@ -41,6 +42,7 @@ fn main() -> Result<()> {
             "--router" => { router_kind = args[i + 1].clone(); i += 2 }
             "--no-stats" => { no_stats = true; i += 1 }
             "--novelty" => { novelty = args[i + 1].clone(); i += 2 }
+            "--backend" => { backend = args[i + 1].clone(); i += 2 }
             _ => { rest.push(args[i].clone()); i += 1 }
         }
     }
@@ -49,6 +51,7 @@ fn main() -> Result<()> {
     let trust_store = TrustStore::from_file(&trust)?;
     let mut rt = Runtime::open(&root, dev, trust_store)?;
     rt.detect = aicore::runtime::Detection::by_name(&detect).ok_or_else(|| anyhow!("unknown --detect {detect}"))?;
+    rt.set_backend(&backend)?;
     rt.record_stats = !no_stats;
     rt.detect.novelty_rule = aicore::runtime::NoveltyRule::by_name(&novelty).ok_or_else(|| anyhow!("unknown --novelty {novelty} (strict|balanced)"))?;
     rt.force_capability = force;

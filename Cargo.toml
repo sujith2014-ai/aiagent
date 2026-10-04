@@ -1,7 +1,15 @@
 [workspace]
 resolver = "2"
-members = ["core", "platforms/desktop"]
+members = ["core", "platforms/desktop", "platforms/android/jni"]
 
 [profile.release]
 opt-level = 3
 lto = "thin"
+
+# Size-optimised profile for mobile libraries (measured in docs/ANDROID.md). Keep panic=unwind: the backend guards and the JNI bridge rely on catch_unwind.
+[profile.release-small]
+inherits = "release"
+opt-level = "z"
+lto = "fat"
+codegen-units = 1
+strip = true

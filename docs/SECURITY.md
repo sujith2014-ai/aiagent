@@ -20,3 +20,6 @@ Policy layer (Rust, default deny, hard guards, approvals bound to request hash, 
 
 ## Phase 9: desktop service
 Loopback-only JSON API with bearer token, Host and Origin checks, JSON-only input, 5 MB declared-length cap, generic error bodies. The process that serves the API also holds the local signing key (single-user mode), and any holder of the API token can install a verified model. No TLS. Novelty-based refusal is a heuristic with measured false-refusal and miss rates (FINDINGS F24), not a security boundary.
+
+## Phase 10: Android / backends
+Package validation is identical on Android (same core); trust roots are public keys in app assets, signing keys never ship. The manifest requests only INTERNET and POST_NOTIFICATIONS, forbids cleartext and backup, and exports one activity (tested statically). The JNI bridge never throws or unwinds across the boundary and returns JSON errors; closed/unknown handles are refused. Model backends are panic-isolated, so a validly signed but malformed model is a rejected import, not a crash; the mlp-lite parser is fuzzed. NaN/Infinity are refused everywhere. Not validated: sandboxing on a real device, ART/bionic behaviour, and anything requiring the Android SDK.

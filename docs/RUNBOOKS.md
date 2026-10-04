@@ -8,8 +8,15 @@ To validate against a real model:
 3. Expected: `result: ANSWER`, `path: [local, teacher, learn]`. Acceptable failures are `NEEDS_HELP` with a reason from spec validation (the model produced a malformed or wrong rule); these are data about the model, not bugs. Record the model name, date and outcome in docs/FINDINGS.md.
 4. Repeat 20 times per task (non-zero temperature models vary) and record the acceptance rate; the fault matrix in benchmarks/reports/phase6.json shows what the gates catch.
 
-## R2. Android (PENDING, see docs/ANDROID.md)
-Added when that phase is reached.
+## R2. Android on a physical device (PENDING, see docs/ANDROID.md)
+Blocked here by: no Android SDK/NDK (dl.google.com unreachable), no device.
+1. Install JDK 17+, Android SDK (platform 34, build-tools) and NDK r26+; set `ANDROID_HOME` and `ANDROID_NDK_HOME`.
+2. `scripts/build_android_libs.sh` (builds the lite core for arm64-v8a, armeabi-v7a, x86_64 into `app/src/main/jniLibs/`; needs the NDK only to link).
+3. Copy the public trust roots (`{"key_id": "<base64 public key>"}`) to `platforms/android/app/src/main/assets/trust.json`. Never put a private key on the device.
+4. `cd platforms/android && gradle :app:assembleDebug` and `adb install -r app/build/outputs/apk/debug/app-debug.apk`. Fix compile errors in `app/` first: those Kotlin files have never been compiled.
+5. Serve a PC-built `.cap` over HTTPS (the app forbids cleartext; use a real or locally trusted certificate, or temporarily relax `network_security_config.xml` for a debug build only).
+6. Acceptance checklist, recording results in docs/FINDINGS.md: (a) logcat shows the library loads and `nativeVersion` reports backend `onnx-mlp-lite`; (b) the app installs the exact PC-built `.cap` (compare SHA-256 on both sides); (c) solve outputs equal the PC's within 1e-5 for the cases in `runs/android_fixtures/expectations.json`; (d) tampered, untrusted and camera-requiring packages are rejected; (e) latency per inference and RSS (`adb shell dumpsys meminfo`), battery (`dumpsys batterystats`) and temperature over a 10-minute loop; (f) kill the process and relaunch: the registry persists; (g) airplane mode: installed capabilities still answer.
+7. If any step needs a change to the package format or capability semantics, that is a portability failure: investigate before continuing.
 
 ## R3. Live OpenClaw research (PENDING)
 Blocked here by: egress proxy denies the search provider (HTTP 403 on CONNECT), no web/model provider credentials, Node 22 only (latest OpenClaw needs Node >= 24.16; 2026.6.35 works on Node >= 22.19).

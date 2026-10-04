@@ -6,10 +6,10 @@ Taught by example through the desktop app: **no teacher, no rule**. Accuracy is 
 
 | task | n | gate | modular overall [95% CI] | coverage | answered acc | logistic reg. | kNN k=5 | sklearn MLP | majority | params (ours / LR / MLP) | model bytes | latency us p50 | ECE raw -> calibrated |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| iris_species | 149 | 0.937 | 1.000 [0.886, 1] | 1.000 | 1.000 | 0.967 | 0.967 | 1.000 | 0.333 | 4675 / 15 / 1315 | 19528 | 11 | 0.037 -> 0.000 |
-| wine_cultivar | 178 | 0.942 | 1.000 [0.904, 1] | 1.000 | 1.000 | 0.972 | 0.889 | 0.972 | 0.417 | 1603 / 42 / 1603 | 7309 | 12 | 0.037 -> 0.000 |
-| digit_recognition | 1797 | 0.934 | 0.950 [0.922, 0.968] | 0.969 | 0.980 | 0.964 | 0.969 | 0.958 | 0.103 | 3466 / 650 / 3466 | 15173 | 9 | 0.010 -> 0.010 |
-| tumor_malignancy | 569 | 0.950 | 0.965 [0.913, 0.986] | 0.991 | 0.973 | 0.982 | 0.939 | 0.974 | 0.623 | 2114 / 31 / 2081 | 9491 | 8 | 0.025 -> 0.028 |
+| iris_species | 149 | 0.937 | 1.000 [0.886, 1] | 1.000 | 1.000 | 0.967 | 0.967 | 1.000 | 0.333 | 4675 / 15 / 1315 | 19528 | 4 | 0.037 -> 0.000 |
+| wine_cultivar | 178 | 0.942 | 1.000 [0.904, 1] | 1.000 | 1.000 | 0.972 | 0.889 | 0.972 | 0.417 | 1603 / 42 / 1603 | 7309 | 2 | 0.037 -> 0.000 |
+| digit_recognition | 1797 | 0.934 | 0.950 [0.922, 0.968] | 0.969 | 0.980 | 0.964 | 0.969 | 0.958 | 0.103 | 3466 / 650 / 3466 | 15173 | 3 | 0.010 -> 0.010 |
+| tumor_malignancy | 569 | 0.950 | 0.965 [0.913, 0.986] | 0.991 | 0.973 | 0.982 | 0.939 | 0.974 | 0.623 | 2114 / 31 / 2081 | 9491 | 3 | 0.025 -> 0.028 |
 
 Max forgetting drop across the 4 sequential stages: 0.0 (independent modules: zero by construction).
 
@@ -48,7 +48,7 @@ Fresh runtime import ok: True; constrained profile import ok: True.
 
 | task | identical outputs after restart | constrained max prob diff | same refusals | constrained peak RSS KB |
 |---|---|---|---|---|
-| iris_species | True | 0.0 | True | 13752 |
-| wine_cultivar | True | 0.0 | True | 14024 |
-| digit_recognition | True | 0.0 | True | 14728 |
-| tumor_malignancy | True | 0.0 | True | 14404 |
+| iris_species | True | 0.0 | True | 6132 |
+| wine_cultivar | True | 0.0 | True | 6192 |
+| digit_recognition | True | 0.0 | True | 6680 |
+| tumor_malignancy | True | 0.0 | True | 6196 |

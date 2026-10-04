@@ -5,3 +5,5 @@ Phase 4 adds: composite accuracy vs end-to-end baselines, routing/glue overhead 
 See `benchmarks/reports/phase3.md` for the latest numbers.
 
 Phase 5-7 reports: `phase5.*` (detection ablation, escalation), `phase6.*` (fault matrix, selective learning), `phase7.*` (consolidation, routing comparison, cross-phase baseline table). Small-quantized-LLM baseline: PENDING (no weights/egress here).
+
+Phase 10: `phase10.*` (Android target builds, Kotlin/JVM bridge results), `phase10_targets.json`, `backend_bench.json` (mlp-lite vs tract latency/memory on the four real-data modules). All earlier reports were regenerated under the mlp-lite default backend (accuracy unchanged, latency lower).

@@ -88,7 +88,7 @@
     "capability": "compare_numbers",
     "before": {
      "accuracy": 1.0,
-     "latency_us_p50": 8,
+     "latency_us_p50": 2,
      "params": 1251,
      "bytes": 5653
     },
@@ -109,7 +109,7 @@
     },
     "after": {
      "accuracy": 1.0,
-     "latency_us_p50": 8,
+     "latency_us_p50": 1,
      "bundled_regression": 1.0,
      "version": "0.1.1"
     },
@@ -121,7 +121,7 @@
     "capability": "point_region",
     "before": {
      "accuracy": 0.992,
-     "latency_us_p50": 8,
+     "latency_us_p50": 1,
      "params": 1218,
      "bytes": 5521
     },
@@ -142,7 +142,7 @@
     },
     "after": {
      "accuracy": 0.989,
-     "latency_us_p50": 8,
+     "latency_us_p50": 0,
      "bundled_regression": 0.9966666666666667,
      "version": "0.1.1"
     },
@@ -156,7 +156,7 @@
     "capability": "argmax_position",
     "before": {
      "accuracy": 0.987,
-     "latency_us_p50": 10,
+     "latency_us_p50": 2,
      "params": 1348,
      "bytes": 6041
     },
@@ -177,7 +177,7 @@
     },
     "after": {
      "accuracy": 0.983,
-     "latency_us_p50": 9,
+     "latency_us_p50": 0,
      "bundled_regression": 0.9933333333333333,
      "version": "0.1.1"
     },
@@ -197,8 +197,8 @@
     "nodes_after": 5,
     "cap_calls_after": 4,
     "outputs_identical": true,
-    "latency_us_p50_before": 91,
-    "latency_us_p50_after": 45
+    "latency_us_p50_before": 14,
+    "latency_us_p50_after": 7
    },
    {
     "plan": "sort4",
@@ -208,8 +208,8 @@
     "nodes_after": 16,
     "cap_calls_after": 5,
     "outputs_identical": true,
-    "latency_us_p50_before": 125,
-    "latency_us_p50_after": 64
+    "latency_us_p50_before": 36,
+    "latency_us_p50_after": 18
    }
   ],
   "after": {
@@ -304,8 +304,8 @@
   "learned_router": {
    "basic": {
     "training": {
-     "train_seconds": 1.459580898284912,
-     "total_seconds": 1.5031347274780273,
+     "train_seconds": 1.4266586303710938,
+     "total_seconds": 1.4722068309783936,
      "val_accuracy": 1.0,
      "params": 16708,
      "bytes": 67274,
@@ -335,8 +335,8 @@
    },
    "hard": {
     "training": {
-     "train_seconds": 1.3681113719940186,
-     "total_seconds": 1.4083542823791504,
+     "train_seconds": 1.6303000450134277,
+     "total_seconds": 1.6717684268951416,
      "val_accuracy": 1.0,
      "params": 16708,
      "bytes": 67274,
@@ -368,15 +368,15 @@
   "speed": {
    "keyword": {
     "cases": 10800,
-    "wall_ms": 374,
-    "us_per_task_wall": 34.629629629629626,
-    "peak_rss_kb": 26424
+    "wall_ms": 206,
+    "us_per_task_wall": 19.074074074074073,
+    "peak_rss_kb": 19068
    },
    "learned": {
     "cases": 10800,
-    "wall_ms": 464,
-    "us_per_task_wall": 42.96296296296296,
-    "peak_rss_kb": 27632
+    "wall_ms": 407,
+    "us_per_task_wall": 37.68518518518518,
+    "peak_rss_kb": 20116
    }
   },
   "new_capability": {
@@ -401,7 +401,7 @@
     "misrouted_known": 0.0,
     "needs_help": 0.5
    },
-   "retrain_seconds": 1.9303336143493652,
+   "retrain_seconds": 1.9598541259765625,
    "keyword_router_retrain_seconds": 0.0
   }
  }

@@ -20,9 +20,9 @@
       "compare_numbers": 5
      },
      "latency_us_p50": {
-      "total": 99,
-      "modules": 40,
-      "overhead": 59
+      "total": 56,
+      "modules": 7,
+      "overhead": 49
      },
      "parallel_levels_example": [
       [
@@ -74,7 +74,7 @@
        "g4"
       ]
      ],
-     "peak_rss_kb": 30640
+     "peak_rss_kb": 23264
     },
     "network/id": {
      "accuracy": 1.0,
@@ -85,9 +85,9 @@
       "compare_numbers": 5
      },
      "latency_us_p50": {
-      "total": 74,
-      "modules": 39,
-      "overhead": 35
+      "total": 32,
+      "modules": 8,
+      "overhead": 24
      },
      "parallel_levels_example": [
       [
@@ -139,7 +139,7 @@
        "g4"
       ]
      ],
-     "peak_rss_kb": 30548
+     "peak_rss_kb": 23052
     },
     "bubble_loop/intent": {
      "accuracy": 1.0,
@@ -150,9 +150,9 @@
       "compare_numbers": 9
      },
      "latency_us_p50": {
-      "total": 181,
-      "modules": 73,
-      "overhead": 107
+      "total": 81,
+      "modules": 9,
+      "overhead": 70
      },
      "parallel_levels_example": [
       [
@@ -160,7 +160,7 @@
        "passes"
       ]
      ],
-     "peak_rss_kb": 39388
+     "peak_rss_kb": 31872
     },
     "bubble_loop/id": {
      "accuracy": 1.0,
@@ -171,9 +171,9 @@
       "compare_numbers": 9
      },
      "latency_us_p50": {
-      "total": 117,
-      "modules": 60,
-      "overhead": 52
+      "total": 37,
+      "modules": 9,
+      "overhead": 27
      },
      "parallel_levels_example": [
       [
@@ -181,7 +181,7 @@
        "passes"
       ]
      ],
-     "peak_rss_kb": 39300
+     "peak_rss_kb": 31784
     }
    },
    "example_trace": [
@@ -260,9 +260,9 @@
       "point_region": 4
      },
      "latency_us_p50": {
-      "total": 77,
-      "modules": 32,
-      "overhead": 46
+      "total": 28,
+      "modules": 4,
+      "overhead": 24
      },
      "parallel_levels_example": [
       [
@@ -275,7 +275,7 @@
        "count"
       ]
      ],
-     "peak_rss_kb": 19868
+     "peak_rss_kb": 12456
     },
     "main/id": {
      "accuracy": 0.957,
@@ -286,9 +286,9 @@
       "point_region": 4
      },
      "latency_us_p50": {
-      "total": 57,
-      "modules": 31,
-      "overhead": 26
+      "total": 13,
+      "modules": 4,
+      "overhead": 8
      },
      "parallel_levels_example": [
       [
@@ -301,7 +301,7 @@
        "count"
       ]
      ],
-     "peak_rss_kb": 19824
+     "peak_rss_kb": 12372
     }
    },
    "example_trace": [
@@ -364,9 +364,9 @@
       "point_region": 1
      },
      "latency_us_p50": {
-      "total": 60,
-      "modules": 25,
-      "overhead": 34
+      "total": 23,
+      "modules": 3,
+      "overhead": 20
      },
      "parallel_levels_example": [
       [
@@ -382,7 +382,7 @@
        "a"
       ]
      ],
-     "peak_rss_kb": 21212
+     "peak_rss_kb": 13488
     },
     "main/id": {
      "accuracy": 0.987,
@@ -395,9 +395,9 @@
       "point_region": 1
      },
      "latency_us_p50": {
-      "total": 66,
-      "modules": 36,
-      "overhead": 30
+      "total": 11,
+      "modules": 3,
+      "overhead": 8
      },
      "parallel_levels_example": [
       [
@@ -413,7 +413,7 @@
        "a"
       ]
      ],
-     "peak_rss_kb": 20856
+     "peak_rss_kb": 13436
     }
    },
    "example_trace": [
@@ -482,9 +482,9 @@
       "argmax_position": 1
      },
      "latency_us_p50": {
-      "total": 35,
-      "modules": 15,
-      "overhead": 20
+      "total": 14,
+      "modules": 2,
+      "overhead": 11
      },
      "parallel_levels_example": [
       [
@@ -494,7 +494,7 @@
        "br"
       ]
      ],
-     "peak_rss_kb": 18120
+     "peak_rss_kb": 10592
     },
     "main/id": {
      "accuracy": 0.998,
@@ -507,9 +507,9 @@
       "argmax_position": 1
      },
      "latency_us_p50": {
-      "total": 30,
-      "modules": 16,
-      "overhead": 14
+      "total": 8,
+      "modules": 2,
+      "overhead": 5
      },
      "parallel_levels_example": [
       [
@@ -519,7 +519,7 @@
        "br"
       ]
      ],
-     "peak_rss_kb": 18040
+     "peak_rss_kb": 10664
     }
    },
    "branch_exclusive": true,
@@ -572,9 +572,9 @@
       "point_region": 1
      },
      "latency_us_p50": {
-      "total": 78,
-      "modules": 33,
-      "overhead": 46
+      "total": 39,
+      "modules": 7,
+      "overhead": 32
      },
      "parallel_levels_example": [
       [
@@ -584,7 +584,7 @@
        "C"
       ]
      ],
-     "peak_rss_kb": 19460
+     "peak_rss_kb": 11624
     },
     "main/id": {
      "accuracy": 0.993,
@@ -597,9 +597,9 @@
       "point_region": 1
      },
      "latency_us_p50": {
-      "total": 81,
-      "modules": 45,
-      "overhead": 35
+      "total": 14,
+      "modules": 4,
+      "overhead": 9
      },
      "parallel_levels_example": [
       [
@@ -609,7 +609,7 @@
        "C"
       ]
      ],
-     "peak_rss_kb": 19448
+     "peak_rss_kb": 11660
     }
    },
    "path_order_ok": true,
@@ -657,14 +657,14 @@
  },
  "latency_modular_vs_monolithic": {
   "count_inside": {
-   "monolithic_inference_us_p50": 8,
-   "modular_plan_total_us_p50": 77,
-   "latency_ratio_modular_over_monolithic": 9.625
+   "monolithic_inference_us_p50": 7,
+   "modular_plan_total_us_p50": 28,
+   "latency_ratio_modular_over_monolithic": 4.0
   },
   "mixed_C_select_B_A": {
-   "monolithic_inference_us_p50": 11,
-   "modular_plan_total_us_p50": 60,
-   "latency_ratio_modular_over_monolithic": 5.454545454545454
+   "monolithic_inference_us_p50": 4,
+   "modular_plan_total_us_p50": 23,
+   "latency_ratio_modular_over_monolithic": 5.75
   }
  },
  "expected_accuracy_if_errors_independent": {

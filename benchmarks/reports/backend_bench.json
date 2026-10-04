@@ -1,0 +1,72 @@
+{
+ "benchmark_format": "bench/1",
+ "experiment": "backend-bench",
+ "date": "2026-10-04",
+ "rows_per_task": 6000,
+ "tasks": {
+  "iris_species": {
+   "mlp": {
+    "latency_us_p50": 4,
+    "latency_us_p95": 6,
+    "wall_us_per_task": 26.17,
+    "peak_rss_kb": 14272,
+    "cases": 6000
+   },
+   "tract": {
+    "latency_us_p50": 16,
+    "latency_us_p95": 34,
+    "wall_us_per_task": 63.67,
+    "peak_rss_kb": 22360,
+    "cases": 6000
+   }
+  },
+  "wine_cultivar": {
+   "mlp": {
+    "latency_us_p50": 1,
+    "latency_us_p95": 2,
+    "wall_us_per_task": 19.67,
+    "peak_rss_kb": 14376,
+    "cases": 6000
+   },
+   "tract": {
+    "latency_us_p50": 10,
+    "latency_us_p95": 20,
+    "wall_us_per_task": 40.33,
+    "peak_rss_kb": 22392,
+    "cases": 6000
+   }
+  },
+  "digit_recognition": {
+   "mlp": {
+    "latency_us_p50": 3,
+    "latency_us_p95": 5,
+    "wall_us_per_task": 32.5,
+    "peak_rss_kb": 17112,
+    "cases": 6000
+   },
+   "tract": {
+    "latency_us_p50": 8,
+    "latency_us_p95": 15,
+    "wall_us_per_task": 47.5,
+    "peak_rss_kb": 25072,
+    "cases": 6000
+   }
+  },
+  "tumor_malignancy": {
+   "mlp": {
+    "latency_us_p50": 2,
+    "latency_us_p95": 4,
+    "wall_us_per_task": 26.5,
+    "peak_rss_kb": 15136,
+    "cases": 6000
+   },
+   "tract": {
+    "latency_us_p50": 11,
+    "latency_us_p95": 22,
+    "wall_us_per_task": 47.67,
+    "peak_rss_kb": 23012,
+    "cases": 6000
+   }
+  }
+ }
+}

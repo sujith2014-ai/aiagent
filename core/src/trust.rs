@@ -11,8 +11,11 @@ pub struct TrustStore {
 }
 
 impl TrustStore {
-    pub fn from_file(p: &Path) -> Result<Self> {
-        let raw: BTreeMap<String, String> = serde_json::from_slice(&std::fs::read(p)?)?;
+    pub fn from_file(p: &Path) -> Result<Self> { Self::from_json(&std::fs::read(p)?) }
+
+    /// Trust roots as a JSON object `{"key_id": "<base64 ed25519 public key>"}` (e.g. from app assets/secure storage on a phone).
+    pub fn from_json(bytes: &[u8]) -> Result<Self> {
+        let raw: BTreeMap<String, String> = serde_json::from_slice(bytes)?;
         let mut keys = BTreeMap::new();
         for (id, b64) in raw {
             let bytes = B64.decode(b64)?;

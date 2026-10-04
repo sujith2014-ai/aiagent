@@ -1,0 +1,149 @@
+{
+ "benchmark_format": "bench/1",
+ "experiment": "phase10-android-portability",
+ "platform": "Linux-6.18.44-fc-v64-x86_64-with-glibc2.39",
+ "date": "2026-10-04",
+ "targets": {
+  "toolchain_standin": "zig 0.16.0 (cc + ar); NOT the Android NDK",
+  "targets": {
+   "aarch64-linux-android": {
+    "lite (mlp-lite backend only, NO C toolchain) / release-small": {
+     "ok": true,
+     "seconds": 0.2,
+     "static_lib_bytes": 11391038,
+     "first_errors": []
+    },
+    "full (adds tract; needs a C/asm toolchain, zig stand-in) / release": {
+     "ok": true,
+     "seconds": 119.2,
+     "static_lib_bytes": 63357670,
+     "first_errors": []
+    },
+    "full (adds tract; needs a C/asm toolchain, zig stand-in) / release-small": {
+     "ok": true,
+     "seconds": 159.0,
+     "static_lib_bytes": 34807498,
+     "first_errors": []
+    }
+   },
+   "x86_64-linux-android": {
+    "lite (mlp-lite backend only, NO C toolchain) / release-small": {
+     "ok": true,
+     "seconds": 0.1,
+     "static_lib_bytes": 10939714,
+     "first_errors": []
+    },
+    "full (adds tract; needs a C/asm toolchain, zig stand-in) / release": {
+     "ok": true,
+     "seconds": 117.8,
+     "static_lib_bytes": 65809506,
+     "first_errors": []
+    },
+    "full (adds tract; needs a C/asm toolchain, zig stand-in) / release-small": {
+     "ok": true,
+     "seconds": 152.5,
+     "static_lib_bytes": 29518784,
+     "first_errors": []
+    }
+   },
+   "armv7-linux-androideabi": {
+    "lite (mlp-lite backend only, NO C toolchain) / release-small": {
+     "ok": true,
+     "seconds": 0.2,
+     "static_lib_bytes": 8805354,
+     "first_errors": []
+    },
+    "full (adds tract; needs a C/asm toolchain, zig stand-in) / release": {
+     "ok": false,
+     "seconds": 0.9,
+     "static_lib_bytes": null,
+     "first_errors": [
+      "warning: tract-linalg@0.21.18: /home/user/ai-system/target/armv7-linux-androideabi/release/build/tract-linalg-d84bab108ab25a7b/out/armvfpv2_mmm_f32_4x4.S:36:5: error: instruction requires: fp registers",
+      "warning: tract-linalg@0.21.18: /home/user/ai-system/target/armv7-linux-androideabi/release/build/tract-linalg-d84bab108ab25a7b/out/armvfpv2_mmm_f32_4x4.S:38:5: error: instruction requires: fp registers",
+      "warning: tract-linalg@0.21.18: /home/user/ai-system/target/armv7-linux-androideabi/release/build/tract-linalg-d84bab108ab25a7b/out/armvfpv2_mmm_f32_4x4.S:40:5: error: instruction requires: fp registers"
+     ]
+    },
+    "full (adds tract; needs a C/asm toolchain, zig stand-in) / release-small": {
+     "ok": false,
+     "seconds": 9.5,
+     "static_lib_bytes": null,
+     "first_errors": [
+      "warning: tract-linalg@0.21.18: /home/user/ai-system/target/armv7-linux-androideabi/release-small/build/tract-linalg-b967c99511a643c7/out/armvfpv2_mmm_f32_4x4.S:36:5: error: instruction requires: fp registers",
+      "warning: tract-linalg@0.21.18: /home/user/ai-system/target/armv7-linux-androideabi/release-small/build/tract-linalg-b967c99511a643c7/out/armvfpv2_mmm_f32_4x4.S:38:5: error: instruction requires: fp registers",
+      "warning: tract-linalg@0.21.18: /home/user/ai-system/target/armv7-linux-androideabi/release-small/build/tract-linalg-b967c99511a643c7/out/armvfpv2_mmm_f32_4x4.S:40:5: error: instruction requires: fp registers"
+     ]
+    }
+   }
+  },
+  "host_stripped_size_optimised_so_bytes": {
+   "full (with tract)": 9077768,
+   "lite (mlp-lite only)": 1250440
+  }
+ },
+ "kotlin_jvm_bridge_tests": [
+  {
+   "test": "guardedDeviceToolsAskThePolicyBeforeTouchingTheDevice",
+   "ok": true
+  },
+  {
+   "test": "serverToDeviceDeliveryInstallsGoodPackagesAndRejectsBadOnesAndCleansUp",
+   "ok": true
+  },
+  {
+   "test": "planExecutionThroughTheBridgeComposesInstalledModules",
+   "ok": true
+  },
+  {
+   "test": "misuseNeverCrashesTheProcess",
+   "ok": true
+  },
+  {
+   "test": "packagesBuiltOnPcInstallThroughTheFullActivationSequence",
+   "ok": true
+  },
+  {
+   "test": "manyThreadsShareOneRuntimeSafely",
+   "ok": true
+  },
+  {
+   "test": "hostileAndIncompatiblePackagesAreRejectedAndLeaveNothingBehind",
+   "ok": true
+  },
+  {
+   "test": "nativeLibraryReportsCoreVersionAndBackend",
+   "ok": true
+  },
+  {
+   "test": "policyChecksRunInTheCoreAndFailClosedOnBadInput",
+   "ok": true
+  },
+  {
+   "test": "registrySurvivesCloseAndReopenAndAFreshInstallReproducesTheSameOutputs",
+   "ok": true
+  },
+  {
+   "test": "solveMatchesTheRustCliOutputsForTheSamePackages",
+   "ok": true
+  },
+  {
+   "test": "unknownTasksAndOutOfRangeInputsAreRefusedNotFabricated",
+   "ok": true
+  },
+  {
+   "test": "deviceSpecificCapabilityIsAcceptedOnlyWhereTheDeviceProvidesIt",
+   "ok": true
+  },
+  {
+   "test": "nonFiniteInputsAreRefusedNeverAnsweredWithGarbage",
+   "ok": true
+  }
+ ],
+ "pending_physical_validation": [
+  "load libaicore_jni.so on ART/bionic",
+  "run on an arm64 phone: latency, memory, battery, temperature",
+  "Gradle/AGP build of the app module and APK size",
+  "permissions flow, notification/clipboard tools, lifecycle/process death",
+  "NDK-linked .so (only static libraries were produced here)",
+  "16 KB page-size alignment on newer Android versions"
+ ]
+}

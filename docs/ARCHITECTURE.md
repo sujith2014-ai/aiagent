@@ -8,8 +8,10 @@ core/ (Rust crate `aicore`, platform-neutral)
   workspace.rs   per-task working state    trace.rs   JSONL trace of imports and tasks
   backend.rs     Backend/Model traits + ONNX(tract)   device.rs  DeviceProfile (the only platform seam)
   graph.rs       execution plans (cap/select/cond_swap/affine/gather/if/repeat), static validation, step budget
+  onnx_lite.rs   mlp-lite: pure-Rust executor for the ONNX subset our modules use (default backend; tract is an optional fallback)
   runtime.rs     guarded import, lazy load/unload (LRU), solve, run_plan, regression
 platforms/desktop/  `aicli` harness (arg parsing, JSON, peak RSS); stateless commands: policy-check, approve, features
+platforms/android/   jni/ (Rust cdylib bridge), core-bridge/ (pure Kotlin/JVM, tested), app/ (Android shell, NOT compiled here)
 apps/desktop/       desktop service + REPL (token-protected loopback JSON API, teach-by-example), see ADR-025
 training/ integrations/teacher/ packages/  Python research side (never imported by the core)
 ```

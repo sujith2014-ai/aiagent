@@ -1,5 +1,5 @@
 //! Runtime: guarded import (the activation sequence), lazy load/unload, solve.
-use crate::backend::{Backend, Model, OnnxBackend};
+use crate::backend::{default_backend, Backend, Model};
 use crate::capability::Manifest;
 use crate::device::DeviceProfile;
 use crate::graph::{NodeRecord, Node, Plan, PlanError, PlanResult, Ref, MAX_STEPS};
@@ -121,11 +121,16 @@ impl Runtime {
         Ok(Self {
             root: root.to_path_buf(), device, trust,
             registry: Registry::open(root)?,
-            backend: Box::new(OnnxBackend),
+            backend: default_backend("auto")?,
             router: Box::new(KeywordRouter::default()),
             loaded: HashMap::new(), lru: vec![],
             trace: Trace::open(root), task_counter: 0, detect: Detection::by_name("full").unwrap(), force_capability: None, record_stats: true,
         })
+    }
+
+    /// Select the inference backend: "auto" (mlp-lite, then the general runtime if compiled in), "mlp", or "tract". Unloads all modules.
+    pub fn set_backend(&mut self, kind: &str) -> Result<()> {
+        self.backend = default_backend(kind)?; self.loaded.clear(); self.lru.clear(); Ok(())
     }
 
     pub fn loaded_modules(&self) -> Vec<String> { self.lru.clone() }
@@ -183,7 +188,7 @@ impl Runtime {
         let model = match self.backend.load(&pkg.manifest.model.format, mb, pkg.manifest.io.input.dim) {
             Ok(m) => m, Err(e) => { Self::fail(&mut rep, "sandbox_load", e); return self.log_import(rep, path); }
         };
-        Self::okstep(&mut rep, "sandbox_load", self.backend.name());
+        Self::okstep(&mut rep, "sandbox_load", model.backend());
 
         // bundled tests
         let tests = match pkg.tests() { Ok(t) => t, Err(e) => { Self::fail(&mut rep, "bundled_tests", e); return self.log_import(rep, path); } };
@@ -271,6 +276,12 @@ impl Runtime {
     pub fn solve(&mut self, task: &Task) -> Result<Outcome> {
         self.task_counter += 1;
         let task_id = format!("t{}-{}", now_secs(), self.task_counter);
+        if !task.input.iter().all(|v| v.is_finite()) {
+            // NaN/inf compare false against every threshold, so they would slip past all guards and produce a garbage answer
+            let o = Outcome::NeedsHelp { reason_code: "INVALID_INPUT", reason: "input contains NaN or infinite values".into(), task_id: task_id.clone() };
+            self.trace.append(&serde_json::json!({"event": "task", "task_id": task_id, "ts": now_secs(), "intent": task.intent, "outcome": &o}))?;
+            return Ok(o);
+        }
         let decision = match &self.force_capability {
             Some(c) => crate::router::Decision { status: Status::Known, chosen: Some(c.clone()),
                 candidates: vec![crate::router::Candidate { capability_id: c.clone(), score: 1.0, dice: 1.0, shape_ok: true }] },
@@ -291,6 +302,11 @@ impl Runtime {
                 let logits = model.run(&task.input)?;
                 let latency_us = t0.elapsed().as_micros() as u64;
                 let ver = ver.clone();
+                if !logits.iter().all(|v| v.is_finite()) {
+                    let o = Outcome::NeedsHelp { reason_code: "NON_FINITE_OUTPUT", reason: format!("module '{cap}' produced non-finite values for this input"), task_id: task_id.clone() };
+                    self.trace.append(&serde_json::json!({"event": "task", "task_id": task_id, "ts": now_secs(), "intent": task.intent, "routing": decision, "outcome": &o}))?;
+                    return Ok(o);
+                }
                 let raw_probs = softmax(&logits);
                 let rec = self.registry.get(&cap).unwrap();
                 let temp = if self.detect.use_calibration { rec.calibration.as_ref().map(|c| c.temperature).unwrap_or(1.0) } else { 1.0 };
@@ -338,6 +354,7 @@ impl Runtime {
         for (name, dim) in &plan.inputs {
             let v = inputs.get(name).ok_or_else(|| PlanError::Invalid(format!("missing input '{name}'")))?;
             if v.len() != *dim { return Err(PlanError::Invalid(format!("input '{name}' has {} values, plan declares {dim}", v.len()))); }
+            if !v.iter().all(|x| x.is_finite()) { return Err(PlanError::Invalid(format!("input '{name}' contains NaN or infinite values"))); }
             slots.insert(name.clone(), v.clone());
         }
         let t0 = Instant::now();
@@ -401,6 +418,9 @@ impl Runtime {
                         }
                         _ => unreachable!("validated"),
                     };
+                    if !input.iter().all(|v| v.is_finite()) {
+                        return Err(PlanError::NeedsHelp { node: id.clone(), reason: "INVALID_INPUT: non-finite value reached a capability".into() });
+                    }
                     if self.detect.use_novelty {
                         // the same out-of-domain refusal as `solve`: a plan must not push inputs through a capability outside its learned domain
                         if let Some(rec) = self.registry.get(&cap) {
@@ -417,6 +437,7 @@ impl Runtime {
                     let t = Instant::now();
                     let logits = model.run(&input).map_err(|e| PlanError::Exec { node: id.clone(), reason: e.to_string() })?;
                     let us = t.elapsed().as_micros() as u64;
+                    if !logits.iter().all(|v| v.is_finite()) { return Err(PlanError::NeedsHelp { node: id.clone(), reason: format!("NON_FINITE_OUTPUT from '{cap}'") }); }
                     st.module_us += us;
                     let probs = softmax(&logits);
                     let idx = argmax(&probs);

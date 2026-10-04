@@ -1,0 +1,19 @@
+[package]
+name = "aicore-jni"
+version = "0.1.0"
+edition = "2021"
+description = "JNI bridge exposing the platform-neutral core to the Kotlin shell (Android) and to JVM tests (host)"
+
+[lib]
+name = "aicore_jni"
+crate-type = ["cdylib", "staticlib"]
+
+[dependencies]
+aicore = { path = "../../../core", default-features = false }
+jni = "0.21"
+serde_json = "1"
+
+[features]
+default = ["tract"]
+# Android builds that must not need a C toolchain use `--no-default-features` (mlp-lite backend only).
+tract = ["aicore/backend-tract"]
