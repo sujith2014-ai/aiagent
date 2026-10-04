@@ -1,0 +1,181 @@
+{
+ "benchmark_format": "bench/1",
+ "experiment": "phase11-hybrid-delivery-offline",
+ "platform": "Linux-6.18.44-fc-v64-x86_64-with-glibc2.39",
+ "date": "2026-10-04",
+ "network": "loopback only: latencies are lower bounds; no TLS; no real WAN",
+ "delivery": {
+  "iris_species": {
+   "learned": true,
+   "server_train_and_sign_s": 1.56,
+   "sync_verify_install_s": 0.009,
+   "upload_bytes_json": 3943,
+   "package_bytes": 20010,
+   "installed_on_device": true,
+   "heldout_accuracy": 1.0
+  },
+  "wine_cultivar": {
+   "learned": true,
+   "server_train_and_sign_s": 0.17,
+   "sync_verify_install_s": 0.009,
+   "upload_bytes_json": 15105,
+   "package_bytes": 9599,
+   "installed_on_device": true,
+   "heldout_accuracy": 1.0
+  },
+  "digit_recognition": {
+   "learned": true,
+   "server_train_and_sign_s": 1.07,
+   "sync_verify_install_s": 0.012,
+   "upload_bytes_json": 615330,
+   "package_bytes": 28985,
+   "installed_on_device": true,
+   "heldout_accuracy": 0.9722222089767456
+  },
+  "tumor_malignancy": {
+   "learned": true,
+   "server_train_and_sign_s": 0.46,
+   "sync_verify_install_s": 0.015,
+   "upload_bytes_json": 139858,
+   "package_bytes": 21493,
+   "installed_on_device": true,
+   "heldout_accuracy": 0.9736841917037964
+  }
+ },
+ "catalog_bytes": 1633,
+ "device_holds_private_key": false,
+ "latency_us": {
+  "local_incl_process_spawn": {
+   "p50": 3641.67199950316,
+   "p95": 5512.764999366482
+  },
+  "remote_loopback_http": {
+   "p50": 4880.929000137257,
+   "p95": 6880.110999190947
+  },
+  "note": "local numbers include spawning the CLI process per call (the harness), so they overstate on-device latency; core inference alone is ~1-4 us (benchmarks/reports/backend_bench.json)"
+ },
+ "placement": {
+  "known_task": {
+   "placement": "LOCAL",
+   "result": "ANSWER",
+   "executed_on": "device"
+  },
+  "unknown_task_online": {
+   "placement": "SERVER",
+   "result": "NEEDS_HELP",
+   "executed_on": "server"
+  },
+  "sensitive_unknown_task": {
+   "placement": "REFUSE_KEEP_LOCAL",
+   "result": "NEEDS_HELP",
+   "server_requests_made": 0
+  },
+  "sensitive_examples_upload": {
+   "uploaded": false,
+   "reason": "examples are sensitive or upload was not consented to; nothing left the device",
+   "server_requests_made": 0
+  }
+ },
+ "offline": {
+  "timeline": [
+   {
+    "kind": "known",
+    "placement": "LOCAL",
+    "result": "ANSWER"
+   },
+   {
+    "kind": "known",
+    "placement": "LOCAL",
+    "result": "ANSWER"
+   },
+   {
+    "kind": "known",
+    "placement": "LOCAL",
+    "result": "ANSWER"
+   },
+   {
+    "kind": "unknown",
+    "placement": "QUEUE",
+    "result": "NEEDS_HELP"
+   },
+   {
+    "kind": "unknown",
+    "placement": "QUEUE",
+    "result": "NEEDS_HELP"
+   }
+  ],
+  "known_answered_offline": 3,
+  "known_total": 3,
+  "unknown_queued": 2,
+  "teach_while_offline": {
+   "uploaded": false,
+   "queued": true
+  },
+  "pending_before_reconnect": 3,
+  "flush_while_offline": {
+   "flushed": 0,
+   "still_queued": 3
+  },
+  "flush_after_reconnect": {
+   "flushed": 3,
+   "still_queued": 0
+  }
+ },
+ "attacks": {
+  "tampered_catalog": {
+   "outcome": {
+    "refused": "catalog signature invalid"
+   },
+   "device_capabilities_after": [],
+   "defended": true
+  },
+  "catalog_signed_by_unknown_key": {
+   "outcome": {
+    "refused": "catalog signed by untrusted or revoked key 'evil'"
+   },
+   "device_capabilities_after": [],
+   "defended": true
+  },
+  "modified_package_in_transit": {
+   "outcome": {
+    "installed": [],
+    "rejected": [
+     "downloaded bytes do not match the signed catalog entry"
+    ],
+    "warnings": []
+   },
+   "device_capabilities_after": [],
+   "defended": true
+  },
+  "catalog_replay": {
+   "outcome": {
+    "refused": "catalog replay: sequence 1 < last seen 2"
+   },
+   "device_capabilities_after": [
+    "iris_species"
+   ],
+   "defended": true
+  },
+  "stale_catalog_freeze": {
+   "outcome": {
+    "refused": "catalog is older than the maximum allowed age (possible freeze attack)"
+   },
+   "device_capabilities_after": [],
+   "defended": true
+  },
+  "downgrade_via_signed_catalog": {
+   "outcome": {
+    "installed": [],
+    "rejected": [],
+    "warnings": [
+     "iris_species: catalog offers 0.1.0 but 0.2.0 is installed (possible downgrade attempt); ignored"
+    ]
+   },
+   "device_capabilities_after": [
+    "iris_species"
+   ],
+   "defended": true
+  }
+ }
+}

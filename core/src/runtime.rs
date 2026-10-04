@@ -295,7 +295,12 @@ impl Runtime {
             }
             (status, Some(cap)) => {
                 let cap = cap.clone();
-                self.ensure_loaded(&cap)?;
+                if let Err(e) = self.ensure_loaded(&cap) {
+                    // the stored package no longer verifies (tampered store, revoked signer, ...): refuse cleanly, never answer from an unverified model
+                    let o = Outcome::NeedsHelp { reason_code: "MODEL_UNAVAILABLE", reason: format!("capability '{cap}' cannot be loaded: {e}"), task_id: task_id.clone() };
+                    self.trace.append(&serde_json::json!({"event": "task", "task_id": task_id, "ts": now_secs(), "intent": task.intent, "routing": decision, "outcome": &o}))?;
+                    return Ok(o);
+                }
                 let mut ws = Workspace::new(&task.intent, &task.input);
                 let t0 = Instant::now();
                 let (ver, model) = self.loaded.get(&cap).unwrap();

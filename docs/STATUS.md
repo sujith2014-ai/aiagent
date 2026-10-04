@@ -12,4 +12,5 @@
 | 8 OpenClaw integration, research/tool escalation, provenance, retry-after-learning | boundary + policy + adapter done and contract-validated against the real binary; **live research PENDING (R3)**; research results use a simulated provider/teacher | benchmarks/reports/phase8.*, tests/test_phase8.py, docs/OPENCLAW.md |
 | 9 Desktop runtime/application, real-world controlled tasks | done (4 small public datasets; on par with standard baselines, not better; novelty-rule redesign, FINDINGS F23-F27) | benchmarks/reports/phase9.*, novelty_rules.json, tests/test_phase9.py |
 | 10 Android Kotlin shell, Rust JNI, portable inference, .cap installation | core + JNI compile for Android targets; Kotlin/JVM bridge validated (14 tests, both library variants); **app module uncompiled and all on-device execution PENDING (R2)**; mlp-lite backend added | benchmarks/reports/phase10.*, backend_bench.json, tests/test_phase10.py, core/tests/mlp_lite.rs, docs/ANDROID.md |
-| 11-15 | not started | |
+| 11 Hybrid local/server execution, signed capability delivery, offline mode | done on loopback (no real network, no TLS); delivery attacks defended 6/6; single signing key for catalog and packages is a stated weakness | benchmarks/reports/phase11.*, tests/test_phase11.py, apps/server, apps/hybrid |
+| 12-15 | not started | |

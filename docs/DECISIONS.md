@@ -87,3 +87,15 @@ Status: accepted. The bridge is JSON-in/JSON-out over a handle table; domain out
 
 ## ADR-029: Non-finite values are refused everywhere
 Status: accepted. NaN and infinity compare false against every guard, so they used to pass novelty checks and yield an answer with a garbage confidence. Single-task solve, plan inputs, intermediate values reaching a capability and model outputs are now refused (`INVALID_INPUT` / `NON_FINITE_OUTPUT`).
+
+## ADR-030: Key custody: the server builds and signs, devices verify
+Status: accepted for hybrid deployments. Devices hold only public trust roots (`trust.json`, optionally with `__revoked__`); the capability server holds the signing key, trains from consented example uploads and publishes. The desktop single-user mode (ADR-025) keeps key and runtime in one process and is the exception. Known weakness: one key signs both catalog and packages (F33).
+
+## ADR-031: Signed catalog with sequence and age; hash pinning; revocation proposed, applied by the operator
+Status: accepted. The catalog body is signed as an exact string; devices verify it against their trust roots, reject sequence numbers below the last seen (replay) and catalogs older than a maximum age (freeze), pin downloads to the signed entry's hash, ignore offers of older versions, and only record proposed revocations for the operator to apply. The core re-verifies signature and hashes on every module load, so revocation also disables already-installed capabilities (fail closed).
+
+## ADR-032: Placement is deterministic, local-first and privacy-first
+Status: accepted. `placement(local_result, sensitive, online, allow_server)`: answer locally if possible; sensitive tasks and unconsented examples never leave the device; server execution only when permitted; offline requests queue and are never executed or reported as done. Heavy training is offloaded to the server (upload requires explicit consent per request).
+
+## ADR-033: Stored models that stop verifying are refused, not errors
+Status: accepted. `solve` returns `NEEDS_HELP(MODEL_UNAVAILABLE)` with the verification failure as the reason when a stored package no longer verifies (modified store file, revoked signer), so callers handle it as a refusal.

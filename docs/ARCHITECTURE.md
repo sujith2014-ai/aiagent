@@ -12,6 +12,7 @@ core/ (Rust crate `aicore`, platform-neutral)
   runtime.rs     guarded import, lazy load/unload (LRU), solve, run_plan, regression
 platforms/desktop/  `aicli` harness (arg parsing, JSON, peak RSS); stateless commands: policy-check, approve, features
 platforms/android/   jni/ (Rust cdylib bridge), core-bridge/ (pure Kotlin/JVM, tested), app/ (Android shell, NOT compiled here)
+apps/server/        capability server (build/sign/catalog/remote execution); apps/hybrid/ device-side client (placement, verified sync, offline queue)
 apps/desktop/       desktop service + REPL (token-protected loopback JSON API, teach-by-example), see ADR-025
 training/ integrations/teacher/ packages/  Python research side (never imported by the core)
 ```

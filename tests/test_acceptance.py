@@ -122,8 +122,36 @@ def test_store_tampering_detected_on_reload(env, cli):
     import1(cli, env["good"])
     f = next((cli.root / "store").glob("*.cap"))
     f.write_bytes(repack(f, f.with_suffix(".tmp"), replace={"model/model.onnx": b"zzz"}).read_bytes())
-    p = cli._run("solve", "--intent", "compare numbers", "--input", "0.1,0.2", check=False)
-    assert p.returncode != 0                                            # refuses to load a modified store file
+    out = cli.solve("compare numbers", [0.1, 0.2])
+    assert out["result"] == "NEEDS_HELP" and out["reason_code"] == "MODEL_UNAVAILABLE" and "label" not in out        # refuses to answer from a modified store file
+
+
+def test_revoked_signer_blocks_new_imports_and_already_installed_capabilities(env, cli, tmp_path):
+    assert import1(cli, env["good"])["activated"]
+    assert cli.solve("compare numbers", [0.1, 0.9])["result"] == "ANSWER"
+    trust = json.loads(Path(env["trust"]).read_text()); trust["__revoked__"] = ["build-svc-1"]
+    revoked = tmp_path / "trust_revoked.json"; revoked.write_text(json.dumps(trust))
+    after = Cli(cli.root, revoked)                                           # same runtime state, trust root now revokes the signer
+    out = after.solve("compare numbers", [0.1, 0.9])
+    assert out["result"] == "NEEDS_HELP" and out["reason_code"] == "MODEL_UNAVAILABLE" and "revoked" in out["reason"]
+    rep = after.import_caps(str(env["good"]))[0]
+    assert rep["activated"] is False and rep["failed_step"] == "signature" and "revoked" in rep["steps"][-1]["detail"]
+    ok = Cli(tmp_path / "other", env["trust"])                                # without the revocation the same package still works
+    assert ok.import_caps(str(env["good"]))[0]["activated"]
+
+
+def test_key_rotation_new_signer_works_while_the_old_one_is_revoked(env, tmp_path):
+    from packages.capbuild import keygen, load_private
+    keygen("build-svc-2", tmp_path / "k2")
+    trust = {"build-svc-1": (env["dir"] / "keys/build-svc-1.public").read_text(), "build-svc-2": (tmp_path / "k2/build-svc-2.public").read_text(), "__revoked__": ["build-svc-1"]}
+    (tmp_path / "t.json").write_text(json.dumps(trust))
+    make_cap(env, tmp_path / "new.cap", key="rogue") if False else None
+    from packages.capbuild import build_cap
+    build_cap(tmp_path / "rot.cap", capability_id="compare_numbers", version="0.3.0", model_bytes=env["onnx"], params=1251, input_dim=2, labels=["LESS", "EQUAL", "GREATER"], tests=env["tests"],
+              keywords=env["lp"].keywords, description="d", signer_id="build-svc-2", signer_key=load_private("build-svc-2", tmp_path / "k2"), provenance={"source": "t"}, min_accuracy=0.9)
+    c = Cli(tmp_path / "rt", tmp_path / "t.json")
+    assert c.import_caps(str(tmp_path / "rot.cap"))[0]["activated"]            # signed by the new key
+    assert c.import_caps(str(env["good"]))[0]["failed_step"] == "signature"    # old key revoked
 
 
 def test_teacher_side_has_no_signing_access():
