@@ -13,4 +13,5 @@
 | 9 Desktop runtime/application, real-world controlled tasks | done (4 small public datasets; on par with standard baselines, not better; novelty-rule redesign, FINDINGS F23-F27) | benchmarks/reports/phase9.*, novelty_rules.json, tests/test_phase9.py |
 | 10 Android Kotlin shell, Rust JNI, portable inference, .cap installation | core + JNI compile for Android targets; Kotlin/JVM bridge validated (14 tests, both library variants); **app module uncompiled and all on-device execution PENDING (R2)**; mlp-lite backend added | benchmarks/reports/phase10.*, backend_bench.json, tests/test_phase10.py, core/tests/mlp_lite.rs, docs/ANDROID.md |
 | 11 Hybrid local/server execution, signed capability delivery, offline mode | done on loopback (no real network, no TLS); delivery attacks defended 6/6; single signing key for catalog and packages is a stated weakness | benchmarks/reports/phase11.*, tests/test_phase11.py, apps/server, apps/hybrid |
-| 12-15 | not started | |
+| 12 On-device learning | done on PC (Rust trainer, device-key signing, adapt/alias gates, server endorsement, JNI/Kotlin bindings tested on the JVM); accuracy at parity with server training, adaptation gated and sometimes refused (F36-F39); **phone battery/thermal/NPU PENDING (R4); Android Keystore not implemented** | benchmarks/reports/phase12.*, tests/test_phase12.py |
+| 13-15 | not started | |

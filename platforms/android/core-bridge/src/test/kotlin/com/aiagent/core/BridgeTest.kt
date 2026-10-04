@@ -195,4 +195,43 @@ class BridgeTest {
             assertEquals(0, temp.listFiles()!!.size)                                                                                                                   // no leftovers
         }
     }
+
+    private fun learnSpec(id: String = "larger_of_two", minAcc: Double = 0.9): String {
+        val rnd = java.util.Random(7); val x = JSONArray(); val y = JSONArray()
+        repeat(240) { val a = rnd.nextDouble() * 10; val b = rnd.nextDouble() * 10; x.put(JSONArray(listOf(a, b))); y.put(if (a > b) 1 else 0) }
+        return JSONObject().put("capability_id", id).put("description", "which of two numbers is larger").put("keywords", JSONArray(listOf("larger", "bigger", "numbers")))
+            .put("labels", JSONArray(listOf("second", "first"))).put("x", x).put("y", y).put("min_accuracy", minAcc).toString()
+    }
+
+    @Test fun onDeviceLearningThroughTheBridgeSignsWithTheDeviceKeyAndIsUsableOnlyWhileThatKeyIsSet() {
+        val dir = tmp(); val seed = "11".repeat(32)
+        open(dir).use { c ->
+            // no device key: the core refuses cleanly, nothing installed
+            assertTrue(runCatching { c.learn(learnSpec()) }.isFailure)
+            assertTrue(c.setDeviceKey("phone-1", seed).isNotEmpty())
+            val r = c.learn(learnSpec())
+            assertTrue(r.getBoolean("learned"), r.toString()); assertTrue(r.getDouble("test_accuracy") >= 0.9)
+            val ok = c.solve("which of two numbers is larger", floatArrayOf(7f, 2f)); assertIs<SolveResult.Answer>(ok); assertEquals("first", ok.label)
+            val ok2 = c.solve("which of two numbers is larger", floatArrayOf(1f, 9f)); assertIs<SolveResult.Answer>(ok2); assertEquals("second", ok2.label)
+            // router update on the device bumps the version and keeps the model
+            assertTrue(c.alias("larger_of_two", listOf("greater")).getBoolean("activated"))
+            assertIs<SolveResult.Answer>(c.solve("which is greater", floatArrayOf(7f, 2f)))
+        }
+        // restart WITHOUT the device key: the stored package is signed by a key this runtime no longer trusts -> refused, not run
+        open(dir).use { c ->
+            val r = c.solve("which of two numbers is larger", floatArrayOf(7f, 2f)); assertIs<SolveResult.NeedsHelp>(r); assertEquals("MODEL_UNAVAILABLE", r.reasonCode)
+            c.setDeviceKey("phone-1", seed)
+            assertIs<SolveResult.Answer>(c.solve("which of two numbers is larger", floatArrayOf(7f, 2f)))
+        }
+    }
+
+    @Test fun onDeviceLearningRefusesBadRequestsAndRandomLabelsThroughTheBridge() {
+        open().use { c ->
+            c.setDeviceKey("phone-1", "22".repeat(32))
+            assertTrue(runCatching { c.learn(JSONObject(learnSpec()).put("capability_id", "bad id!").toString()) }.isFailure)
+            val noise = JSONObject(learnSpec()); val y = noise.getJSONArray("y"); val rnd = java.util.Random(1); for (k in 0 until y.length()) y.put(k, rnd.nextInt(2))
+            val r = c.learn(noise.toString()); assertFalse(r.getBoolean("learned")); assertTrue(r.getString("reason").contains("held-out accuracy"))
+            assertEquals(0, c.list().length())
+        }
+    }
 }

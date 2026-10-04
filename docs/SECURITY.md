@@ -26,3 +26,10 @@ Package validation is identical on Android (same core); trust roots are public k
 
 ## Phase 11: hybrid delivery
 Devices hold public keys only; the server signs. Catalog: signed, monotonic sequence, maximum age; downloads pinned to signed hashes; downgrades ignored; revocations proposed by the catalog and applied only by the operator; revoked signers disable installed capabilities (fail closed). Server API: bearer token, Host check, size and shape limits, no path traversal. Privacy: sensitive tasks and unconsented examples never leave the device. Limits (F33): one key signs catalog and packages (no separated roles), no TLS in the tests, clock-dependent freshness, unbounded offline queue.
+
+
+## Phase 12: on-device learning
+- Learned packages are signed with a device-scoped key, trusted only by the runtime that holds it (ADR-034); the server signing key never leaves the server.
+- Learning refuses non-finite or malformed examples, too few examples, too few per class and models below `min_accuracy`; adaptation refuses regressions (ADR-035). All installs go through the normal activation sequence.
+- Server endorsement (ADR-036) verifies signer, hashes, bundled tests and supplied examples; it does not prove the data are honest (F39).
+- Weaknesses: the device key is a 0600 file on PC and is not wrapped by the Android Keystore (PENDING, R4); a device that loses its key cannot use its learned models; training data never leave the device unless the operator sends them to `/endorse`.

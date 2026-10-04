@@ -99,3 +99,16 @@ Status: accepted. `placement(local_result, sensitive, online, allow_server)`: an
 
 ## ADR-033: Stored models that stop verifying are refused, not errors
 Status: accepted. `solve` returns `NEEDS_HELP(MODEL_UNAVAILABLE)` with the verification failure as the reason when a stored package no longer verifies (modified store file, revoked signer), so callers handle it as a refusal.
+
+
+## ADR-034: On-device learning signs with a device-scoped key that only that runtime trusts
+Status: accepted. `learn`, `adapt` and `alias` sign with a device-local Ed25519 key (`keygen`, mode 0600). The key is added to the trust set only while loaded (`--device-key`, JNI `nativeSetDeviceKey`), so other runtimes reject device-signed packages and a device without its key refuses its own learned models as `MODEL_UNAVAILABLE`. Learned packages go through the same activation sequence as any import. The device can never sign with the server key (ADR-030 holds).
+
+## ADR-035: Adaptation is gated; new modules need enough data
+Status: accepted. `adapt` (head-only or full) installs a newer version only if accuracy on held-out new examples improves by `min_gain` and old-domain accuracy (replay buffer) drops by at most `max_old_drop`; otherwise nothing changes. `learn` refuses below 30 distinct examples or 3 per class and refuses models that miss `min_accuracy` on held-out data (3 escalating attempts). Backed by F37.
+
+## ADR-036: The server endorses device-learned packages; it never trusts them blindly
+Status: accepted. `/endorse` accepts only packages signed by enrolled device keys, verified by the core, evaluated on supplied examples, newer than the server's version, then re-signed with the server key. Other devices keep trusting only the server key. Limit documented in F39. Server training remains the path for anything outside the on-device trainer (F36).
+
+## ADR-037: Trainer hygiene found by tests
+Status: accepted. Early stopping ties on validation accuracy are broken by validation loss; calibration temperature is restricted to T >= 1.

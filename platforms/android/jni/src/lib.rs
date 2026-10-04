@@ -113,6 +113,54 @@ pub extern "system" fn Java_com_aiagent_core_NativeCore_nativeRunPlan(mut env: J
     out(&mut env, r)
 }
 
+// ---- on-device learning (Phase 12). The signing seed is passed in by the Kotlin shell (read from Android Keystore-wrapped storage); it is never logged or returned.
+#[no_mangle]
+pub extern "system" fn Java_com_aiagent_core_NativeCore_nativeSetDeviceKey(mut env: JNIEnv, _c: JClass, handle: jlong, key_json: JString) -> jstring {
+    let k = jstr(&mut env, &key_json);
+    let r = catch_unwind(AssertUnwindSafe(|| {
+        let rt = get(handle)?; let k: Value = serde_json::from_str(&k?).map_err(|e| format!("device key: {e}"))?;
+        let id = k["key_id"].as_str().ok_or("key_id")?; let seed = k["seed_hex"].as_str().ok_or("seed_hex")?;
+        let signer = aicore::pack::DeviceSigner::from_seed_hex(id, seed).map_err(|e| e.to_string())?;
+        let public = signer.public_b64();
+        rt.lock().map_err(|_| "runtime poisoned".to_string())?.set_device_signer(signer).map_err(|e| e.to_string())?;
+        Ok(json!({"key_id": id, "public_b64": public}))
+    }));
+    out(&mut env, r)
+}
+
+#[no_mangle]
+pub extern "system" fn Java_com_aiagent_core_NativeCore_nativeLearn(mut env: JNIEnv, _c: JClass, handle: jlong, spec_json: JString) -> jstring {
+    let s = jstr(&mut env, &spec_json);
+    let r = catch_unwind(AssertUnwindSafe(|| {
+        let rt = get(handle)?; let req: aicore::learn::LearnRequest = serde_json::from_str(&s?).map_err(|e| format!("learn spec: {e}"))?;
+        let mut g = rt.lock().map_err(|_| "runtime poisoned".to_string())?;
+        serde_json::to_value(g.learn(&req).map_err(|e| e.to_string())?).map_err(|e| e.to_string())
+    }));
+    out(&mut env, r)
+}
+
+#[no_mangle]
+pub extern "system" fn Java_com_aiagent_core_NativeCore_nativeAdapt(mut env: JNIEnv, _c: JClass, handle: jlong, spec_json: JString) -> jstring {
+    let s = jstr(&mut env, &spec_json);
+    let r = catch_unwind(AssertUnwindSafe(|| {
+        let rt = get(handle)?; let req: aicore::learn::AdaptRequest = serde_json::from_str(&s?).map_err(|e| format!("adapt spec: {e}"))?;
+        let mut g = rt.lock().map_err(|_| "runtime poisoned".to_string())?;
+        serde_json::to_value(g.adapt(&req).map_err(|e| e.to_string())?).map_err(|e| e.to_string())
+    }));
+    out(&mut env, r)
+}
+
+#[no_mangle]
+pub extern "system" fn Java_com_aiagent_core_NativeCore_nativeAlias(mut env: JNIEnv, _c: JClass, handle: jlong, capability: JString, keywords_json: JString) -> jstring {
+    let (c, k) = (jstr(&mut env, &capability), jstr(&mut env, &keywords_json));
+    let r = catch_unwind(AssertUnwindSafe(|| {
+        let rt = get(handle)?; let kws: Vec<String> = serde_json::from_str(&k?).map_err(|e| format!("keywords: {e}"))?;
+        let mut g = rt.lock().map_err(|_| "runtime poisoned".to_string())?;
+        serde_json::to_value(g.alias(&c?, &kws).map_err(|e| e.to_string())?).map_err(|e| e.to_string())
+    }));
+    out(&mut env, r)
+}
+
 #[no_mangle]
 pub extern "system" fn Java_com_aiagent_core_NativeCore_nativePolicyCheck(mut env: JNIEnv, _c: JClass, policy_json: JString, request_json: JString, approvals_json: JString) -> jstring {
     let (p, q, a) = (jstr(&mut env, &policy_json), jstr(&mut env, &request_json), jstr(&mut env, &approvals_json));

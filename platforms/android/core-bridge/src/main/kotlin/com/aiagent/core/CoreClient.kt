@@ -50,6 +50,16 @@ class CoreClient private constructor(private var handle: Long) : AutoCloseable {
             if (j.isNull("failed_step")) null else j.getString("failed_step"), names, if (j.isNull("test_accuracy")) null else j.getDouble("test_accuracy"), j)
     }
 
+    /** Install the device-local signing key (public part returned). Learned/adapted packages are signed with it and trusted by this runtime only while it is set. */
+    fun setDeviceKey(keyId: String, seedHex: String): String =
+        JSONObject(NativeCore.nativeSetDeviceKey(h(), JSONObject().put("key_id", keyId).put("seed_hex", seedHex).toString())).orThrow().getString("public_b64")
+
+    /** Train a new capability on the device from labelled examples. [specJson] has the CLI `learn` spec shape. Refusals come back in the report (learned=false), not as exceptions. */
+    fun learn(specJson: String): JSONObject = JSONObject(NativeCore.nativeLearn(h(), specJson)).orThrow()
+    fun adapt(specJson: String): JSONObject = JSONObject(NativeCore.nativeAdapt(h(), specJson)).orThrow()
+    fun alias(capability: String, keywords: List<String>): JSONObject =
+        JSONObject(NativeCore.nativeAlias(h(), capability, org.json.JSONArray(keywords).toString())).orThrow()
+
     fun solve(intent: String, input: FloatArray): SolveResult {
         val j = JSONObject(NativeCore.nativeSolve(h(), intent, input)).orThrow()
         return if (j.getString("result") == "ANSWER") {

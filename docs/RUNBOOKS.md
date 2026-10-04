@@ -26,3 +26,13 @@ Blocked here by: egress proxy denies the search provider (HTTP 403 on CONNECT), 
 4. Expected: provider listing, evidence entries with sha256/provenance, audit log lines. If the success JSON does not parse into evidence, the adapter raises `no_results`/`bad_output` (not fabricated evidence): adjust `_hits` in `integrations/openclaw/openclaw_cli.py` to the real provider shape and add a contract test with the captured output.
 5. Run `OPENCLAW_BIN=... python3 -m pytest tests/test_phase8.py -q -k real_openclaw` and record results (and the OpenClaw version) in docs/FINDINGS.md.
 6. For a real teacher via OpenClaw: configure model auth in the OpenClaw profile, then use `OpenClawModelTeacher` (not validated).
+
+
+## R4. On-device learning on a real phone: battery, thermal, NPU (PENDING)
+Blocked here by: no Android device, no NDK. Everything below the physical layer is validated (F36-F38): the Rust trainer, ONNX writer, signing, gates, JNI/Kotlin bridge on the JVM.
+1. Build the lite JNI library and the CLI for the phone ABI: `scripts/build_android_libs.sh` (needs `ANDROID_NDK_HOME`); for a quick check also cross-build `aicli` (`cargo build --release -p aicli --target aarch64-linux-android --no-default-features` with the NDK linker configured) and `adb push` it with a `learn` spec (see tests/test_phase12.py for the shape) and a key from `aicli keygen`.
+2. Run the 4 tasks of scripts/run_phase12.py on the phone: `adb shell taskset -c <big core> ./aicli --root /data/local/tmp/rt --trust trust.json --device-key key.json learn --spec spec.json`. Record train_seconds, peak_rss_kb (from the report) and wall time, five repeats, screen off, airplane mode, battery 100% -> note `dumpsys battery` level before/after a 200-run loop.
+3. Thermal: sample `/sys/class/thermal/thermal_zone*/temp` and CPU frequency each second during a 10-minute continuous learn loop; report throttling onset and the slowdown relative to the first minute.
+4. NPU/GPU: not used. The trainer is CPU-only and inference is the mlp-lite CPU backend; NNAPI/LiteRT would need a separate backend (not built). Do not claim NPU results.
+5. Keystore: wrap the 32-byte seed with an Android Keystore AES key in the Kotlin shell before `setDeviceKey` (not implemented).
+6. Compare against F36 (PC, one pinned core) and record the phone numbers and device model in docs/FINDINGS.md.

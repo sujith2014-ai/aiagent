@@ -11,6 +11,10 @@ object NativeCore {
     @JvmStatic external fun nativeSolve(handle: Long, intent: String, input: FloatArray): String
     @JvmStatic external fun nativeList(handle: Long): String
     @JvmStatic external fun nativeRunPlan(handle: Long, planJson: String, inputsJson: String): String
+    @JvmStatic external fun nativeSetDeviceKey(handle: Long, keyJson: String): String
+    @JvmStatic external fun nativeLearn(handle: Long, specJson: String): String
+    @JvmStatic external fun nativeAdapt(handle: Long, specJson: String): String
+    @JvmStatic external fun nativeAlias(handle: Long, capability: String, keywordsJson: String): String
     @JvmStatic external fun nativePolicyCheck(policyJson: String, requestJson: String, approvalsJson: String): String
     @JvmStatic external fun nativeVersion(): String
 

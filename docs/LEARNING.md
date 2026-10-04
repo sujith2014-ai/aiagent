@@ -12,3 +12,7 @@ unknown task (`NEEDS_HELP` from the runtime) -> `HelpRequest` (minimum context o
 - Teacher actions: `new_capability` (LearningPackage), `new_capability_spec` (TaskSpec + environment verification), `reroute`, `use_memory`, `external_research`, `request_tool`, `cannot_help`.
 - Strategy engine (`training/strategies.py`, `SelectiveLearner`) and `BuildService.repackage/adapt/commit`; Escalator performs `router_update` for verified reroutes. See DECISIONS ADR-013..015 and FINDINGS F10-F13.
 - Real providers: `integrations/teacher/http_providers.py` (OpenAI-compatible, Anthropic). Live validation is PENDING (docs/RUNBOOKS.md R1).
+
+
+## On-device learning (Phase 12)
+`aicli learn|adapt|alias` (and JNI `nativeLearn/nativeAdapt/nativeAlias`) train, adapt and re-route entirely in the Rust core: an Adam MLP trainer (`train_lite.rs`), a hand-written ONNX writer, input statistics, temperature calibration (T >= 1), and a signed `.cap` assembled by `pack.rs` and installed through the normal activation sequence. Adaptation modes: head-only (trunk frozen) or full; both gated on new-data gain and old-data regression (ADR-035). Results and negative results: FINDINGS F36-F39. Scope: MLPs on fixed-length numeric inputs, at least 30 examples.

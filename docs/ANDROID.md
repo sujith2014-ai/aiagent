@@ -18,7 +18,7 @@ Android supplies only: a `DeviceProfile` (what the phone has), `DeviceTool` impl
 - Library size: stripped, size-optimised host build 9.1 MB (full) vs 1.3 MB (lite).
 
 ## Not validated (PENDING; runbook R2)
-Loading the `.so` on ART/bionic; any run on a phone (latency, memory, battery, temperature); the Gradle/AGP build of `app/` and APK size; permission flows, notification/clipboard tools, lifecycle and process death; an NDK-linked `.so` (only static libraries were produced); 16 KB page-size alignment; armv7 execution; on-device learning (Phase 12). The Kotlin files in `app/` were written carefully but have never been compiled.
+Loading the `.so` on ART/bionic; any run on a phone (latency, memory, battery, temperature); the Gradle/AGP build of `app/` and APK size; permission flows, notification/clipboard tools, lifecycle and process death; an NDK-linked `.so` (only static libraries were produced); 16 KB page-size alignment; armv7 execution; on-device learning on a phone (the learn/adapt/alias bridge calls pass 16 Kotlin/JVM tests with the host library, but nothing was trained on a phone: R4). The Kotlin files in `app/` were written carefully but have never been compiled.
 
 ## Build (needs the Android SDK + NDK)
 `scripts/build_android_libs.sh` (lite variant) then `cd platforms/android && gradle :app:assembleDebug`. See docs/RUNBOOKS.md R2.
