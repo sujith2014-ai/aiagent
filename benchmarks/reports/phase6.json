@@ -1,0 +1,994 @@
+{
+ "benchmark_format": "bench/1",
+ "experiment": "phase6-selective-learning",
+ "platform": "Linux-6.18.44-fc-v64-x86_64-with-glibc2.39",
+ "date": "2026-10-04",
+ "teacher_fault_matrix": {
+  "None": {
+   "compare_numbers": {
+    "result": "ANSWER",
+    "reason": ""
+   },
+   "point_region": {
+    "result": "ANSWER",
+    "reason": ""
+   },
+   "argmax_position": {
+    "result": "ANSWER",
+    "reason": ""
+   }
+  },
+  "contradicts_examples": {
+   "compare_numbers": {
+    "result": "NEEDS_HELP",
+    "reason": "teacher spec rejected: rule contradicts its own worked example {'x': [0.10526315789473684, 0.42105263157894735"
+   },
+   "point_region": {
+    "result": "NEEDS_HELP",
+    "reason": "teacher spec rejected: rule contradicts its own worked example {'x': [-0.03685193230694539, 0.2818532758473047"
+   },
+   "argmax_position": {
+    "result": "NEEDS_HELP",
+    "reason": "teacher spec rejected: rule contradicts its own worked example {'x': [0.07468760220974835, 0.45595097462500256"
+   }
+  },
+  "malicious_expr": {
+   "compare_numbers": {
+    "result": "NEEDS_HELP",
+    "reason": "teacher spec rejected: only whitelisted function calls allowed"
+   },
+   "point_region": {
+    "result": "NEEDS_HELP",
+    "reason": "teacher spec rejected: only whitelisted function calls allowed"
+   },
+   "argmax_position": {
+    "result": "NEEDS_HELP",
+    "reason": "teacher spec rejected: only whitelisted function calls allowed"
+   }
+  },
+  "plausible_wrong": {
+   "compare_numbers": {
+    "result": "NEEDS_HELP",
+    "reason": "candidate rejected after 3 attempts: heldout accuracy 0.950 < 0.95"
+   },
+   "point_region": {
+    "result": "NEEDS_HELP",
+    "reason": "candidate rejected after 3 attempts: environment verification accuracy 0.930 < 0.95"
+   },
+   "argmax_position": {
+    "result": "NEEDS_HELP",
+    "reason": "candidate rejected after 3 attempts: environment verification accuracy 0.930 < 0.95"
+   }
+  },
+  "subtle_wrong": {
+   "compare_numbers": {
+    "result": "ANSWER",
+    "reason": ""
+   },
+   "point_region": {
+    "result": "NEEDS_HELP",
+    "reason": "candidate rejected after 3 attempts: environment verification accuracy 0.930 < 0.95"
+   },
+   "argmax_position": {
+    "result": "NEEDS_HELP",
+    "reason": "candidate rejected after 3 attempts: environment verification accuracy 0.930 < 0.95"
+   }
+  }
+ },
+ "http_providers": {
+  "openai_compat_end_to_end": {
+   "result": "ANSWER",
+   "path": [
+    "local",
+    "teacher",
+    "learn"
+   ],
+   "requests": 1,
+   "auth_header_sent": true,
+   "request_body_fields": [
+    "attempted_route",
+    "available_tools",
+    "failure",
+    "input_dim",
+    "known_capabilities",
+    "task_intent"
+   ]
+  },
+  "anthropic_style_end_to_end": {
+   "result": "ANSWER",
+   "path": [
+    "local",
+    "teacher",
+    "learn"
+   ],
+   "api_key_header": true
+  },
+  "server_error_503": {
+   "result": "QUEUED_OFFLINE",
+   "teacher_calls_counted": 0,
+   "queued": true
+  },
+  "garbage_text_response": {
+   "result": "NEEDS_HELP",
+   "capabilities_installed": 0
+  },
+  "live_endpoint_validation": "PENDING: requires network egress and an API key (see docs/RUNBOOKS.md)"
+ },
+ "paraphrase_teacher_dependency": {
+  "without_router_update": {
+   "teacher_calls_after_learning": 9,
+   "tasks": 36,
+   "router_updates_accepted": 0,
+   "per_round_teacher_calls": [
+    3,
+    3,
+    3
+   ],
+   "answered": 36,
+   "rows": [
+    {
+     "round": 0,
+     "intent": "comparison relation of numbers",
+     "result": "ANSWER",
+     "teacher_called": false,
+     "path": [
+      "local"
+     ],
+     "router_update": null
+    },
+    {
+     "round": 0,
+     "intent": "which of these numbers is bigger",
+     "result": "ANSWER",
+     "teacher_called": false,
+     "path": [
+      "local"
+     ],
+     "router_update": null
+    },
+    {
+     "round": 0,
+     "intent": "order the two values",
+     "result": "ANSWER",
+     "teacher_called": true,
+     "path": [
+      "local",
+      "teacher",
+      "reroute"
+     ],
+     "router_update": null
+    },
+    {
+     "round": 0,
+     "intent": "is the first one greater than, smaller than or the same as the second",
+     "result": "ANSWER",
+     "teacher_called": false,
+     "path": [
+      "local"
+     ],
+     "router_update": null
+    },
+    {
+     "round": 0,
+     "intent": "geometry check point inside circle",
+     "result": "ANSWER",
+     "teacher_called": false,
+     "path": [
+      "local"
+     ],
+     "router_update": null
+    },
+    {
+     "round": 0,
+     "intent": "does this coordinate fall within the disc",
+     "result": "ANSWER",
+     "teacher_called": true,
+     "path": [
+      "local",
+      "teacher",
+      "reroute"
+     ],
+     "router_update": null
+    },
+    {
+     "round": 0,
+     "intent": "classify the point as inside or outside",
+     "result": "ANSWER",
+     "teacher_called": false,
+     "path": [
+      "local"
+     ],
+     "router_update": null
+    },
+    {
+     "round": 0,
+     "intent": "locate point relative to the circular region",
+     "result": "ANSWER",
+     "teacher_called": false,
+     "path": [
+      "local"
+     ],
+     "router_update": null
+    },
+    {
+     "round": 0,
+     "intent": "which index holds the maximum",
+     "result": "ANSWER",
+     "teacher_called": false,
+     "path": [
+      "local"
+     ],
+     "router_update": null
+    },
+    {
+     "round": 0,
+     "intent": "where is the biggest entry",
+     "result": "ANSWER",
+     "teacher_called": false,
+     "path": [
+      "local"
+     ],
+     "router_update": null
+    },
+    {
+     "round": 0,
+     "intent": "pick the winning slot",
+     "result": "ANSWER",
+     "teacher_called": true,
+     "path": [
+      "local",
+      "teacher",
+      "reroute"
+     ],
+     "router_update": null
+    },
+    {
+     "round": 0,
+     "intent": "position of the highest value",
+     "result": "ANSWER",
+     "teacher_called": false,
+     "path": [
+      "local"
+     ],
+     "router_update": null
+    },
+    {
+     "round": 1,
+     "intent": "comparison relation of numbers",
+     "result": "ANSWER",
+     "teacher_called": false,
+     "path": [
+      "local"
+     ],
+     "router_update": null
+    },
+    {
+     "round": 1,
+     "intent": "which of these numbers is bigger",
+     "result": "ANSWER",
+     "teacher_called": false,
+     "path": [
+      "local"
+     ],
+     "router_update": null
+    },
+    {
+     "round": 1,
+     "intent": "order the two values",
+     "result": "ANSWER",
+     "teacher_called": true,
+     "path": [
+      "local",
+      "teacher",
+      "reroute"
+     ],
+     "router_update": null
+    },
+    {
+     "round": 1,
+     "intent": "is the first one greater than, smaller than or the same as the second",
+     "result": "ANSWER",
+     "teacher_called": false,
+     "path": [
+      "local"
+     ],
+     "router_update": null
+    },
+    {
+     "round": 1,
+     "intent": "geometry check point inside circle",
+     "result": "ANSWER",
+     "teacher_called": false,
+     "path": [
+      "local"
+     ],
+     "router_update": null
+    },
+    {
+     "round": 1,
+     "intent": "does this coordinate fall within the disc",
+     "result": "ANSWER",
+     "teacher_called": true,
+     "path": [
+      "local",
+      "teacher",
+      "reroute"
+     ],
+     "router_update": null
+    },
+    {
+     "round": 1,
+     "intent": "classify the point as inside or outside",
+     "result": "ANSWER",
+     "teacher_called": false,
+     "path": [
+      "local"
+     ],
+     "router_update": null
+    },
+    {
+     "round": 1,
+     "intent": "locate point relative to the circular region",
+     "result": "ANSWER",
+     "teacher_called": false,
+     "path": [
+      "local"
+     ],
+     "router_update": null
+    },
+    {
+     "round": 1,
+     "intent": "which index holds the maximum",
+     "result": "ANSWER",
+     "teacher_called": false,
+     "path": [
+      "local"
+     ],
+     "router_update": null
+    },
+    {
+     "round": 1,
+     "intent": "where is the biggest entry",
+     "result": "ANSWER",
+     "teacher_called": false,
+     "path": [
+      "local"
+     ],
+     "router_update": null
+    },
+    {
+     "round": 1,
+     "intent": "pick the winning slot",
+     "result": "ANSWER",
+     "teacher_called": true,
+     "path": [
+      "local",
+      "teacher",
+      "reroute"
+     ],
+     "router_update": null
+    },
+    {
+     "round": 1,
+     "intent": "position of the highest value",
+     "result": "ANSWER",
+     "teacher_called": false,
+     "path": [
+      "local"
+     ],
+     "router_update": null
+    },
+    {
+     "round": 2,
+     "intent": "comparison relation of numbers",
+     "result": "ANSWER",
+     "teacher_called": false,
+     "path": [
+      "local"
+     ],
+     "router_update": null
+    },
+    {
+     "round": 2,
+     "intent": "which of these numbers is bigger",
+     "result": "ANSWER",
+     "teacher_called": false,
+     "path": [
+      "local"
+     ],
+     "router_update": null
+    },
+    {
+     "round": 2,
+     "intent": "order the two values",
+     "result": "ANSWER",
+     "teacher_called": true,
+     "path": [
+      "local",
+      "teacher",
+      "reroute"
+     ],
+     "router_update": null
+    },
+    {
+     "round": 2,
+     "intent": "is the first one greater than, smaller than or the same as the second",
+     "result": "ANSWER",
+     "teacher_called": false,
+     "path": [
+      "local"
+     ],
+     "router_update": null
+    },
+    {
+     "round": 2,
+     "intent": "geometry check point inside circle",
+     "result": "ANSWER",
+     "teacher_called": false,
+     "path": [
+      "local"
+     ],
+     "router_update": null
+    },
+    {
+     "round": 2,
+     "intent": "does this coordinate fall within the disc",
+     "result": "ANSWER",
+     "teacher_called": true,
+     "path": [
+      "local",
+      "teacher",
+      "reroute"
+     ],
+     "router_update": null
+    },
+    {
+     "round": 2,
+     "intent": "classify the point as inside or outside",
+     "result": "ANSWER",
+     "teacher_called": false,
+     "path": [
+      "local"
+     ],
+     "router_update": null
+    },
+    {
+     "round": 2,
+     "intent": "locate point relative to the circular region",
+     "result": "ANSWER",
+     "teacher_called": false,
+     "path": [
+      "local"
+     ],
+     "router_update": null
+    },
+    {
+     "round": 2,
+     "intent": "which index holds the maximum",
+     "result": "ANSWER",
+     "teacher_called": false,
+     "path": [
+      "local"
+     ],
+     "router_update": null
+    },
+    {
+     "round": 2,
+     "intent": "where is the biggest entry",
+     "result": "ANSWER",
+     "teacher_called": false,
+     "path": [
+      "local"
+     ],
+     "router_update": null
+    },
+    {
+     "round": 2,
+     "intent": "pick the winning slot",
+     "result": "ANSWER",
+     "teacher_called": true,
+     "path": [
+      "local",
+      "teacher",
+      "reroute"
+     ],
+     "router_update": null
+    },
+    {
+     "round": 2,
+     "intent": "position of the highest value",
+     "result": "ANSWER",
+     "teacher_called": false,
+     "path": [
+      "local"
+     ],
+     "router_update": null
+    }
+   ]
+  },
+  "with_router_update": {
+   "teacher_calls_after_learning": 3,
+   "tasks": 36,
+   "router_updates_accepted": 3,
+   "per_round_teacher_calls": [
+    3,
+    0,
+    0
+   ],
+   "answered": 36,
+   "rows": [
+    {
+     "round": 0,
+     "intent": "comparison relation of numbers",
+     "result": "ANSWER",
+     "teacher_called": false,
+     "path": [
+      "local"
+     ],
+     "router_update": null
+    },
+    {
+     "round": 0,
+     "intent": "which of these numbers is bigger",
+     "result": "ANSWER",
+     "teacher_called": false,
+     "path": [
+      "local"
+     ],
+     "router_update": null
+    },
+    {
+     "round": 0,
+     "intent": "order the two values",
+     "result": "ANSWER",
+     "teacher_called": true,
+     "path": [
+      "local",
+      "teacher",
+      "reroute",
+      "router_update"
+     ],
+     "router_update": {
+      "accepted": true,
+      "why": "added keywords ['order', 'values']"
+     }
+    },
+    {
+     "round": 0,
+     "intent": "is the first one greater than, smaller than or the same as the second",
+     "result": "ANSWER",
+     "teacher_called": false,
+     "path": [
+      "local"
+     ],
+     "router_update": null
+    },
+    {
+     "round": 0,
+     "intent": "geometry check point inside circle",
+     "result": "ANSWER",
+     "teacher_called": false,
+     "path": [
+      "local"
+     ],
+     "router_update": null
+    },
+    {
+     "round": 0,
+     "intent": "does this coordinate fall within the disc",
+     "result": "ANSWER",
+     "teacher_called": true,
+     "path": [
+      "local",
+      "teacher",
+      "reroute",
+      "router_update"
+     ],
+     "router_update": {
+      "accepted": true,
+      "why": "added keywords ['does', 'coordinate', 'fall', 'within', 'disc']"
+     }
+    },
+    {
+     "round": 0,
+     "intent": "classify the point as inside or outside",
+     "result": "ANSWER",
+     "teacher_called": false,
+     "path": [
+      "local"
+     ],
+     "router_update": null
+    },
+    {
+     "round": 0,
+     "intent": "locate point relative to the circular region",
+     "result": "ANSWER",
+     "teacher_called": false,
+     "path": [
+      "local"
+     ],
+     "router_update": null
+    },
+    {
+     "round": 0,
+     "intent": "which index holds the maximum",
+     "result": "ANSWER",
+     "teacher_called": false,
+     "path": [
+      "local"
+     ],
+     "router_update": null
+    },
+    {
+     "round": 0,
+     "intent": "where is the biggest entry",
+     "result": "ANSWER",
+     "teacher_called": false,
+     "path": [
+      "local"
+     ],
+     "router_update": null
+    },
+    {
+     "round": 0,
+     "intent": "pick the winning slot",
+     "result": "ANSWER",
+     "teacher_called": true,
+     "path": [
+      "local",
+      "teacher",
+      "reroute",
+      "router_update"
+     ],
+     "router_update": {
+      "accepted": true,
+      "why": "added keywords ['pick', 'winning', 'slot']"
+     }
+    },
+    {
+     "round": 0,
+     "intent": "position of the highest value",
+     "result": "ANSWER",
+     "teacher_called": false,
+     "path": [
+      "local"
+     ],
+     "router_update": null
+    },
+    {
+     "round": 1,
+     "intent": "comparison relation of numbers",
+     "result": "ANSWER",
+     "teacher_called": false,
+     "path": [
+      "local"
+     ],
+     "router_update": null
+    },
+    {
+     "round": 1,
+     "intent": "which of these numbers is bigger",
+     "result": "ANSWER",
+     "teacher_called": false,
+     "path": [
+      "local"
+     ],
+     "router_update": null
+    },
+    {
+     "round": 1,
+     "intent": "order the two values",
+     "result": "ANSWER",
+     "teacher_called": false,
+     "path": [
+      "local"
+     ],
+     "router_update": null
+    },
+    {
+     "round": 1,
+     "intent": "is the first one greater than, smaller than or the same as the second",
+     "result": "ANSWER",
+     "teacher_called": false,
+     "path": [
+      "local"
+     ],
+     "router_update": null
+    },
+    {
+     "round": 1,
+     "intent": "geometry check point inside circle",
+     "result": "ANSWER",
+     "teacher_called": false,
+     "path": [
+      "local"
+     ],
+     "router_update": null
+    },
+    {
+     "round": 1,
+     "intent": "does this coordinate fall within the disc",
+     "result": "ANSWER",
+     "teacher_called": false,
+     "path": [
+      "local"
+     ],
+     "router_update": null
+    },
+    {
+     "round": 1,
+     "intent": "classify the point as inside or outside",
+     "result": "ANSWER",
+     "teacher_called": false,
+     "path": [
+      "local"
+     ],
+     "router_update": null
+    },
+    {
+     "round": 1,
+     "intent": "locate point relative to the circular region",
+     "result": "ANSWER",
+     "teacher_called": false,
+     "path": [
+      "local"
+     ],
+     "router_update": null
+    },
+    {
+     "round": 1,
+     "intent": "which index holds the maximum",
+     "result": "ANSWER",
+     "teacher_called": false,
+     "path": [
+      "local"
+     ],
+     "router_update": null
+    },
+    {
+     "round": 1,
+     "intent": "where is the biggest entry",
+     "result": "ANSWER",
+     "teacher_called": false,
+     "path": [
+      "local"
+     ],
+     "router_update": null
+    },
+    {
+     "round": 1,
+     "intent": "pick the winning slot",
+     "result": "ANSWER",
+     "teacher_called": false,
+     "path": [
+      "local"
+     ],
+     "router_update": null
+    },
+    {
+     "round": 1,
+     "intent": "position of the highest value",
+     "result": "ANSWER",
+     "teacher_called": false,
+     "path": [
+      "local"
+     ],
+     "router_update": null
+    },
+    {
+     "round": 2,
+     "intent": "comparison relation of numbers",
+     "result": "ANSWER",
+     "teacher_called": false,
+     "path": [
+      "local"
+     ],
+     "router_update": null
+    },
+    {
+     "round": 2,
+     "intent": "which of these numbers is bigger",
+     "result": "ANSWER",
+     "teacher_called": false,
+     "path": [
+      "local"
+     ],
+     "router_update": null
+    },
+    {
+     "round": 2,
+     "intent": "order the two values",
+     "result": "ANSWER",
+     "teacher_called": false,
+     "path": [
+      "local"
+     ],
+     "router_update": null
+    },
+    {
+     "round": 2,
+     "intent": "is the first one greater than, smaller than or the same as the second",
+     "result": "ANSWER",
+     "teacher_called": false,
+     "path": [
+      "local"
+     ],
+     "router_update": null
+    },
+    {
+     "round": 2,
+     "intent": "geometry check point inside circle",
+     "result": "ANSWER",
+     "teacher_called": false,
+     "path": [
+      "local"
+     ],
+     "router_update": null
+    },
+    {
+     "round": 2,
+     "intent": "does this coordinate fall within the disc",
+     "result": "ANSWER",
+     "teacher_called": false,
+     "path": [
+      "local"
+     ],
+     "router_update": null
+    },
+    {
+     "round": 2,
+     "intent": "classify the point as inside or outside",
+     "result": "ANSWER",
+     "teacher_called": false,
+     "path": [
+      "local"
+     ],
+     "router_update": null
+    },
+    {
+     "round": 2,
+     "intent": "locate point relative to the circular region",
+     "result": "ANSWER",
+     "teacher_called": false,
+     "path": [
+      "local"
+     ],
+     "router_update": null
+    },
+    {
+     "round": 2,
+     "intent": "which index holds the maximum",
+     "result": "ANSWER",
+     "teacher_called": false,
+     "path": [
+      "local"
+     ],
+     "router_update": null
+    },
+    {
+     "round": 2,
+     "intent": "where is the biggest entry",
+     "result": "ANSWER",
+     "teacher_called": false,
+     "path": [
+      "local"
+     ],
+     "router_update": null
+    },
+    {
+     "round": 2,
+     "intent": "pick the winning slot",
+     "result": "ANSWER",
+     "teacher_called": false,
+     "path": [
+      "local"
+     ],
+     "router_update": null
+    },
+    {
+     "round": 2,
+     "intent": "position of the highest value",
+     "result": "ANSWER",
+     "teacher_called": false,
+     "path": [
+      "local"
+     ],
+     "router_update": null
+    }
+   ]
+  }
+ },
+ "domain_extension_compare_wide": {
+  "before_extension_outcome": "OUT_OF_DISTRIBUTION",
+  "decision": {
+   "capability_id": "compare_numbers",
+   "attempts": [
+    {
+     "strategy": "metadata_update",
+     "new_acc_verification": 0.9433333277702332,
+     "passed": false
+    },
+    {
+     "strategy": "adapt_existing",
+     "replay": true,
+     "epochs": 58,
+     "old_acc_before": 1.0,
+     "old_acc_after": 1.0,
+     "new_acc_verification": 0.9933333396911621,
+     "params_added": 0,
+     "package_id": "compare_numbers-0.1.1-8f500031",
+     "passed": true,
+     "reason": "promoted",
+     "activated": true
+    }
+   ],
+   "chosen": "adapt_existing"
+  },
+  "naive_finetune_no_replay_ablation": {
+   "strategy": "adapt_existing_no_replay",
+   "replay": false,
+   "epochs": 59,
+   "old_acc_before": 1.0,
+   "old_acc_after": 0.9624999761581421,
+   "new_acc_verification": 0.9900000095367432,
+   "params_added": 0,
+   "would_pass": false,
+   "reason": "regression: old-domain accuracy 1.000 -> 0.962"
+  },
+  "after_extension": {
+   "result": "ANSWER",
+   "label": "GREATER",
+   "expected": "GREATER"
+  },
+  "bundled_regression_after": {
+   "bundled_test_accuracy": 1.0,
+   "capability_id": "compare_numbers"
+  }
+ },
+ "conflicting_rule_change": {
+  "decision": {
+   "capability_id": "point_region",
+   "attempts": [
+    {
+     "strategy": "metadata_update",
+     "new_acc_verification": 0.7599999904632568,
+     "passed": false
+    },
+    {
+     "strategy": "adapt_existing",
+     "replay": true,
+     "epochs": 42,
+     "old_acc_before": 0.9919999837875366,
+     "old_acc_after": 0.8510000109672546,
+     "new_acc_verification": 0.9366666674613953,
+     "params_added": 0,
+     "passed": false,
+     "reason": "new-domain verification 0.937 < 0.95"
+    },
+    {
+     "strategy": "new_module",
+     "passed": true,
+     "reason": "promoted",
+     "params_added": 1218,
+     "new_acc_verification": 0.9933333396911621,
+     "activated": true
+    }
+   ],
+   "chosen": "new_module",
+   "new_capability_id": "point_region__ext"
+  },
+  "routing_after": {
+   "old_intent": {
+    "capability": "point_region",
+    "status": "KNOWN",
+    "label": "INSIDE"
+   },
+   "new_intent": {
+    "capability": "point_region__ext",
+    "status": "KNOWN",
+    "label": "OUTSIDE"
+   }
+  },
+  "probe": "(0.5, 0.0) has r^2=0.25: INSIDE under the old rule (r^2<0.5), OUTSIDE under the new rule (r^2<0.2)"
+ }
+}

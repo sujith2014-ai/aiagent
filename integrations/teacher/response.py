@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from typing import Any
 from training.learning_package.schema import LearningPackage
 
-ACTIONS = {"reroute", "use_memory", "external_research", "adapt_existing", "new_capability", "request_tool", "cannot_help"}
+ACTIONS = {"new_capability_spec", "reroute", "use_memory", "external_research", "adapt_existing", "new_capability", "request_tool", "cannot_help"}
 
 
 class InvalidTeacherResponse(ValueError):
@@ -22,6 +22,7 @@ class TeacherResponse:
     research_query: str | None = None
     tool: str | None = None
     memory_text: str | None = None
+    spec: dict | None = None
 
 
 def parse_response(raw: str | dict, known_capabilities: set[str]) -> TeacherResponse:
@@ -40,6 +41,10 @@ def parse_response(raw: str | dict, known_capabilities: set[str]) -> TeacherResp
             r.learning_package = LearningPackage(**d["learning_package"])
         except Exception as e:
             raise InvalidTeacherResponse(f"bad learning_package: {e}")
+    elif action == "new_capability_spec":
+        if not isinstance(d.get("spec"), dict):
+            raise InvalidTeacherResponse("spec object required")
+        r.spec = d["spec"]
     elif action == "reroute":
         r.reroute_intent = d.get("reroute_intent"); r.capability_id = d.get("capability_id")
         if r.capability_id not in known_capabilities or not r.reroute_intent:

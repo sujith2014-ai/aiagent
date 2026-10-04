@@ -25,6 +25,7 @@ fn main() -> Result<()> {
     let mut trust = PathBuf::from("./trust.json");
     let mut device = "PC_FULL".to_string();
     let mut detect = "full".to_string();
+    let mut force: Option<String> = None;
     let mut rest = vec![];
     let mut i = 0;
     while i < args.len() {
@@ -33,6 +34,7 @@ fn main() -> Result<()> {
             "--trust" => { trust = args[i + 1].clone().into(); i += 2 }
             "--device" => { device = args[i + 1].clone(); i += 2 }
             "--detect" => { detect = args[i + 1].clone(); i += 2 }
+            "--capability" => { force = Some(args[i + 1].clone()); i += 2 }
             _ => { rest.push(args[i].clone()); i += 1 }
         }
     }
@@ -40,6 +42,7 @@ fn main() -> Result<()> {
     let trust_store = TrustStore::from_file(&trust)?;
     let mut rt = Runtime::open(&root, dev, trust_store)?;
     rt.detect = aicore::runtime::Detection::by_name(&detect).ok_or_else(|| anyhow!("unknown --detect {detect}"))?;
+    rt.force_capability = force;
     let cmd = rest.first().map(|s| s.as_str()).unwrap_or("help");
     match cmd {
         "import" => {
@@ -49,7 +52,7 @@ fn main() -> Result<()> {
         }
         "list" => {
             let v: Vec<_> = rt.registry.all().map(|r| json!({
-                "capability_id": r.capability_id, "active_version": r.active_version,
+                "capability_id": r.capability_id, "active_version": r.active_version, "store_file": r.active().store_file, "keywords": r.keywords,
                 "versions": r.versions.iter().map(|v| &v.version).collect::<Vec<_>>(),
                 "params": r.active().params, "model_bytes": r.active().model_bytes,
                 "test_accuracy": r.active().test_accuracy, "stats": r.stats,

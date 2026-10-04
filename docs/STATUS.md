@@ -7,4 +7,5 @@
 | 3 B/C, sequential learning, regression, restart, constrained sim | done (simulation only) | benchmarks/reports/phase3.* |
 | 4 Dynamic routing, reuse, composition, execution graph | done (hand-written plans; see FINDINGS F2) | benchmarks/reports/phase4.*, tests/test_graph.py |
 | 5 Unknown/novelty detection, NEEDS_HELP flow, TeacherProvider, simulator | done, with documented failures (FINDINGS F6-F9) | benchmarks/reports/phase5.*, tests/test_phase5.py |
-| 6-15 | not started | |
+| 6 Real-teacher integration, selective learning, automated candidate evaluation | done locally; live teacher PENDING (R1) | benchmarks/reports/phase6.*, tests/test_phase6.py |
+| 7-15 | not started | |

@@ -36,3 +36,12 @@ Status: accepted. Out-of-domain input (outside training range + 10% margin on an
 
 ## ADR-012: Teacher output is untrusted text
 Status: accepted. `TeacherProvider.advise` returns raw JSON text; `parse_response` validates it strictly (known action, required fields, referenced capabilities must be installed); LearningPackages are validated again before any training. One teacher call per task maximum; offline requests are queued; research/tool actions are reported as NEEDS_EXTERNAL until OpenClaw exists.
+
+## ADR-013: Teachers return declarative specs, not data or code
+Status: accepted. Real LLMs cannot reliably produce large labelled datasets and generated code must not run in the learning pipeline. The teacher returns a `TaskSpec` (domain, restricted expression, worked examples); labels come from a whitelist AST evaluator (`training/safe_expr.py`, no eval/exec, node/magnitude limits). A direct-LearningPackage action remains for providers that can supply data.
+
+## ADR-014: Environment verification is the promotion authority
+Status: accepted. Teacher output is never ground truth. A spec-derived candidate is promoted only if it also reaches >= 0.95 on labelled examples supplied by the environment/user, independent of the teacher; without such examples a spec cannot be installed (NEEDS_HELP). Known limit: errors below the gate resolution are not detectable (FINDINGS F10).
+
+## ADR-015: Selective learning order and gates
+Status: accepted. Cheapest first: metadata_update (no neural change) -> router_update (re-sign with new keywords) -> adapt_existing with replay -> new_module. Gates: new-domain verification >= 0.95; old-domain regression drop <= 1 point; routing regression for router/metadata changes; failed candidates are never installed, installed versions can be rolled back. The remaining strategies in the schema (adapter, new_connection, module_expansion) are not implemented.

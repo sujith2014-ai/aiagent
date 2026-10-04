@@ -94,6 +94,8 @@ pub struct Runtime {
     trace: Trace,
     task_counter: u64,
     pub detect: Detection,
+    /// When set, the router is bypassed and this capability handles every task (used for verification).
+    pub force_capability: Option<String>,
 }
 
 impl Runtime {
@@ -105,7 +107,7 @@ impl Runtime {
             backend: Box::new(OnnxBackend),
             router: Box::new(KeywordRouter::default()),
             loaded: HashMap::new(), lru: vec![],
-            trace: Trace::open(root), task_counter: 0, detect: Detection::by_name("full").unwrap(),
+            trace: Trace::open(root), task_counter: 0, detect: Detection::by_name("full").unwrap(), force_capability: None,
         })
     }
 
@@ -251,7 +253,11 @@ impl Runtime {
     pub fn solve(&mut self, task: &Task) -> Result<Outcome> {
         self.task_counter += 1;
         let task_id = format!("t{}-{}", now_secs(), self.task_counter);
-        let decision = self.router.route(&self.registry, task);
+        let decision = match &self.force_capability {
+            Some(c) => crate::router::Decision { status: Status::Known, chosen: Some(c.clone()),
+                candidates: vec![crate::router::Candidate { capability_id: c.clone(), score: 1.0, dice: 1.0, shape_ok: true }] },
+            None => self.router.route(&self.registry, task),
+        };
         let out = match (&decision.status, &decision.chosen) {
             (Status::Unknown, _) | (_, None) => {
                 let shape_any = decision.candidates.iter().any(|c| c.shape_ok);

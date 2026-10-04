@@ -80,19 +80,28 @@ def splits(task: str, seed: int = 1234):
 class TeacherSimulator(TeacherProvider):
     name = "teacher-simulator/1"
 
-    def __init__(self, seed=1234):
+    def __init__(self, seed=1234, mode="lp", fault=None):
+        """mode: "lp" returns full LearningPackages; "spec" returns declarative specs like a real LLM would.
+        fault (spec mode only): None | "contradicts_examples" | "plausible_wrong" | "malicious_expr" """
         self.seed = seed
         self.calls = 0
+        self.mode, self.fault = mode, fault
 
     def heldout(self, task: str, exclude: set, seed_offset=100):
         """Independent unseen examples for the build/validation service (oracle use, Phase 1 only)."""
         t = TASKS[task]
         return sample(task, t["n_test"], self.seed + seed_offset, exclude=exclude, unique=True)
 
+    # words a language model would associate with each task (stands in for semantic understanding)
+    SEMANTIC = {"compare_numbers": {"order", "bigger", "smaller", "greater", "larger", "same", "equal", "less", "relation", "rank", "ordering"},
+                "point_region": {"coordinate", "disc", "within", "inside", "outside", "circle", "circular", "region", "geometry"},
+                "argmax_position": {"index", "slot", "winning", "biggest", "highest", "maximum", "largest", "entry", "max", "argmax"}}
+    CANON_INTENT = {"compare_numbers": "compare numbers relation", "point_region": "point inside region", "argmax_position": "largest value position"}
+
     def _identify(self, intent: str, dim: int) -> str:
         toks = set(intent.lower().replace(",", " ").split())
         for name, t in TASKS.items():
-            if t["dim"] == dim and toks & set(t["match"]):
+            if t["dim"] == dim and toks & (set(t["match"]) | self.SEMANTIC[name]):
                 return name
         raise TeacherCannotHelp(f"simulator knows no task for '{intent}' (dim {dim})")
 
@@ -131,6 +140,20 @@ class TeacherSimulator(TeacherProvider):
     def advise(self, req: HelpRequest) -> str:
         toks = set(req.task_intent.lower().replace(",", " ").split())
         try:
+            known_name = self._identify(req.task_intent, req.input_dim)
+        except TeacherCannotHelp:
+            known_name = None
+        if known_name in req.known_capabilities:
+            self.calls += 1
+            return json.dumps({"action": "reroute", "rationale": "an installed capability already solves this", "reroute_intent": self.CANON_INTENT[known_name], "capability_id": known_name})
+        if self.mode == "spec":
+            try:
+                name = self._identify(req.task_intent, req.input_dim)
+                self.calls += 1
+                return json.dumps({"action": "new_capability_spec", "rationale": "rule-based synthetic task", "spec": self.make_spec(name)})
+            except TeacherCannotHelp:
+                pass
+        try:
             lp = self.respond(req)
             return json.dumps({"action": "new_capability", "rationale": "teachable synthetic capability", "learning_package": asdict(lp)})
         except TeacherCannotHelp:
@@ -143,3 +166,40 @@ class TeacherSimulator(TeacherProvider):
         if toks & self.MEMORY_MARKERS:
             return json.dumps({"action": "use_memory", "rationale": "personal fact, not a skill", "memory_text": req.task_intent})
         return json.dumps({"action": "cannot_help", "rationale": "simulator has no knowledge of this task"})
+
+
+    SPEC_EXPR = {
+        "compare_numbers": "0 if x0 < x1 else 1 if x0 == x1 else 2",
+        "point_region": "0 if x0*x0 + x1*x1 < 0.5 else 1",
+        "argmax_position": "0 if x0 >= max(x1, x2, x3) else 1 if x1 >= max(x0, x2, x3) else 2 if x2 >= max(x0, x1, x3) else 3",
+    }
+    SPEC_DOMAIN = {"compare_numbers": [{"lo": 0.0, "hi": 1.0, "grid": GRID}] * 2, "point_region": [{"lo": -1.0, "hi": 1.0}] * 2,
+                   "argmax_position": [{"lo": 0.0, "hi": 1.0}] * 4}
+
+    def make_spec(self, name: str) -> dict:
+        t = TASKS[name]
+        rng = random.Random(self.seed + 5)
+        ex = [t["gen"](rng) for _ in range(6)]
+        expr = self.SPEC_EXPR[name]
+        if self.fault == "contradicts_examples":
+            expr = "2" if name == "compare_numbers" else "1" if name == "point_region" else "0"
+        elif self.fault in ("plausible_wrong", "subtle_wrong"):
+            # wrong on a region, but the worked examples are chosen (as a confident-but-mistaken teacher might) to agree with the rule
+            gross = {"compare_numbers": "1 if (x0 > 0.5 and x1 > 0.5) else (0 if x0 < x1 else 1 if x0 == x1 else 2)",
+                     "point_region": "0 if x0*x0 + x1*x1 < 0.5 and x0 < 0.3 else 1",
+                     "argmax_position": "0 if x0 >= max(x1, x2, x3) else 1 if x1 >= max(x0, x2, x3) else 2 if x2 >= max(x0, x1, x3) and x3 < 0.8 else 3"}
+            subtle = dict(gross, compare_numbers="1 if (x0 > 0.9 and x1 > 0.9) else (0 if x0 < x1 else 1 if x0 == x1 else 2)")
+            expr = (gross if self.fault == "plausible_wrong" else subtle)[name]
+            from training.safe_expr import compile_expr, evaluate, names_for
+            tree = compile_expr(expr, names_for(t["dim"]))
+            agree, rng2 = [], random.Random(self.seed + 6)
+            while len(agree) < 6:
+                x, y = t["gen"](rng2)
+                if int(evaluate(tree, x)) == y:
+                    agree.append((x, y))
+            ex = agree
+        elif self.fault == "malicious_expr":
+            expr = "__import__('os').system('echo pwned')"
+        return {"capability_id": name, "description": t["description"], "keywords": t["keywords"], "labels": t["labels"], "input_dim": t["dim"],
+                "domain": self.SPEC_DOMAIN[name], "label_expr": expr, "worked_examples": [{"x": x, "y": y} for x, y in ex],
+                "n_train": t["n_train"], "n_val": t["n_val"]}
