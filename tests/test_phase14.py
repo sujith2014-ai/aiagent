@@ -34,7 +34,7 @@ def test_stream_is_seeded_introduces_each_capability_first_and_schedules_drift()
     for e in a:
         if e["type"] == "new": assert e["cap"] not in intro; intro[e["cap"]] = e["t"]
         elif e["type"] in ("known", "paraphrase"): assert e["cap"] in intro, e
-    assert len(intro) == 36 and [(e["t"], e["cap"]) for e in a if e["type"] == "drift"] == [(300, "boiler_alarm"), (420, "gear_zone"), (540, "bearing_vote")]
+    assert len(intro) == 36 and [(e["t"], e["cap"]) for e in a if e["type"] == "drift"] == [(300, "boiler_alarm"), (420, "gear_zone"), (540, "mixer_zone")]
     assert collections.Counter(e["type"] for e in a)["oos"] > 20 and all(len(e["x"]) in (1, 2, 4) for e in a if e["type"] == "oos")
 
 
