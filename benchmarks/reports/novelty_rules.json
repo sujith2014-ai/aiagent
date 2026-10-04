@@ -1,0 +1,414 @@
+{
+ "per_dataset": {
+  "iris": {
+   "R0 any feature outside range+-10% (current)": {
+    "false_refusal_on_heldout": 0.0,
+    "gross (x*10+1000)": 1.0,
+    "moderate (+4 sd on every feature)": 1.0,
+    "moderate negative (-4 sd on every feature)": 1.0,
+    "single feature +25 sd": 1.0,
+    "unit-box uniform (in range, undetectable by range rules)": 0.0
+   },
+   "R1 >=25% of features outside range+-10%": {
+    "false_refusal_on_heldout": 0.0,
+    "gross (x*10+1000)": 1.0,
+    "moderate (+4 sd on every feature)": 1.0,
+    "moderate negative (-4 sd on every feature)": 1.0,
+    "single feature +25 sd": 1.0,
+    "unit-box uniform (in range, undetectable by range rules)": 0.0
+   },
+   "R2 any feature |z|>8": {
+    "false_refusal_on_heldout": 0.0,
+    "gross (x*10+1000)": 1.0,
+    "moderate (+4 sd on every feature)": 0.0,
+    "moderate negative (-4 sd on every feature)": 0.0,
+    "single feature +25 sd": 1.0,
+    "unit-box uniform (in range, undetectable by range rules)": 0.0
+   },
+   "R3 any feature |z|>12": {
+    "false_refusal_on_heldout": 0.0,
+    "gross (x*10+1000)": 1.0,
+    "moderate (+4 sd on every feature)": 0.0,
+    "moderate negative (-4 sd on every feature)": 0.0,
+    "single feature +25 sd": 1.0,
+    "unit-box uniform (in range, undetectable by range rules)": 0.0
+   },
+   "R4 >=25% outside range+-10% OR any |z|>12": {
+    "false_refusal_on_heldout": 0.0,
+    "gross (x*10+1000)": 1.0,
+    "moderate (+4 sd on every feature)": 1.0,
+    "moderate negative (-4 sd on every feature)": 1.0,
+    "single feature +25 sd": 1.0,
+    "unit-box uniform (in range, undetectable by range rules)": 0.0
+   },
+   "R5 >=10% outside range+-10% OR any |z|>12": {
+    "false_refusal_on_heldout": 0.0,
+    "gross (x*10+1000)": 1.0,
+    "moderate (+4 sd on every feature)": 1.0,
+    "moderate negative (-4 sd on every feature)": 1.0,
+    "single feature +25 sd": 1.0,
+    "unit-box uniform (in range, undetectable by range rules)": 0.0
+   },
+   "R6 >=2 features outside range+-10% OR any |z|>12": {
+    "false_refusal_on_heldout": 0.0,
+    "gross (x*10+1000)": 1.0,
+    "moderate (+4 sd on every feature)": 1.0,
+    "moderate negative (-4 sd on every feature)": 1.0,
+    "single feature +25 sd": 1.0,
+    "unit-box uniform (in range, undetectable by range rules)": 0.0
+   },
+   "R7 >=2 features outside range+-10% OR any |z|>8": {
+    "false_refusal_on_heldout": 0.0,
+    "gross (x*10+1000)": 1.0,
+    "moderate (+4 sd on every feature)": 1.0,
+    "moderate negative (-4 sd on every feature)": 1.0,
+    "single feature +25 sd": 1.0,
+    "unit-box uniform (in range, undetectable by range rules)": 0.0
+   },
+   "R8 >=2 outside range+-10% OR any |z|>12 (std floored at 5% of range)": {
+    "false_refusal_on_heldout": 0.0,
+    "gross (x*10+1000)": 1.0,
+    "moderate (+4 sd on every feature)": 1.0,
+    "moderate negative (-4 sd on every feature)": 1.0,
+    "single feature +25 sd": 1.0,
+    "unit-box uniform (in range, undetectable by range rules)": 0.0
+   },
+   "R9 >=2 outside range+-10% OR any |z|>8 (std floored at 5% of range)": {
+    "false_refusal_on_heldout": 0.0,
+    "gross (x*10+1000)": 1.0,
+    "moderate (+4 sd on every feature)": 1.0,
+    "moderate negative (-4 sd on every feature)": 1.0,
+    "single feature +25 sd": 1.0,
+    "unit-box uniform (in range, undetectable by range rules)": 0.0
+   }
+  },
+  "wine": {
+   "R0 any feature outside range+-10% (current)": {
+    "false_refusal_on_heldout": 0.05555555555555555,
+    "gross (x*10+1000)": 1.0,
+    "moderate (+4 sd on every feature)": 1.0,
+    "moderate negative (-4 sd on every feature)": 1.0,
+    "single feature +25 sd": 1.0,
+    "unit-box uniform (in range, undetectable by range rules)": 0.0
+   },
+   "R1 >=25% of features outside range+-10%": {
+    "false_refusal_on_heldout": 0.0,
+    "gross (x*10+1000)": 1.0,
+    "moderate (+4 sd on every feature)": 1.0,
+    "moderate negative (-4 sd on every feature)": 1.0,
+    "single feature +25 sd": 0.0,
+    "unit-box uniform (in range, undetectable by range rules)": 0.0
+   },
+   "R2 any feature |z|>8": {
+    "false_refusal_on_heldout": 0.0,
+    "gross (x*10+1000)": 1.0,
+    "moderate (+4 sd on every feature)": 0.027777777777777776,
+    "moderate negative (-4 sd on every feature)": 0.0,
+    "single feature +25 sd": 1.0,
+    "unit-box uniform (in range, undetectable by range rules)": 0.0
+   },
+   "R3 any feature |z|>12": {
+    "false_refusal_on_heldout": 0.0,
+    "gross (x*10+1000)": 1.0,
+    "moderate (+4 sd on every feature)": 0.0,
+    "moderate negative (-4 sd on every feature)": 0.0,
+    "single feature +25 sd": 1.0,
+    "unit-box uniform (in range, undetectable by range rules)": 0.0
+   },
+   "R4 >=25% outside range+-10% OR any |z|>12": {
+    "false_refusal_on_heldout": 0.0,
+    "gross (x*10+1000)": 1.0,
+    "moderate (+4 sd on every feature)": 1.0,
+    "moderate negative (-4 sd on every feature)": 1.0,
+    "single feature +25 sd": 1.0,
+    "unit-box uniform (in range, undetectable by range rules)": 0.0
+   },
+   "R5 >=10% outside range+-10% OR any |z|>12": {
+    "false_refusal_on_heldout": 0.0,
+    "gross (x*10+1000)": 1.0,
+    "moderate (+4 sd on every feature)": 1.0,
+    "moderate negative (-4 sd on every feature)": 1.0,
+    "single feature +25 sd": 1.0,
+    "unit-box uniform (in range, undetectable by range rules)": 0.0
+   },
+   "R6 >=2 features outside range+-10% OR any |z|>12": {
+    "false_refusal_on_heldout": 0.0,
+    "gross (x*10+1000)": 1.0,
+    "moderate (+4 sd on every feature)": 1.0,
+    "moderate negative (-4 sd on every feature)": 1.0,
+    "single feature +25 sd": 1.0,
+    "unit-box uniform (in range, undetectable by range rules)": 0.0
+   },
+   "R7 >=2 features outside range+-10% OR any |z|>8": {
+    "false_refusal_on_heldout": 0.0,
+    "gross (x*10+1000)": 1.0,
+    "moderate (+4 sd on every feature)": 1.0,
+    "moderate negative (-4 sd on every feature)": 1.0,
+    "single feature +25 sd": 1.0,
+    "unit-box uniform (in range, undetectable by range rules)": 0.0
+   },
+   "R8 >=2 outside range+-10% OR any |z|>12 (std floored at 5% of range)": {
+    "false_refusal_on_heldout": 0.0,
+    "gross (x*10+1000)": 1.0,
+    "moderate (+4 sd on every feature)": 1.0,
+    "moderate negative (-4 sd on every feature)": 1.0,
+    "single feature +25 sd": 1.0,
+    "unit-box uniform (in range, undetectable by range rules)": 0.0
+   },
+   "R9 >=2 outside range+-10% OR any |z|>8 (std floored at 5% of range)": {
+    "false_refusal_on_heldout": 0.0,
+    "gross (x*10+1000)": 1.0,
+    "moderate (+4 sd on every feature)": 1.0,
+    "moderate negative (-4 sd on every feature)": 1.0,
+    "single feature +25 sd": 1.0,
+    "unit-box uniform (in range, undetectable by range rules)": 0.0
+   }
+  },
+  "digits": {
+   "R0 any feature outside range+-10% (current)": {
+    "false_refusal_on_heldout": 0.013888888888888888,
+    "gross (x*10+1000)": 1.0,
+    "moderate (+4 sd on every feature)": 1.0,
+    "moderate negative (-4 sd on every feature)": 1.0,
+    "single feature +25 sd": 0.9055555555555556,
+    "unit-box uniform (in range, undetectable by range rules)": 0.0
+   },
+   "R1 >=25% of features outside range+-10%": {
+    "false_refusal_on_heldout": 0.0,
+    "gross (x*10+1000)": 1.0,
+    "moderate (+4 sd on every feature)": 1.0,
+    "moderate negative (-4 sd on every feature)": 1.0,
+    "single feature +25 sd": 0.0,
+    "unit-box uniform (in range, undetectable by range rules)": 0.0
+   },
+   "R2 any feature |z|>8": {
+    "false_refusal_on_heldout": 0.041666666666666664,
+    "gross (x*10+1000)": 1.0,
+    "moderate (+4 sd on every feature)": 0.10555555555555556,
+    "moderate negative (-4 sd on every feature)": 0.030555555555555555,
+    "single feature +25 sd": 1.0,
+    "unit-box uniform (in range, undetectable by range rules)": 1.0
+   },
+   "R3 any feature |z|>12": {
+    "false_refusal_on_heldout": 0.030555555555555555,
+    "gross (x*10+1000)": 1.0,
+    "moderate (+4 sd on every feature)": 0.041666666666666664,
+    "moderate negative (-4 sd on every feature)": 0.019444444444444445,
+    "single feature +25 sd": 1.0,
+    "unit-box uniform (in range, undetectable by range rules)": 0.9972222222222222
+   },
+   "R4 >=25% outside range+-10% OR any |z|>12": {
+    "false_refusal_on_heldout": 0.030555555555555555,
+    "gross (x*10+1000)": 1.0,
+    "moderate (+4 sd on every feature)": 1.0,
+    "moderate negative (-4 sd on every feature)": 1.0,
+    "single feature +25 sd": 1.0,
+    "unit-box uniform (in range, undetectable by range rules)": 0.9972222222222222
+   },
+   "R5 >=10% outside range+-10% OR any |z|>12": {
+    "false_refusal_on_heldout": 0.030555555555555555,
+    "gross (x*10+1000)": 1.0,
+    "moderate (+4 sd on every feature)": 1.0,
+    "moderate negative (-4 sd on every feature)": 1.0,
+    "single feature +25 sd": 1.0,
+    "unit-box uniform (in range, undetectable by range rules)": 1.0
+   },
+   "R6 >=2 features outside range+-10% OR any |z|>12": {
+    "false_refusal_on_heldout": 0.030555555555555555,
+    "gross (x*10+1000)": 1.0,
+    "moderate (+4 sd on every feature)": 1.0,
+    "moderate negative (-4 sd on every feature)": 1.0,
+    "single feature +25 sd": 1.0,
+    "unit-box uniform (in range, undetectable by range rules)": 1.0
+   },
+   "R7 >=2 features outside range+-10% OR any |z|>8": {
+    "false_refusal_on_heldout": 0.041666666666666664,
+    "gross (x*10+1000)": 1.0,
+    "moderate (+4 sd on every feature)": 1.0,
+    "moderate negative (-4 sd on every feature)": 1.0,
+    "single feature +25 sd": 1.0,
+    "unit-box uniform (in range, undetectable by range rules)": 1.0
+   },
+   "R8 >=2 outside range+-10% OR any |z|>12 (std floored at 5% of range)": {
+    "false_refusal_on_heldout": 0.030555555555555555,
+    "gross (x*10+1000)": 1.0,
+    "moderate (+4 sd on every feature)": 1.0,
+    "moderate negative (-4 sd on every feature)": 1.0,
+    "single feature +25 sd": 1.0,
+    "unit-box uniform (in range, undetectable by range rules)": 0.9861111111111112
+   },
+   "R9 >=2 outside range+-10% OR any |z|>8 (std floored at 5% of range)": {
+    "false_refusal_on_heldout": 0.041666666666666664,
+    "gross (x*10+1000)": 1.0,
+    "moderate (+4 sd on every feature)": 1.0,
+    "moderate negative (-4 sd on every feature)": 1.0,
+    "single feature +25 sd": 1.0,
+    "unit-box uniform (in range, undetectable by range rules)": 1.0
+   }
+  },
+  "breast_cancer": {
+   "R0 any feature outside range+-10% (current)": {
+    "false_refusal_on_heldout": 0.043859649122807015,
+    "gross (x*10+1000)": 1.0,
+    "moderate (+4 sd on every feature)": 0.8859649122807017,
+    "moderate negative (-4 sd on every feature)": 1.0,
+    "single feature +25 sd": 1.0,
+    "unit-box uniform (in range, undetectable by range rules)": 0.0
+   },
+   "R1 >=25% of features outside range+-10%": {
+    "false_refusal_on_heldout": 0.0,
+    "gross (x*10+1000)": 1.0,
+    "moderate (+4 sd on every feature)": 0.3333333333333333,
+    "moderate negative (-4 sd on every feature)": 1.0,
+    "single feature +25 sd": 0.0,
+    "unit-box uniform (in range, undetectable by range rules)": 0.0
+   },
+   "R2 any feature |z|>8": {
+    "false_refusal_on_heldout": 0.017543859649122806,
+    "gross (x*10+1000)": 1.0,
+    "moderate (+4 sd on every feature)": 0.06140350877192982,
+    "moderate negative (-4 sd on every feature)": 0.008771929824561403,
+    "single feature +25 sd": 1.0,
+    "unit-box uniform (in range, undetectable by range rules)": 0.2631578947368421
+   },
+   "R3 any feature |z|>12": {
+    "false_refusal_on_heldout": 0.008771929824561403,
+    "gross (x*10+1000)": 1.0,
+    "moderate (+4 sd on every feature)": 0.017543859649122806,
+    "moderate negative (-4 sd on every feature)": 0.0,
+    "single feature +25 sd": 1.0,
+    "unit-box uniform (in range, undetectable by range rules)": 0.0
+   },
+   "R4 >=25% outside range+-10% OR any |z|>12": {
+    "false_refusal_on_heldout": 0.008771929824561403,
+    "gross (x*10+1000)": 1.0,
+    "moderate (+4 sd on every feature)": 0.3333333333333333,
+    "moderate negative (-4 sd on every feature)": 1.0,
+    "single feature +25 sd": 1.0,
+    "unit-box uniform (in range, undetectable by range rules)": 0.0
+   },
+   "R5 >=10% outside range+-10% OR any |z|>12": {
+    "false_refusal_on_heldout": 0.008771929824561403,
+    "gross (x*10+1000)": 1.0,
+    "moderate (+4 sd on every feature)": 0.5526315789473685,
+    "moderate negative (-4 sd on every feature)": 1.0,
+    "single feature +25 sd": 1.0,
+    "unit-box uniform (in range, undetectable by range rules)": 0.0
+   },
+   "R6 >=2 features outside range+-10% OR any |z|>12": {
+    "false_refusal_on_heldout": 0.008771929824561403,
+    "gross (x*10+1000)": 1.0,
+    "moderate (+4 sd on every feature)": 0.7280701754385965,
+    "moderate negative (-4 sd on every feature)": 1.0,
+    "single feature +25 sd": 1.0,
+    "unit-box uniform (in range, undetectable by range rules)": 0.0
+   },
+   "R7 >=2 features outside range+-10% OR any |z|>8": {
+    "false_refusal_on_heldout": 0.017543859649122806,
+    "gross (x*10+1000)": 1.0,
+    "moderate (+4 sd on every feature)": 0.7280701754385965,
+    "moderate negative (-4 sd on every feature)": 1.0,
+    "single feature +25 sd": 1.0,
+    "unit-box uniform (in range, undetectable by range rules)": 0.23684210526315788
+   },
+   "R8 >=2 outside range+-10% OR any |z|>12 (std floored at 5% of range)": {
+    "false_refusal_on_heldout": 0.008771929824561403,
+    "gross (x*10+1000)": 1.0,
+    "moderate (+4 sd on every feature)": 0.7280701754385965,
+    "moderate negative (-4 sd on every feature)": 1.0,
+    "single feature +25 sd": 1.0,
+    "unit-box uniform (in range, undetectable by range rules)": 0.0
+   },
+   "R9 >=2 outside range+-10% OR any |z|>8 (std floored at 5% of range)": {
+    "false_refusal_on_heldout": 0.017543859649122806,
+    "gross (x*10+1000)": 1.0,
+    "moderate (+4 sd on every feature)": 0.7280701754385965,
+    "moderate negative (-4 sd on every feature)": 1.0,
+    "single feature +25 sd": 1.0,
+    "unit-box uniform (in range, undetectable by range rules)": 0.22807017543859648
+   }
+  }
+ },
+ "mean_over_datasets": {
+  "R0 any feature outside range+-10% (current)": {
+   "false_refusal_on_heldout": 0.028326023391812866,
+   "gross (x*10+1000)": 1.0,
+   "moderate (+4 sd on every feature)": 0.9714912280701754,
+   "moderate negative (-4 sd on every feature)": 1.0,
+   "single feature +25 sd": 0.9763888888888889,
+   "unit-box uniform (in range, undetectable by range rules)": 0.0
+  },
+  "R1 >=25% of features outside range+-10%": {
+   "false_refusal_on_heldout": 0.0,
+   "gross (x*10+1000)": 1.0,
+   "moderate (+4 sd on every feature)": 0.8333333333333334,
+   "moderate negative (-4 sd on every feature)": 1.0,
+   "single feature +25 sd": 0.25,
+   "unit-box uniform (in range, undetectable by range rules)": 0.0
+  },
+  "R2 any feature |z|>8": {
+   "false_refusal_on_heldout": 0.014802631578947368,
+   "gross (x*10+1000)": 1.0,
+   "moderate (+4 sd on every feature)": 0.04868421052631579,
+   "moderate negative (-4 sd on every feature)": 0.00983187134502924,
+   "single feature +25 sd": 1.0,
+   "unit-box uniform (in range, undetectable by range rules)": 0.3157894736842105
+  },
+  "R3 any feature |z|>12": {
+   "false_refusal_on_heldout": 0.00983187134502924,
+   "gross (x*10+1000)": 1.0,
+   "moderate (+4 sd on every feature)": 0.014802631578947368,
+   "moderate negative (-4 sd on every feature)": 0.004861111111111111,
+   "single feature +25 sd": 1.0,
+   "unit-box uniform (in range, undetectable by range rules)": 0.24930555555555556
+  },
+  "R4 >=25% outside range+-10% OR any |z|>12": {
+   "false_refusal_on_heldout": 0.00983187134502924,
+   "gross (x*10+1000)": 1.0,
+   "moderate (+4 sd on every feature)": 0.8333333333333334,
+   "moderate negative (-4 sd on every feature)": 1.0,
+   "single feature +25 sd": 1.0,
+   "unit-box uniform (in range, undetectable by range rules)": 0.24930555555555556
+  },
+  "R5 >=10% outside range+-10% OR any |z|>12": {
+   "false_refusal_on_heldout": 0.00983187134502924,
+   "gross (x*10+1000)": 1.0,
+   "moderate (+4 sd on every feature)": 0.8881578947368421,
+   "moderate negative (-4 sd on every feature)": 1.0,
+   "single feature +25 sd": 1.0,
+   "unit-box uniform (in range, undetectable by range rules)": 0.25
+  },
+  "R6 >=2 features outside range+-10% OR any |z|>12": {
+   "false_refusal_on_heldout": 0.00983187134502924,
+   "gross (x*10+1000)": 1.0,
+   "moderate (+4 sd on every feature)": 0.9320175438596492,
+   "moderate negative (-4 sd on every feature)": 1.0,
+   "single feature +25 sd": 1.0,
+   "unit-box uniform (in range, undetectable by range rules)": 0.25
+  },
+  "R7 >=2 features outside range+-10% OR any |z|>8": {
+   "false_refusal_on_heldout": 0.014802631578947368,
+   "gross (x*10+1000)": 1.0,
+   "moderate (+4 sd on every feature)": 0.9320175438596492,
+   "moderate negative (-4 sd on every feature)": 1.0,
+   "single feature +25 sd": 1.0,
+   "unit-box uniform (in range, undetectable by range rules)": 0.3092105263157895
+  },
+  "R8 >=2 outside range+-10% OR any |z|>12 (std floored at 5% of range)": {
+   "false_refusal_on_heldout": 0.00983187134502924,
+   "gross (x*10+1000)": 1.0,
+   "moderate (+4 sd on every feature)": 0.9320175438596492,
+   "moderate negative (-4 sd on every feature)": 1.0,
+   "single feature +25 sd": 1.0,
+   "unit-box uniform (in range, undetectable by range rules)": 0.2465277777777778
+  },
+  "R9 >=2 outside range+-10% OR any |z|>8 (std floored at 5% of range)": {
+   "false_refusal_on_heldout": 0.014802631578947368,
+   "gross (x*10+1000)": 1.0,
+   "moderate (+4 sd on every feature)": 0.9320175438596492,
+   "moderate negative (-4 sd on every feature)": 1.0,
+   "single feature +25 sd": 1.0,
+   "unit-box uniform (in range, undetectable by range rules)": 0.30701754385964913
+  }
+ }
+}

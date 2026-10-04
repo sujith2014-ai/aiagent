@@ -4,18 +4,18 @@ Module held-out accuracy: compare_numbers: 1.000, point_region: 0.992, argmax_po
 
 | composite | plan variant | modular acc | end-to-end MLP acc (3 seeds, mean) | MLP params | cap calls/task | node exec p50 | total us p50 | modules us | overhead us |
 |---|---|---|---|---|---|---|---|---|---|
-| sort4 | network/intent | 1.000 | 1.000 | 6040 | 5 | 16 | 88 | 37 | 50 |
-| sort4 | network/id | 1.000 | 1.000 | 6040 | 5 | 16 | 76 | 43 | 32 |
-| sort4 | bubble_loop/intent | 1.000 | 1.000 | 6040 | 9 | 29 | 165 | 70 | 93 |
-| sort4 | bubble_loop/id | 1.000 | 1.000 | 6040 | 9 | 29 | 112 | 63 | 49 |
-| count_inside | main/intent | 0.957 | 0.569 | 5061 | 4 | 5 | 78 | 34 | 43 |
-| count_inside | main/id | 0.957 | 0.569 | 5061 | 4 | 5 | 52 | 30 | 22 |
-| mixed_C_select_B_A | main/intent | 0.987 | 0.833 | 5126 | 3 | 6 | 66 | 30 | 35 |
-| mixed_C_select_B_A | main/id | 0.987 | 0.833 | 5126 | 3 | 6 | 52 | 32 | 20 |
-| branch | main/intent | 0.998 | 0.980 | 5516 | 1-2 | 3 | 35 | 16 | 19 |
-| branch | main/id | 0.998 | 0.980 | 5516 | 1-2 | 3 | 27 | 16 | 11 |
-| path_ABAC | main/intent | 0.993 | 0.862 | 9544 | 4 | 4 | 75 | 34 | 42 |
-| path_ABAC | main/id | 0.993 | 0.862 | 9544 | 4 | 4 | 50 | 30 | 20 |
+| sort4 | network/intent | 1.000 | 1.000 | 6040 | 5 | 16 | 99 | 40 | 59 |
+| sort4 | network/id | 1.000 | 1.000 | 6040 | 5 | 16 | 74 | 39 | 35 |
+| sort4 | bubble_loop/intent | 1.000 | 1.000 | 6040 | 9 | 29 | 181 | 73 | 107 |
+| sort4 | bubble_loop/id | 1.000 | 1.000 | 6040 | 9 | 29 | 117 | 60 | 52 |
+| count_inside | main/intent | 0.957 | 0.569 | 5061 | 4 | 5 | 77 | 32 | 46 |
+| count_inside | main/id | 0.957 | 0.569 | 5061 | 4 | 5 | 57 | 31 | 26 |
+| mixed_C_select_B_A | main/intent | 0.987 | 0.833 | 5126 | 3 | 6 | 60 | 25 | 34 |
+| mixed_C_select_B_A | main/id | 0.987 | 0.833 | 5126 | 3 | 6 | 66 | 36 | 30 |
+| branch | main/intent | 0.998 | 0.980 | 5516 | 1-2 | 3 | 35 | 15 | 20 |
+| branch | main/id | 0.998 | 0.980 | 5516 | 1-2 | 3 | 30 | 16 | 14 |
+| path_ABAC | main/intent | 0.993 | 0.862 | 9544 | 4 | 4 | 78 | 33 | 46 |
+| path_ABAC | main/id | 0.993 | 0.862 | 9544 | 4 | 4 | 81 | 45 | 35 |
 
 Intent-routed vs id-routed variants give identical accuracy; the difference is overhead only.
 
@@ -26,8 +26,8 @@ A->B->A->C path executed in order for every case: True.
 
 | task | monolithic us p50 | modular plan total us p50 | ratio |
 |---|---|---|---|
-| count_inside | 9 | 78 | 8.7x |
-| mixed_C_select_B_A | 7 | 66 | 9.4x |
+| count_inside | 8 | 77 | 9.6x |
+| mixed_C_select_B_A | 11 | 60 | 5.5x |
 
 ## Error accumulation check
 

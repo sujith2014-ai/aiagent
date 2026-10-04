@@ -35,7 +35,7 @@
 
 - **correct_evidence**: {"result": "ANSWER", "path": ["local", "teacher", "openclaw", "learn"], "teacher_calls": 2, "openclaw_calls": 1, "label": "MID"}
 - **related_encounter_after_learning**: {"result": "ANSWER", "path": ["local"], "teacher_calls_total": 2, "openclaw_calls_total": 1}
-- **provenance_in_signed_manifest**: {"unverified_internet_content": true, "evidence": [{"id": "ev0", "provider": "fixture-simulated", "retrieved_at": "2026-10-04T19:18:00Z", "sha256": "29db4504407bfee4ff823a6b8f3fc87b1e36b4768d710ece982ab38f95d39bb7", "simulated": true, "source": "https://docs.example.org/grading"}], "label_expr": "0 if x0 < 0.3 else 1 if x0 < 0.7 else 2"}
+- **provenance_in_signed_manifest**: {"unverified_internet_content": true, "evidence": [{"id": "ev0", "provider": "fixture-simulated", "retrieved_at": "2026-10-04T19:37:50Z", "sha256": "29db4504407bfee4ff823a6b8f3fc87b1e36b4768d710ece982ab38f95d39bb7", "simulated": true, "source": "https://docs.example.org/grading"}], "label_expr": "0 if x0 < 0.3 else 1 if x0 < 0.7 else 2"}
 - **wrong_evidence**: {"result": "NEEDS_HELP", "reason": "candidate rejected after 4 attempts: environment verification accuracy 0.595 < 0.95", "installed": 0}
 - **no_environment_examples**: {"result": "NEEDS_HELP", "reason": "teacher rule cannot be verified: environment examples required", "installed": 0}
 - **provider_unavailable_no_provider**: {"result": "QUEUED_EXTERNAL", "reason": "external research unavailable (no_provider); request queued, nothing was researched", "openclaw_calls": 0, "installed": 0}

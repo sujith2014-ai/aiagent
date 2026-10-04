@@ -73,3 +73,11 @@ def test_nested_loops_hit_the_runtime_step_budget(rt3, tmp_path):
 def test_wrong_input_shape_rejected(rt3, tmp_path):
     r = run(rt3, P.count_inside("intent"), [{"p": [0.1, 0.2]}], tmp_path)["results"][0]
     assert "error" in r
+
+
+def test_plans_refuse_inputs_outside_a_capabilitys_learned_domain(rt3, tmp_path):
+    # count_inside feeds points to the region capability, which was trained on [-1, 1]^2
+    far = run(rt3, P.count_inside("intent"), [{"p": [5.0, 5.0, 0.1, 0.1, 0.2, 0.2, 0.0, 0.0]}], tmp_path)["results"][0]
+    assert far.get("needs_help") and "OUT_OF_DISTRIBUTION" in far["reason"] and "outputs" not in far
+    near = run(rt3, P.count_inside("intent"), [{"p": [0.1, 0.1, 0.2, 0.2, 0.3, 0.3, 0.9, 0.9]}], tmp_path)["results"][0]
+    assert near["outputs"] == [3.0]

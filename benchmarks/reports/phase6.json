@@ -49,15 +49,15 @@
   "plausible_wrong": {
    "compare_numbers": {
     "result": "NEEDS_HELP",
-    "reason": "candidate rejected after 3 attempts: heldout accuracy 0.950 < 0.95"
+    "reason": "candidate rejected after 4 attempts: environment verification accuracy 0.775 < 0.95"
    },
    "point_region": {
     "result": "NEEDS_HELP",
-    "reason": "candidate rejected after 3 attempts: environment verification accuracy 0.930 < 0.95"
+    "reason": "candidate rejected after 4 attempts: environment verification accuracy 0.915 < 0.95"
    },
    "argmax_position": {
     "result": "NEEDS_HELP",
-    "reason": "candidate rejected after 3 attempts: environment verification accuracy 0.930 < 0.95"
+    "reason": "candidate rejected after 4 attempts: environment verification accuracy 0.935 < 0.95"
    }
   },
   "subtle_wrong": {
@@ -67,11 +67,11 @@
    },
    "point_region": {
     "result": "NEEDS_HELP",
-    "reason": "candidate rejected after 3 attempts: environment verification accuracy 0.930 < 0.95"
+    "reason": "candidate rejected after 4 attempts: environment verification accuracy 0.915 < 0.95"
    },
    "argmax_position": {
     "result": "NEEDS_HELP",
-    "reason": "candidate rejected after 3 attempts: environment verification accuracy 0.930 < 0.95"
+    "reason": "candidate rejected after 4 attempts: environment verification accuracy 0.935 < 0.95"
    }
   }
  },
@@ -88,6 +88,7 @@
    "request_body_fields": [
     "attempted_route",
     "available_tools",
+    "evidence",
     "failure",
     "input_dim",
     "known_capabilities",

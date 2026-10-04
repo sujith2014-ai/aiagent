@@ -22,16 +22,16 @@ Merge `compare_values` into `compare_numbers`: merged=True, steps=['keeper_passe
 
 | capability | params before | after | held-out acc before | distilled | pruned (dry run) | installed? | bytes before -> after | latency us p50 before -> after | rollback check |
 |---|---|---|---|---|---|---|---|---|---|
-| compare_numbers | 1251 | 371 | 1.000 | 0.975 | 0.975 | False (accuracy drop 0.025 > 0.01) | 5653 -> 5653 | 8 -> 7 | {'skipped': 'nothing was installed'} |
-| point_region | 1218 | 354 | 0.992 | 0.990 | 0.991 | True | 5521 -> 2061 | 7 -> 8 | {'active_version': '0.1.0', 'accuracy': 0.992, 'original_accuracy': 0.992} |
-| argmax_position | 1348 | 420 | 0.988 | 0.982 | 0.984 | True | 6041 -> 2325 | 9 -> 9 | {'active_version': '0.1.0', 'accuracy': 0.987, 'original_accuracy': 0.987} |
+| compare_numbers | 1251 | 371 | 1.000 | 0.975 | 0.975 | False (accuracy drop 0.025 > 0.01) | 5653 -> 5653 | 8 -> 8 | {'skipped': 'nothing was installed'} |
+| point_region | 1218 | 354 | 0.992 | 0.990 | 0.991 | True | 5521 -> 2061 | 8 -> 8 | {'active_version': '0.1.0', 'accuracy': 0.992, 'original_accuracy': 0.992} |
+| argmax_position | 1348 | 420 | 0.988 | 0.982 | 0.984 | True | 6041 -> 2325 | 10 -> 9 | {'active_version': '0.1.0', 'accuracy': 0.987, 'original_accuracy': 0.987} |
 
 ### Route optimisation (common-subexpression + dead-node elimination)
 
 | plan | cap calls before -> after | nodes before -> after | outputs identical | latency us p50 before -> after |
 |---|---|---|---|---|
-| count_inside | 8 -> 4 | 9 -> 5 | True | 86 -> 39 |
-| sort4 | 10 -> 5 | 21 -> 16 | True | 113 -> 57 |
+| count_inside | 8 -> 4 | 9 -> 5 | True | 91 -> 45 |
+| sort4 | 10 -> 5 | 21 -> 16 | True | 125 -> 64 |
 
 ## Learned router vs deterministic keyword router
 
@@ -43,7 +43,7 @@ Evaluation intents are hand-written and disjoint from training templates (overla
 | learned (basic negatives) | 27 | 0.89 [0.72, 0.96] | 0.93 [0.77, 0.98] | 0.07 | 24 | 0.12 [0.04, 0.31] | 15 | 0.60 [0.36, 0.80] | 0.20 |
 | learned (hard negatives) | 27 | 0.81 [0.63, 0.92] | 0.89 [0.72, 0.96] | 0.11 | 24 | 0.08 [0.02, 0.26] | 15 | 0.27 [0.11, 0.52] | 0.60 |
 
-Learned router: params 16708, 67274 bytes, training 1.6s. Per-task wall time over 10800 tasks: keyword 30.0 us, learned 43.2 us; peak RSS 26736 vs 27500 KB.
+Learned router: params 16708, 67274 bytes, training 1.4s. Per-task wall time over 10800 tasks: keyword 34.6 us, learned 43.0 us; peak RSS 26424 vs 27632 KB.
 
 ### A new capability arrives after the router was trained (4 paraphrased majority-vote intents)
 
@@ -53,7 +53,7 @@ Learned router: params 16708, 67274 bytes, training 1.6s. Per-task wall time ove
 | learned_stale | 0.00 | 1.00 |
 | learned_after_retrain | 0.50 | 0.50 |
 
-Learned-router retrain: 2.1s per new capability; keyword router: 0 (reads package metadata).
+Learned-router retrain: 1.9s per new capability; keyword router: 0 (reads package metadata).
 
 ## Cross-phase baseline comparison (all numbers from the earlier reports)
 
@@ -77,7 +77,7 @@ Parameters: modular 3817 total vs shared MLP 2932.
 | branch | 0.998 | 0.980 |
 | path_ABAC | 0.993 | 0.862 |
 
-Latency through the same ONNX backend: count_inside: modular 78 us vs monolithic 9 us; mixed_C_select_B_A: modular 66 us vs monolithic 7 us.
+Latency through the same ONNX backend: count_inside: modular 77 us vs monolithic 8 us; mixed_C_select_B_A: modular 60 us vs monolithic 11 us.
 
 ### Teacher dependency
 

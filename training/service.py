@@ -64,13 +64,18 @@ class BuildService:
         self.models: dict[str, dict] = {}   # capability_id -> trained state kept for adaptation / metadata updates
 
     def build(self, lp: LearningPackage, version: str, known_caps: set[str], attempts=((32, 32), (64, 64), (64, 64), (128, 128)),
-              heldout=None, verification=None, min_verification=PROMOTE_MIN_TEST_ACC) -> BuildResult:
+              heldout=None, verification=None, min_verification=None, standardize=False, min_acc=None) -> BuildResult:
+        thr = PROMOTE_MIN_TEST_ACC if min_acc is None else min_acc
+        min_verification = thr if min_verification is None else min_verification
+        norm = None
+        if standardize:                                            # statistics from the training split only, baked into the model
+            arr = np.asarray(lp.train_x, dtype=np.float64); norm = (arr.mean(0).tolist(), arr.std(0).tolist())
         validate(lp, known_caps)                                   # 1. LearningPackage validation
         used = set(map(tuple, lp.train_x)) | set(map(tuple, lp.validation_x))
         tx, ty = heldout if heldout is not None else self.oracle.heldout(lp.capability_id, used)   # 2. generalization set
         rep = {"capability_id": lp.capability_id, "attempts": []}
         for i, hidden in enumerate(attempts):                      # 3. isolated training of a *new* module
-            model, tr = train_candidate(lp, hidden=hidden, seed=i, epochs=400 + 200 * (i // 2))
+            model, tr = train_candidate(lp, hidden=hidden, seed=i, epochs=400 + 200 * (i // 2), normalize=norm)
             test_acc = accuracy(model, tx, ty)
             att = {**tr, "heldout_accuracy": test_acc, "heldout_n": len(tx)}
             rep["attempts"].append(att)
@@ -79,10 +84,10 @@ class BuildService:
                 vacc = accuracy(model, verification[0], verification[1])
                 att["verification_accuracy"] = vacc
                 rep["verification_accuracy"] = vacc; rep["verification_n"] = len(verification[0])
-            if test_acc >= PROMOTE_MIN_TEST_ACC and (vacc is None or vacc >= min_verification):
+            if test_acc >= thr and (vacc is None or vacc >= min_verification):
                 break
         else:
-            why = f"heldout accuracy {test_acc:.3f} < {PROMOTE_MIN_TEST_ACC}" if test_acc < PROMOTE_MIN_TEST_ACC else \
+            why = f"heldout accuracy {test_acc:.3f} < {thr}" if test_acc < thr else \
                   f"environment verification accuracy {vacc:.3f} < {min_verification}"
             return BuildResult(False, f"candidate rejected after {len(attempts)} attempts: {why}", None, rep)
         onnx_bytes = export_onnx(model, lp.input_dim)              # 4. export + parity check vs PyTorch
@@ -96,7 +101,7 @@ class BuildService:
             params=tr["params"], input_dim=lp.input_dim, labels=lp.labels, tests=tests, keywords=lp.keywords,
             description=lp.description, signer_id=self.signer_id, signer_key=self.key, device_caps=lp.device_caps,
             dependencies=lp.existing_dependencies, input_stats=input_stats(lp.train_x + lp.edge_cases_x),
-            calibration={"method": "temperature", "temperature": T}, min_accuracy=PROMOTE_MIN_TEST_ACC - 0.05,
+            calibration={"method": "temperature", "temperature": T}, min_accuracy=thr - 0.05,
             provenance={"learning_package": {k: lp.provenance.get(k) for k in ("source", "teacher", "created", "verified", "evidence", "unverified_internet_content", "label_expr")},
                         "training": {k: tr[k] for k in ("epochs", "hidden", "seed", "train_seconds", "val_accuracy")},
                         "heldout_accuracy": test_acc, "strategy": lp.strategy,

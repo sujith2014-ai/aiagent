@@ -109,7 +109,7 @@
     },
     "after": {
      "accuracy": 1.0,
-     "latency_us_p50": 7,
+     "latency_us_p50": 8,
      "bundled_regression": 1.0,
      "version": "0.1.1"
     },
@@ -121,7 +121,7 @@
     "capability": "point_region",
     "before": {
      "accuracy": 0.992,
-     "latency_us_p50": 7,
+     "latency_us_p50": 8,
      "params": 1218,
      "bytes": 5521
     },
@@ -156,7 +156,7 @@
     "capability": "argmax_position",
     "before": {
      "accuracy": 0.987,
-     "latency_us_p50": 9,
+     "latency_us_p50": 10,
      "params": 1348,
      "bytes": 6041
     },
@@ -197,8 +197,8 @@
     "nodes_after": 5,
     "cap_calls_after": 4,
     "outputs_identical": true,
-    "latency_us_p50_before": 86,
-    "latency_us_p50_after": 39
+    "latency_us_p50_before": 91,
+    "latency_us_p50_after": 45
    },
    {
     "plan": "sort4",
@@ -208,8 +208,8 @@
     "nodes_after": 16,
     "cap_calls_after": 5,
     "outputs_identical": true,
-    "latency_us_p50_before": 113,
-    "latency_us_p50_after": 57
+    "latency_us_p50_before": 125,
+    "latency_us_p50_after": 64
    }
   ],
   "after": {
@@ -304,8 +304,8 @@
   "learned_router": {
    "basic": {
     "training": {
-     "train_seconds": 1.7333509922027588,
-     "total_seconds": 1.7789146900177002,
+     "train_seconds": 1.459580898284912,
+     "total_seconds": 1.5031347274780273,
      "val_accuracy": 1.0,
      "params": 16708,
      "bytes": 67274,
@@ -335,8 +335,8 @@
    },
    "hard": {
     "training": {
-     "train_seconds": 1.5397515296936035,
-     "total_seconds": 1.5891954898834229,
+     "train_seconds": 1.3681113719940186,
+     "total_seconds": 1.4083542823791504,
      "val_accuracy": 1.0,
      "params": 16708,
      "bytes": 67274,
@@ -368,15 +368,15 @@
   "speed": {
    "keyword": {
     "cases": 10800,
-    "wall_ms": 324,
-    "us_per_task_wall": 30.0,
-    "peak_rss_kb": 26736
+    "wall_ms": 374,
+    "us_per_task_wall": 34.629629629629626,
+    "peak_rss_kb": 26424
    },
    "learned": {
     "cases": 10800,
-    "wall_ms": 467,
-    "us_per_task_wall": 43.24074074074074,
-    "peak_rss_kb": 27500
+    "wall_ms": 464,
+    "us_per_task_wall": 42.96296296296296,
+    "peak_rss_kb": 27632
    }
   },
   "new_capability": {
@@ -401,7 +401,7 @@
     "misrouted_known": 0.0,
     "needs_help": 0.5
    },
-   "retrain_seconds": 2.1436829566955566,
+   "retrain_seconds": 1.9303336143493652,
    "keyword_router_retrain_seconds": 0.0
   }
  }

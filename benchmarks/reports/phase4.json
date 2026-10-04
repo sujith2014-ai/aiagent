@@ -20,9 +20,9 @@
       "compare_numbers": 5
      },
      "latency_us_p50": {
-      "total": 88,
-      "modules": 37,
-      "overhead": 50
+      "total": 99,
+      "modules": 40,
+      "overhead": 59
      },
      "parallel_levels_example": [
       [
@@ -74,7 +74,7 @@
        "g4"
       ]
      ],
-     "peak_rss_kb": 30112
+     "peak_rss_kb": 30640
     },
     "network/id": {
      "accuracy": 1.0,
@@ -85,9 +85,9 @@
       "compare_numbers": 5
      },
      "latency_us_p50": {
-      "total": 76,
-      "modules": 43,
-      "overhead": 32
+      "total": 74,
+      "modules": 39,
+      "overhead": 35
      },
      "parallel_levels_example": [
       [
@@ -139,7 +139,7 @@
        "g4"
       ]
      ],
-     "peak_rss_kb": 30384
+     "peak_rss_kb": 30548
     },
     "bubble_loop/intent": {
      "accuracy": 1.0,
@@ -150,9 +150,9 @@
       "compare_numbers": 9
      },
      "latency_us_p50": {
-      "total": 165,
-      "modules": 70,
-      "overhead": 93
+      "total": 181,
+      "modules": 73,
+      "overhead": 107
      },
      "parallel_levels_example": [
       [
@@ -160,7 +160,7 @@
        "passes"
       ]
      ],
-     "peak_rss_kb": 39048
+     "peak_rss_kb": 39388
     },
     "bubble_loop/id": {
      "accuracy": 1.0,
@@ -171,9 +171,9 @@
       "compare_numbers": 9
      },
      "latency_us_p50": {
-      "total": 112,
-      "modules": 63,
-      "overhead": 49
+      "total": 117,
+      "modules": 60,
+      "overhead": 52
      },
      "parallel_levels_example": [
       [
@@ -181,7 +181,7 @@
        "passes"
       ]
      ],
-     "peak_rss_kb": 39056
+     "peak_rss_kb": 39300
     }
    },
    "example_trace": [
@@ -260,9 +260,9 @@
       "point_region": 4
      },
      "latency_us_p50": {
-      "total": 78,
-      "modules": 34,
-      "overhead": 43
+      "total": 77,
+      "modules": 32,
+      "overhead": 46
      },
      "parallel_levels_example": [
       [
@@ -275,7 +275,7 @@
        "count"
       ]
      ],
-     "peak_rss_kb": 19440
+     "peak_rss_kb": 19868
     },
     "main/id": {
      "accuracy": 0.957,
@@ -286,9 +286,9 @@
       "point_region": 4
      },
      "latency_us_p50": {
-      "total": 52,
-      "modules": 30,
-      "overhead": 22
+      "total": 57,
+      "modules": 31,
+      "overhead": 26
      },
      "parallel_levels_example": [
       [
@@ -301,7 +301,7 @@
        "count"
       ]
      ],
-     "peak_rss_kb": 19436
+     "peak_rss_kb": 19824
     }
    },
    "example_trace": [
@@ -364,9 +364,9 @@
       "point_region": 1
      },
      "latency_us_p50": {
-      "total": 66,
-      "modules": 30,
-      "overhead": 35
+      "total": 60,
+      "modules": 25,
+      "overhead": 34
      },
      "parallel_levels_example": [
       [
@@ -382,7 +382,7 @@
        "a"
       ]
      ],
-     "peak_rss_kb": 20640
+     "peak_rss_kb": 21212
     },
     "main/id": {
      "accuracy": 0.987,
@@ -395,9 +395,9 @@
       "point_region": 1
      },
      "latency_us_p50": {
-      "total": 52,
-      "modules": 32,
-      "overhead": 20
+      "total": 66,
+      "modules": 36,
+      "overhead": 30
      },
      "parallel_levels_example": [
       [
@@ -413,7 +413,7 @@
        "a"
       ]
      ],
-     "peak_rss_kb": 20648
+     "peak_rss_kb": 20856
     }
    },
    "example_trace": [
@@ -483,8 +483,8 @@
      },
      "latency_us_p50": {
       "total": 35,
-      "modules": 16,
-      "overhead": 19
+      "modules": 15,
+      "overhead": 20
      },
      "parallel_levels_example": [
       [
@@ -494,7 +494,7 @@
        "br"
       ]
      ],
-     "peak_rss_kb": 17908
+     "peak_rss_kb": 18120
     },
     "main/id": {
      "accuracy": 0.998,
@@ -507,9 +507,9 @@
       "argmax_position": 1
      },
      "latency_us_p50": {
-      "total": 27,
+      "total": 30,
       "modules": 16,
-      "overhead": 11
+      "overhead": 14
      },
      "parallel_levels_example": [
       [
@@ -519,7 +519,7 @@
        "br"
       ]
      ],
-     "peak_rss_kb": 17748
+     "peak_rss_kb": 18040
     }
    },
    "branch_exclusive": true,
@@ -572,9 +572,9 @@
       "point_region": 1
      },
      "latency_us_p50": {
-      "total": 75,
-      "modules": 34,
-      "overhead": 42
+      "total": 78,
+      "modules": 33,
+      "overhead": 46
      },
      "parallel_levels_example": [
       [
@@ -584,7 +584,7 @@
        "C"
       ]
      ],
-     "peak_rss_kb": 18764
+     "peak_rss_kb": 19460
     },
     "main/id": {
      "accuracy": 0.993,
@@ -597,9 +597,9 @@
       "point_region": 1
      },
      "latency_us_p50": {
-      "total": 50,
-      "modules": 30,
-      "overhead": 20
+      "total": 81,
+      "modules": 45,
+      "overhead": 35
      },
      "parallel_levels_example": [
       [
@@ -609,7 +609,7 @@
        "C"
       ]
      ],
-     "peak_rss_kb": 18780
+     "peak_rss_kb": 19448
     }
    },
    "path_order_ok": true,
@@ -657,14 +657,14 @@
  },
  "latency_modular_vs_monolithic": {
   "count_inside": {
-   "monolithic_inference_us_p50": 9,
-   "modular_plan_total_us_p50": 78,
-   "latency_ratio_modular_over_monolithic": 8.666666666666666
+   "monolithic_inference_us_p50": 8,
+   "modular_plan_total_us_p50": 77,
+   "latency_ratio_modular_over_monolithic": 9.625
   },
   "mixed_C_select_B_A": {
-   "monolithic_inference_us_p50": 7,
-   "modular_plan_total_us_p50": 66,
-   "latency_ratio_modular_over_monolithic": 9.428571428571429
+   "monolithic_inference_us_p50": 11,
+   "modular_plan_total_us_p50": 60,
+   "latency_ratio_modular_over_monolithic": 5.454545454545454
   }
  },
  "expected_accuracy_if_errors_independent": {

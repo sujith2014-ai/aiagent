@@ -23,7 +23,7 @@ class Escalator:
         self.log: list[dict] = []
         self.teacher_calls = 0
         self.openclaw_calls = 0                  # successful external research actions
-        self.versions: dict[str, int] = {}
+        self.versions: dict[str, int] = {c["capability_id"]: int(c["active_version"].split(".")[1]) for c in cli.list()}   # survive restarts
         self.routing_suite: list[tuple[str, list[float], str]] = []   # (intent, input, capability) served KNOWN: regression suite for routing changes
         self.router_updates = 0
         self.persist_router_updates = True

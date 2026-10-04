@@ -28,6 +28,7 @@ fn main() -> Result<()> {
     let mut force: Option<String> = None;
     let mut router_kind = "keyword".to_string();
     let mut no_stats = false;
+    let mut novelty = "balanced".to_string();
     let mut rest = vec![];
     let mut i = 0;
     while i < args.len() {
@@ -39,6 +40,7 @@ fn main() -> Result<()> {
             "--capability" => { force = Some(args[i + 1].clone()); i += 2 }
             "--router" => { router_kind = args[i + 1].clone(); i += 2 }
             "--no-stats" => { no_stats = true; i += 1 }
+            "--novelty" => { novelty = args[i + 1].clone(); i += 2 }
             _ => { rest.push(args[i].clone()); i += 1 }
         }
     }
@@ -48,6 +50,7 @@ fn main() -> Result<()> {
     let mut rt = Runtime::open(&root, dev, trust_store)?;
     rt.detect = aicore::runtime::Detection::by_name(&detect).ok_or_else(|| anyhow!("unknown --detect {detect}"))?;
     rt.record_stats = !no_stats;
+    rt.detect.novelty_rule = aicore::runtime::NoveltyRule::by_name(&novelty).ok_or_else(|| anyhow!("unknown --novelty {novelty} (strict|balanced)"))?;
     rt.force_capability = force;
     if router_kind == "learned" { rt.use_learned_router()?; }
     let cmd = rest.first().map(|s| s.as_str()).unwrap_or("help");

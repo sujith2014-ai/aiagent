@@ -9,7 +9,8 @@ core/ (Rust crate `aicore`, platform-neutral)
   backend.rs     Backend/Model traits + ONNX(tract)   device.rs  DeviceProfile (the only platform seam)
   graph.rs       execution plans (cap/select/cond_swap/affine/gather/if/repeat), static validation, step budget
   runtime.rs     guarded import, lazy load/unload (LRU), solve, run_plan, regression
-platforms/desktop/  `aicli` harness (arg parsing, JSON, peak RSS)
+platforms/desktop/  `aicli` harness (arg parsing, JSON, peak RSS); stateless commands: policy-check, approve, features
+apps/desktop/       desktop service + REPL (token-protected loopback JSON API, teach-by-example), see ADR-025
 training/ integrations/teacher/ packages/  Python research side (never imported by the core)
 ```
 Directory deviations from the master layout: core modules are flat files in `core/src` instead of subdirectories (`core/router`, etc. are placeholders); `packages/capbuild.py` holds signing/building. Revisit when modules grow.

@@ -51,9 +51,9 @@ Offline: unknown task -> QUEUED_OFFLINE (teacher called while offline: False); k
 | related | compare these two numbers | ANSWER | local | False |
 | related | is this point inside the circular region | ANSWER | local | False |
 | related | find the position of the largest value | ANSWER | local | False |
-| related | order the two values | NEEDS_HELP | local > teacher | True |
+| related | order the two values | ANSWER | local > teacher > reroute | True |
 | related | classify the point as inside or outside | ANSWER | local | False |
-| related | pick the winning slot | NEEDS_HELP | local > teacher | True |
+| related | pick the winning slot | ANSWER | local > teacher > reroute | True |
 | related | is the first one greater than, smaller than or the same as the second | ANSWER | local | False |
 | related | locate point relative to the circular region | ANSWER | local | False |
 | related | position of the highest value | ANSWER | local | False |
@@ -76,7 +76,7 @@ Offline: unknown task -> QUEUED_OFFLINE (teacher called while offline: False); k
 
 ## Privacy filter
 
-Request actually sent: `{"task_intent": "compare numbers for user [EMAIL] [SECRET] token [SECRET] in [PATH]", "input_dim": 2, "known_capabilities": ["compare_numbers"], "attempted_route": {"status": "NO_MATCH", "candidates": []}, "failure": "", "available_tools": []}`
+Request actually sent: `{"task_intent": "compare numbers for user [EMAIL] [SECRET] token [SECRET] in [PATH]", "input_dim": 2, "known_capabilities": ["compare_numbers"], "attempted_route": {"status": "NO_MATCH", "candidates": []}, "failure": "", "available_tools": [], "evidence": []}`
 Leaked secrets: []
 
 ## Information classification (rule baseline)

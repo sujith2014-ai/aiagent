@@ -1,0 +1,328 @@
+{
+ "benchmark_format": "bench/1",
+ "experiment": "phase9-real-world-tasks",
+ "platform": "Linux-6.18.44-fc-v64-x86_64-with-glibc2.39",
+ "date": "2026-10-04",
+ "datasets": "scikit-learn bundled copies of iris, wine, digits, breast cancer (duplicates removed, stratified 60/20/20 split, seed 0; baselines fit on the same 60% train split)",
+ "tasks": {
+  "iris_species": {
+   "data": {
+    "n": 149,
+    "train": 89,
+    "val": 30,
+    "test": 30,
+    "duplicates_removed": 1
+   },
+   "promotion_gate": 0.9366666666666666,
+   "baselines": {
+    "majority": {
+     "accuracy": 0.3333333333333333,
+     "params_or_stored_floats": 0
+    },
+    "logistic_regression": {
+     "accuracy": 0.9666666666666667,
+     "params_or_stored_floats": 15
+    },
+    "knn_k5": {
+     "accuracy": 0.9666666666666667,
+     "params_or_stored_floats": 356
+    },
+    "sklearn_mlp_32x32": {
+     "accuracy": 1.0,
+     "params_or_stored_floats": 1315
+    }
+   },
+   "teach": {
+    "learned": true,
+    "reason": null,
+    "version": "0.1.0",
+    "heldout_accuracy": 1.0,
+    "params": 4675,
+    "teacher_used": false
+   },
+   "teach_seconds": 1.5361535549163818,
+   "runtime": {
+    "accuracy_overall": 1.0,
+    "ci95_overall": [
+     0.886,
+     1
+    ],
+    "coverage": 1.0,
+    "n_test": 30,
+    "accuracy_answered": 1.0,
+    "refused_as_out_of_range": 0,
+    "latency_us_p50": 11,
+    "params": 4675,
+    "model_bytes": 19528,
+    "ece_calibrated_answered": 1.079638799028615e-05,
+    "ece_raw_answered": 0.03654315869013471
+   },
+   "accuracy_of_all_earlier_after_this_stage": {
+    "iris_species": 1.0
+   }
+  },
+  "wine_cultivar": {
+   "data": {
+    "n": 178,
+    "train": 106,
+    "val": 36,
+    "test": 36,
+    "duplicates_removed": 0
+   },
+   "promotion_gate": 0.9422222222222222,
+   "baselines": {
+    "majority": {
+     "accuracy": 0.4166666666666667,
+     "params_or_stored_floats": 0
+    },
+    "logistic_regression": {
+     "accuracy": 0.9722222222222222,
+     "params_or_stored_floats": 42
+    },
+    "knn_k5": {
+     "accuracy": 0.8888888888888888,
+     "params_or_stored_floats": 1378
+    },
+    "sklearn_mlp_32x32": {
+     "accuracy": 0.9722222222222222,
+     "params_or_stored_floats": 1603
+    }
+   },
+   "teach": {
+    "learned": true,
+    "reason": null,
+    "version": "0.1.0",
+    "heldout_accuracy": 1.0,
+    "params": 1603,
+    "teacher_used": false
+   },
+   "teach_seconds": 0.1460428237915039,
+   "runtime": {
+    "accuracy_overall": 1.0,
+    "ci95_overall": [
+     0.904,
+     1
+    ],
+    "coverage": 1.0,
+    "n_test": 36,
+    "accuracy_answered": 1.0,
+    "refused_as_out_of_range": 0,
+    "latency_us_p50": 12,
+    "params": 1603,
+    "model_bytes": 7309,
+    "ece_calibrated_answered": 0.0001810474528206596,
+    "ece_raw_answered": 0.036994094649950675
+   },
+   "accuracy_of_all_earlier_after_this_stage": {
+    "iris_species": 1.0,
+    "wine_cultivar": 1.0
+   }
+  },
+  "digit_recognition": {
+   "data": {
+    "n": 1797,
+    "train": 1078,
+    "val": 359,
+    "test": 360,
+    "duplicates_removed": 0
+   },
+   "promotion_gate": 0.9338888888888889,
+   "baselines": {
+    "majority": {
+     "accuracy": 0.10277777777777777,
+     "params_or_stored_floats": 0
+    },
+    "logistic_regression": {
+     "accuracy": 0.9638888888888889,
+     "params_or_stored_floats": 650
+    },
+    "knn_k5": {
+     "accuracy": 0.9694444444444444,
+     "params_or_stored_floats": 68992
+    },
+    "sklearn_mlp_32x32": {
+     "accuracy": 0.9583333333333334,
+     "params_or_stored_floats": 3466
+    }
+   },
+   "teach": {
+    "learned": true,
+    "reason": null,
+    "version": "0.1.0",
+    "heldout_accuracy": 0.9722222089767456,
+    "params": 3466,
+    "teacher_used": false
+   },
+   "teach_seconds": 0.8711192607879639,
+   "runtime": {
+    "accuracy_overall": 0.95,
+    "ci95_overall": [
+     0.922,
+     0.968
+    ],
+    "coverage": 0.9694444444444444,
+    "n_test": 360,
+    "accuracy_answered": 0.9799426934097422,
+    "refused_as_out_of_range": 11,
+    "latency_us_p50": 9,
+    "params": 3466,
+    "model_bytes": 15173,
+    "ece_calibrated_answered": 0.00983710471743493,
+    "ece_raw_answered": 0.009856144473340937
+   },
+   "accuracy_of_all_earlier_after_this_stage": {
+    "iris_species": 1.0,
+    "wine_cultivar": 1.0,
+    "digit_recognition": 0.9799426934097422
+   }
+  },
+  "tumor_malignancy": {
+   "data": {
+    "n": 569,
+    "train": 341,
+    "val": 114,
+    "test": 114,
+    "duplicates_removed": 0
+   },
+   "promotion_gate": 0.95,
+   "baselines": {
+    "majority": {
+     "accuracy": 0.6228070175438597,
+     "params_or_stored_floats": 0
+    },
+    "logistic_regression": {
+     "accuracy": 0.9824561403508771,
+     "params_or_stored_floats": 31
+    },
+    "knn_k5": {
+     "accuracy": 0.9385964912280702,
+     "params_or_stored_floats": 10230
+    },
+    "sklearn_mlp_32x32": {
+     "accuracy": 0.9736842105263158,
+     "params_or_stored_floats": 2081
+    }
+   },
+   "teach": {
+    "learned": true,
+    "reason": null,
+    "version": "0.1.0",
+    "heldout_accuracy": 0.9736841917037964,
+    "params": 2114,
+    "teacher_used": false
+   },
+   "teach_seconds": 0.3743290901184082,
+   "runtime": {
+    "accuracy_overall": 0.9649122807017544,
+    "ci95_overall": [
+     0.913,
+     0.986
+    ],
+    "coverage": 0.9912280701754386,
+    "n_test": 114,
+    "accuracy_answered": 0.9734513274336283,
+    "refused_as_out_of_range": 1,
+    "latency_us_p50": 8,
+    "params": 2114,
+    "model_bytes": 9491,
+    "ece_calibrated_answered": 0.02753489576609791,
+    "ece_raw_answered": 0.024634625004456123
+   },
+   "accuracy_of_all_earlier_after_this_stage": {
+    "iris_species": 1.0,
+    "wine_cultivar": 1.0,
+    "digit_recognition": 0.9799426934097422,
+    "tumor_malignancy": 0.9734513274336283
+   }
+  }
+ },
+ "max_forgetting_drop": 0.0,
+ "routing_correct_capability_fraction": {
+  "iris_species": 1.0,
+  "wine_cultivar": 1.0,
+  "digit_recognition": 1.0,
+  "tumor_malignancy": 0.975
+ },
+ "out_of_range_refused_fraction": {
+  "iris_species": 1.0,
+  "wine_cultivar": 1.0,
+  "digit_recognition": 1.0,
+  "tumor_malignancy": 1.0
+ },
+ "novelty_rule_on_real_tasks": {
+  "iris_species": {
+   "strict": {
+    "heldout_coverage": 1.0,
+    "shift_4sd_refused": 1.0
+   },
+   "balanced": {
+    "heldout_coverage": 1.0,
+    "shift_4sd_refused": 1.0
+   }
+  },
+  "wine_cultivar": {
+   "strict": {
+    "heldout_coverage": 0.9444444444444444,
+    "shift_4sd_refused": 1.0
+   },
+   "balanced": {
+    "heldout_coverage": 1.0,
+    "shift_4sd_refused": 1.0
+   }
+  },
+  "digit_recognition": {
+   "strict": {
+    "heldout_coverage": 0.9861111111111112,
+    "shift_4sd_refused": 1.0
+   },
+   "balanced": {
+    "heldout_coverage": 0.9694444444444444,
+    "shift_4sd_refused": 1.0
+   }
+  },
+  "tumor_malignancy": {
+   "strict": {
+    "heldout_coverage": 0.956140350877193,
+    "shift_4sd_refused": 0.8771929824561403
+   },
+   "balanced": {
+    "heldout_coverage": 0.9912280701754386,
+    "shift_4sd_refused": 0.7280701754385965
+   }
+  }
+ },
+ "restart_and_constrained": {
+  "fresh_import_all_activated": true,
+  "constrained_import_all_activated": true,
+  "per_capability": {
+   "iris_species": {
+    "fresh_identical_to_before": true,
+    "constrained_max_prob_diff": 0.0,
+    "same_refusals_constrained": true,
+    "constrained_latency_us_p50": 11,
+    "constrained_peak_rss_kb": 13752
+   },
+   "wine_cultivar": {
+    "fresh_identical_to_before": true,
+    "constrained_max_prob_diff": 0.0,
+    "same_refusals_constrained": true,
+    "constrained_latency_us_p50": 10,
+    "constrained_peak_rss_kb": 14024
+   },
+   "digit_recognition": {
+    "fresh_identical_to_before": true,
+    "constrained_max_prob_diff": 0.0,
+    "same_refusals_constrained": true,
+    "constrained_latency_us_p50": 11,
+    "constrained_peak_rss_kb": 14728
+   },
+   "tumor_malignancy": {
+    "fresh_identical_to_before": true,
+    "constrained_max_prob_diff": 0.0,
+    "same_refusals_constrained": true,
+    "constrained_latency_us_p50": 7,
+    "constrained_peak_rss_kb": 14404
+   }
+  }
+ }
+}

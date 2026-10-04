@@ -8,8 +8,19 @@ from training.learning_package.schema import LearningPackage
 torch.set_num_threads(2)
 
 
-def make_mlp(din: int, dout: int, hidden=(32, 32)) -> nn.Sequential:
-    layers, d = [], din
+class Normalize(nn.Module):
+    """Input standardisation baked into the model (so exported packages are self-contained: raw features in, logits out)."""
+    def __init__(self, mean, std):
+        super().__init__()
+        self.register_buffer("mean", torch.as_tensor(mean, dtype=torch.float32))
+        self.register_buffer("std", torch.clamp(torch.as_tensor(std, dtype=torch.float32), min=1e-6))
+
+    def forward(self, x):
+        return (x - self.mean) / self.std
+
+
+def make_mlp(din: int, dout: int, hidden=(32, 32), normalize=None) -> nn.Sequential:
+    layers, d = ([Normalize(*normalize)] if normalize is not None else []), din
     for h in hidden:
         layers += [nn.Linear(d, h), nn.ReLU()]
         d = h
@@ -32,13 +43,13 @@ def accuracy(model, x, y) -> float:
         return (model(xt).argmax(1) == yt).float().mean().item()
 
 
-def train_candidate(lp: LearningPackage, hidden=(32, 32), epochs=400, lr=5e-3, seed=0, patience=60):
+def train_candidate(lp: LearningPackage, hidden=(32, 32), epochs=400, lr=5e-3, seed=0, patience=60, normalize=None):
     """Train on lp.train (+edge cases), early-stop on lp.validation. Returns (model, report)."""
     torch.manual_seed(seed)
     x = lp.train_x + lp.edge_cases_x
     y = lp.train_y + lp.edge_cases_y
     xt, yt = _tensors(x, y)
-    model = make_mlp(lp.input_dim, len(lp.labels), hidden)
+    model = make_mlp(lp.input_dim, len(lp.labels), hidden, normalize)
     opt = torch.optim.Adam(model.parameters(), lr=lr)
     lossf = nn.CrossEntropyLoss()
     best, best_state, bad, t0 = -1.0, None, 0, time.time()

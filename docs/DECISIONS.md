@@ -66,3 +66,12 @@ Status: accepted. Retrieved text is passed to the teacher as delimited data with
 
 ## ADR-022: Pin the OpenClaw version used for validation
 Status: accepted. Version drift (npm latest vs tarball, Node requirements) is a known risk; contract tests run against a pinned install via `OPENCLAW_BIN`; the adapter parses results defensively and maps every failure to a typed `ActionUnavailable`.
+
+## ADR-023: Novelty rule is selectable; "balanced" is the default
+Status: accepted; supersedes the "any feature outside range" statement in ADR-011. Evidence and trade-offs: FINDINGS F24. `strict` remains available (`--novelty strict`) for deployments that prefer refusing more over coverage.
+
+## ADR-024: Standardisation lives inside the model; the learn-from-examples path needs no teacher
+Status: accepted. Real features have arbitrary scales, so training statistics (train split only) are baked into the exported graph as constants: packages stay self-contained and portable (raw features in, logits out), and the Rust core needs no preprocessing logic. Examples supplied by the user/environment are split 60/20/20 after removing exact duplicates; promotion requires the held-out split to pass a gate relative to a conventional baseline.
+
+## ADR-025: The desktop application is a thin local service, not a new architecture
+Status: accepted. `apps/desktop/app.py` wires the existing pieces (Rust runtime via the CLI harness, build service, escalation, optional broker/OpenClaw) behind a token-protected loopback JSON API and a REPL. It adds no business logic of its own. Deviation from the repository sketch: application code lives in `apps/`, platform harness in `platforms/`.

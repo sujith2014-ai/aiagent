@@ -42,9 +42,24 @@ pub enum Outcome {
     NeedsHelp { reason_code: &'static str, reason: String, task_id: String },
 }
 
+/// When an input counts as outside the learned domain, from the statistics shipped in the package.
+/// strict: any feature outside range+10%. balanced (default): >=2 features outside range+10%, or any |z|>12 (std floored at 5% of range).
+/// Measured trade-off on 4 real datasets (benchmarks/reports/novelty_rules.json): false refusals on held-out data 3% -> 1%, detection of a
+/// +-4 sd shift on every feature 97% -> 93%, gross/single-extreme-feature shifts still ~100%.
+#[derive(Clone, Debug, Serialize)]
+pub struct NoveltyRule { pub min_count: usize, pub max_z: f32, pub std_floor_frac: f32, pub margin_frac: f32 }
+
+impl NoveltyRule {
+    pub fn strict() -> Self { Self { min_count: 1, max_z: f32::INFINITY, std_floor_frac: 0.05, margin_frac: 0.1 } }
+    pub fn balanced() -> Self { Self { min_count: 2, max_z: 12.0, std_floor_frac: 0.05, margin_frac: 0.1 } }
+    pub fn by_name(n: &str) -> Option<Self> { match n { "strict" => Some(Self::strict()), "balanced" => Some(Self::balanced()), _ => None } }
+    pub fn flags(&self, n: &Novelty) -> bool { n.out_of_range_count >= self.min_count || n.max_z > self.max_z }
+}
+
 /// Which unknown/novelty signals are active (ablatable in experiments).
 #[derive(Clone, Debug, Serialize)]
 pub struct Detection {
+    pub novelty_rule: NoveltyRule,
     pub use_novelty: bool,
     pub use_calibration: bool,
     pub use_confidence: bool,
@@ -62,24 +77,24 @@ impl Detection {
             "full" => (true, true, true, true),
             _ => return None,
         };
-        Some(Self { use_novelty: nov, use_calibration: cal, use_confidence: conf, use_history: hist, conf_threshold: 0.7 })
+        Some(Self { novelty_rule: NoveltyRule::balanced(), use_novelty: nov, use_calibration: cal, use_confidence: conf, use_history: hist, conf_threshold: 0.7 })
     }
 }
 
 #[derive(Serialize, Debug, Clone)]
-pub struct Novelty { pub out_of_range_frac: f32, pub max_z: f32 }
+pub struct Novelty { pub out_of_range_frac: f32, pub out_of_range_count: usize, pub max_z: f32 }
 
-fn novelty_of(rec: &CapabilityRecord, x: &[f32]) -> Option<Novelty> {
+fn novelty_of(rec: &CapabilityRecord, x: &[f32], rule: &NoveltyRule) -> Option<Novelty> {
     let st = rec.input_stats.as_ref()?;
     if st.min.len() != x.len() { return None; }
     let mut oor = 0usize;
     let mut max_z = 0f32;
     for i in 0..x.len() {
         let range = (st.max[i] - st.min[i]).abs().max(1e-6);
-        if x[i] < st.min[i] - 0.1 * range || x[i] > st.max[i] + 0.1 * range { oor += 1; }
-        max_z = max_z.max((x[i] - st.mean[i]).abs() / st.std[i].max(1e-6));
+        if x[i] < st.min[i] - rule.margin_frac * range || x[i] > st.max[i] + rule.margin_frac * range { oor += 1; }
+        max_z = max_z.max((x[i] - st.mean[i]).abs() / st.std[i].max(rule.std_floor_frac * range).max(1e-6));
     }
-    Some(Novelty { out_of_range_frac: oor as f32 / x.len() as f32, max_z })
+    Some(Novelty { out_of_range_frac: oor as f32 / x.len() as f32, out_of_range_count: oor, max_z })
 }
 
 pub struct Runtime {
@@ -285,11 +300,11 @@ impl Runtime {
                 let raw_confidence = raw_probs[argmax(&raw_probs)];
                 let label = rec.labels.get(idx).cloned().unwrap_or_else(|| idx.to_string());
                 let route_score = decision.candidates.iter().find(|c| c.capability_id == cap).map(|c| c.score).unwrap_or(0.0);
-                let novelty = novelty_of(rec, &task.input);
+                let novelty = novelty_of(rec, &task.input, &self.detect.novelty_rule);
                 let mut flags: Vec<&'static str> = vec![];
                 let mut st = status.clone();
                 if let (true, Some(n)) = (self.detect.use_novelty, &novelty) {
-                    if n.out_of_range_frac > 0.0 { flags.push("OUT_OF_DISTRIBUTION"); }
+                    if self.detect.novelty_rule.flags(n) { flags.push("OUT_OF_DISTRIBUTION"); }
                 }
                 if self.detect.use_confidence && confidence < self.detect.conf_threshold { flags.push("LOW_CONFIDENCE"); st = Status::Uncertain; }
                 if self.detect.use_history {
@@ -386,6 +401,16 @@ impl Runtime {
                         }
                         _ => unreachable!("validated"),
                     };
+                    if self.detect.use_novelty {
+                        // the same out-of-domain refusal as `solve`: a plan must not push inputs through a capability outside its learned domain
+                        if let Some(rec) = self.registry.get(&cap) {
+                            if let Some(n) = novelty_of(rec, &input, &self.detect.novelty_rule) {
+                                if self.detect.novelty_rule.flags(&n) {
+                                    return Err(PlanError::NeedsHelp { node: id.clone(), reason: format!("OUT_OF_DISTRIBUTION: input outside the learned domain of '{cap}'") });
+                                }
+                            }
+                        }
+                    }
                     self.ensure_loaded(&cap).map_err(|e| PlanError::Exec { node: id.clone(), reason: e.to_string() })?;
                     let (ver, model) = self.loaded.get(&cap).unwrap();
                     let ver = ver.clone();
@@ -501,4 +526,25 @@ fn resolve_all(rs: &[Ref], slots: &BTreeMap<String, Vec<f32>>) -> Result<Vec<f32
     let mut out = vec![];
     for r in rs { out.extend(resolve(r, slots)?); }
     Ok(out)
+}
+
+#[cfg(test)]
+mod novelty_tests {
+    use super::*;
+    fn n(count: usize, z: f32) -> Novelty { Novelty { out_of_range_frac: 0.0, out_of_range_count: count, max_z: z } }
+    #[test]
+    fn strict_flags_any_single_feature_outside_range() {
+        let r = NoveltyRule::strict();
+        assert!(!r.flags(&n(0, 3.0)) && r.flags(&n(1, 3.0)) && r.flags(&n(5, 3.0)));
+    }
+    #[test]
+    fn balanced_needs_two_features_or_an_extreme_z() {
+        let r = NoveltyRule::balanced();
+        assert!(!r.flags(&n(0, 3.0)) && !r.flags(&n(1, 3.8)));          // one moderately out-of-range feature is tolerated
+        assert!(r.flags(&n(2, 3.0)) && r.flags(&n(1, 12.5)) && r.flags(&n(0, 30.0)));
+    }
+    #[test]
+    fn rules_are_selectable_by_name() {
+        assert!(NoveltyRule::by_name("strict").is_some() && NoveltyRule::by_name("balanced").is_some() && NoveltyRule::by_name("x").is_none());
+    }
 }

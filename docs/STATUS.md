@@ -10,4 +10,5 @@
 | 6 Real-teacher integration, selective learning, automated candidate evaluation | done locally; live teacher PENDING (R1) | benchmarks/reports/phase6.*, tests/test_phase6.py |
 | 7 Consolidation/pruning, learned routing, baseline comparison | done; small-LLM baseline PENDING (no weights/egress) | benchmarks/reports/phase7.*, tests/test_phase7.py |
 | 8 OpenClaw integration, research/tool escalation, provenance, retry-after-learning | boundary + policy + adapter done and contract-validated against the real binary; **live research PENDING (R3)**; research results use a simulated provider/teacher | benchmarks/reports/phase8.*, tests/test_phase8.py, docs/OPENCLAW.md |
-| 9-15 | not started | |
+| 9 Desktop runtime/application, real-world controlled tasks | done (4 small public datasets; on par with standard baselines, not better; novelty-rule redesign, FINDINGS F23-F27) | benchmarks/reports/phase9.*, novelty_rules.json, tests/test_phase9.py |
+| 10-15 | not started | |

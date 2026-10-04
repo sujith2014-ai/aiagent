@@ -329,10 +329,11 @@
    {
     "kind": "related",
     "intent": "order the two values",
-    "result": "NEEDS_HELP",
+    "result": "ANSWER",
     "path": [
      "local",
-     "teacher"
+     "teacher",
+     "reroute"
     ],
     "teacher_called": true,
     "status": null
@@ -350,10 +351,11 @@
    {
     "kind": "related",
     "intent": "pick the winning slot",
-    "result": "NEEDS_HELP",
+    "result": "ANSWER",
     "path": [
      "local",
-     "teacher"
+     "teacher",
+     "reroute"
     ],
     "teacher_called": true,
     "status": null
@@ -508,7 +510,8 @@
     "candidates": []
    },
    "failure": "",
-   "available_tools": []
+   "available_tools": [],
+   "evidence": []
   },
   "leaks": [],
   "contains_input_values": false

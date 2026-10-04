@@ -14,7 +14,7 @@
 
 ## Provider path (mock HTTP endpoints)
 
-- openai_compat_end_to_end: {'result': 'ANSWER', 'path': ['local', 'teacher', 'learn'], 'requests': 1, 'auth_header_sent': True, 'request_body_fields': ['attempted_route', 'available_tools', 'failure', 'input_dim', 'known_capabilities', 'task_intent']}
+- openai_compat_end_to_end: {'result': 'ANSWER', 'path': ['local', 'teacher', 'learn'], 'requests': 1, 'auth_header_sent': True, 'request_body_fields': ['attempted_route', 'available_tools', 'evidence', 'failure', 'input_dim', 'known_capabilities', 'task_intent']}
 - anthropic_style_end_to_end: {'result': 'ANSWER', 'path': ['local', 'teacher', 'learn'], 'api_key_header': True}
 - server_error_503: {'result': 'QUEUED_OFFLINE', 'teacher_calls_counted': 0, 'queued': True}
 - garbage_text_response: {'result': 'NEEDS_HELP', 'capabilities_installed': 0}

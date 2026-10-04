@@ -17,3 +17,6 @@ Teacher rules are evaluated by a whitelist AST interpreter (no eval/exec; node a
 
 ## Phase 8: external actions
 Policy layer (Rust, default deny, hard guards, approvals bound to request hash, fail closed), action broker with audit log (parameters hashed, redacted previews, no raw secrets), OpenClaw adapter with isolated profile/HOME and minimal environment, evidence as untrusted data with provenance. Limits (FINDINGS F20): string-based host checks (no DNS/redirect resolution), logical-only approval separation inside one OS user, unsigned policy file, heuristic secret detection. Prompt-injection containment is tested with a scripted obedient teacher only, not a real LLM.
+
+## Phase 9: desktop service
+Loopback-only JSON API with bearer token, Host and Origin checks, JSON-only input, 5 MB declared-length cap, generic error bodies. The process that serves the API also holds the local signing key (single-user mode), and any holder of the API token can install a verified model. No TLS. Novelty-based refusal is a heuristic with measured false-refusal and miss rates (FINDINGS F24), not a security boundary.
