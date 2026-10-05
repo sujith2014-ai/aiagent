@@ -22,7 +22,7 @@ One Rust core owns registry, validation, routing and execution on every platform
 
 ## 3. Test results
 
-- Python: 311 passed, 4 skipped (the skipped ones need `OPENCLAW_BIN` or `RUN_ANDROID_JVM_TESTS=1`; both were run separately and pass). Rust: 24 unit + 5 ONNX-parity tests. Kotlin/JVM: 16 tests, both library variants.
+- Python: 327 passed, 11 skipped (the skipped ones need `OPENCLAW_BIN` or `RUN_ANDROID_JVM_TESTS=1`; the OpenClaw-dependent ones were run separately and pass, see docs/VALIDATION.md). Rust: 25 unit + 5 ONNX-parity tests. Kotlin/JVM: 16 tests, both library variants.
 - The tests found real bugs, all fixed and listed in F3, F18, F26, F30, F35, F38, F43, F46 (for example NaN inputs answered KNOWN, a per-call registry write that cost 10x the compute, tract panics on malformed signed models, early stopping freezing weights, router aliasing polluting routes).
 
 ## 4. Benchmark results (what was measured)
@@ -37,6 +37,7 @@ All phases run on PC. Accuracy on four real datasets through the Rust runtime: i
 ## 6. Android results
 
 - Validated: the core and JNI bridge compile as static libraries for aarch64, x86_64 (both variants) and armv7 (lite only; the full variant fails at the assembler under the zig stand-in). The Kotlin module drives the real core through the real JNI library on the JVM: outputs equal the Rust CLI's within 1e-6, hostile or incompatible packages rejected, 8-thread use, restart, delivery (F28). The learn/adapt/alias bridge calls pass 2 further tests (16 total).
+- Compile level, added later: the `app/` module compiled for the first time against the Android 14 framework jar (androidx stubbed) and exposed a real bug, fixed (F52). Not AGP, not an APK, not an NDK link.
 - **PENDING (R2, R4):** anything on ART/bionic or a device: loading the `.so`, the app module (never compiled), latency, memory, battery, thermal, NPU, Android Keystore key wrapping.
 
 ## 7. Portability results
@@ -58,7 +59,7 @@ All with a simulator teacher that never errs.
 - Levers: router updates save 107 calls (292 to 185) at the cost of 13 more wrong answers; a negative cache for refusals saves 38 more (F45).
 - Escalating UNCERTAIN routes is essential: serving them cuts calls to 107 but leaves 9 of 36 capabilities never learned (F47). The router-alias bug (F46) alone changed learned-at-first-request from 13/36 to 36/36.
 - Earlier phases: related paraphrases cost 3 teacher calls instead of 9 with router updates (F11); a research-led capability needed 2 teacher calls and 1 OpenClaw call, then 9 of 11 follow-ups needed none (F21).
-- A live LLM teacher was never called (R1): its error rate, cost and latency are unknown, so these numbers measure the gates and loop, not a model.
+- No real AI service was ever used as teacher (R1): its error rate, cost and latency are unknown, so these numbers measure the gates and loop, not a model. The intended external-teacher path is an AI website driven through OpenClaw's browser with a human doing any login (ADR-045); it works against a local mock only (F51).
 
 ## 10. OpenClaw results
 
@@ -103,3 +104,26 @@ The hypothesis: a system of small, separately learned, signed capability modules
 - The claim that it works on a phone is **untested**, as is everything involving a live LLM or live web research.
 
 Honest summary: the architecture is sound for what it was built to do, and the benchmark found and fixed one serious scale-dependent bug (F46). Its weakest parts are drift detection and routing generalisation. The evidence does not yet say whether it pays off against a real teacher or on real devices; the runbooks R1-R5 list exactly what to run.
+
+
+## 15. Follow-up after this report: R1-R5 validation attempt, routing and drift work (2026-10-05)
+
+**Validation status (evidence in `docs/VALIDATION.md`). Nothing in R1-R5 beyond what is listed as PASS has been validated in the real world, and the real Android + real teacher + real OpenClaw end-to-end path has NOT passed.**
+
+| Item | Status |
+|---|---|
+| R3 OpenClaw install, real-binary contract test, exported-skill loading | PASS |
+| R3 live web search | BLOCKED: `duckduckgo.com` refused by the network policy even after the allowlist change (re-verified in two sessions) |
+| Browser-based teacher and tool generator (OpenClaw browser, no API key) | PASS against a local mock chat site only (7 real-browser tests); NOT validated against any real AI website |
+| R1 real teacher | PENDING: the chat sites are unreachable from the container and a real site needs your own interactive sign-in on a machine with a display |
+| R2 / R4 Android SDK, NDK, APK, link | BLOCKED: `dl.google.com` refused |
+| R2 / R4 physical phone | PENDING: no device; nothing claimed |
+| R5 OpenClaw agent turn, real-site tool generation | PENDING |
+
+**Reproduction.** The complete Phase 14 suite was rerun after the changes below: all 8 original arms reproduced their earlier numbers exactly (for example base 185 teacher calls, 41 wrong answers).
+
+**Routing generalisation (F54, F55): not solved; nothing lexical helps hard paraphrases.** An IDF-weighted router lifted easy paraphrases from 0% to 100% KNOWN-correct in a 36-capability registry, but on the 3-capability adversarial set it raised fabricated KNOWN from 0.20 to 0.93, and end to end only 21 of 36 new capabilities were learned at first request (vs 36). Teacher-supplied synonym lists caused 4 of 36 capabilities to never be learned and 31% wrong-KNOWN on hard paraphrases. Both stay opt-in; the keyword router remains the default (ADR-046).
+
+**Drift detection (F53): improved but insufficient.** A CUSUM test over capability-isolated probes with 270 label queries per run repaired 3 of 9 drifts across three seeds (delays 248-342 arrivals, no spurious repairs) against 1 of 9 for the original window monitor (2 spurious repairs). It misses most drifts at a realistic budget and did not reliably reduce wrong answers, so it stays opt-in.
+
+**Effect on the verdict (section 14).** Unchanged: the two weakest parts, routing to new wordings and noticing stale capabilities, remain open, and the claims that need a real teacher, a real website or a phone remain untested.

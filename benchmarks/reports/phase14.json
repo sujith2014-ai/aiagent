@@ -1,8 +1,8 @@
 {
  "benchmark_format": "bench/1",
  "experiment": "phase14-long-running-continual-learning",
- "platform": "Linux-6.18.44-fc-v64-x86_64-with-glibc2.39",
- "date": "2026-10-04",
+ "platform": "Linux-6.18.44-fc-v70-x86_64-with-glibc2.39",
+ "date": "2026-10-05",
  "caveats": [
   "teacher is a simulator that knows the world (including drift); no live LLM",
   "synthetic rule families, 36 capabilities, one world seed for the ablations",
@@ -11,7 +11,7 @@
  ],
  "arms": {
   "base": {
-   "wall_seconds": 98.4,
+   "wall_seconds": 99.7,
    "arrivals": 720,
    "teacher_calls": 185,
    "teacher_calls_by_action": {
@@ -236,7 +236,9 @@
    "final_accuracy_mean": 0.9702777777777778,
    "final_accuracy_min": 0.78,
    "backward_transfer_stable_capabilities": -0.0009090909090909132,
-   "build_seconds": 47.9,
+   "build_seconds": 47.7,
+   "label_queries": 0,
+   "probe_rounds": 0,
    "drift": {
     "boiler_alarm": {
      "drift_t": 300,
@@ -276,84 +278,84 @@
      "modules": 11,
      "latency_us_p50": 1,
      "latency_us_p95": 2,
-     "us_per_task_wall": 33.3
+     "us_per_task_wall": 40.0
     },
     {
      "t": 119,
      "modules": 17,
-     "latency_us_p50": 3,
-     "latency_us_p95": 7,
-     "us_per_task_wall": 93.3
+     "latency_us_p50": 1,
+     "latency_us_p95": 5,
+     "us_per_task_wall": 53.3
     },
     {
      "t": 179,
      "modules": 22,
      "latency_us_p50": 1,
-     "latency_us_p95": 4,
-     "us_per_task_wall": 76.7
+     "latency_us_p95": 3,
+     "us_per_task_wall": 63.3
     },
     {
      "t": 239,
      "modules": 28,
-     "latency_us_p50": 2,
+     "latency_us_p50": 1,
      "latency_us_p95": 4,
-     "us_per_task_wall": 90.0
+     "us_per_task_wall": 83.3
     },
     {
      "t": 299,
      "modules": 33,
      "latency_us_p50": 1,
-     "latency_us_p95": 3,
-     "us_per_task_wall": 70.0
+     "latency_us_p95": 2,
+     "us_per_task_wall": 93.3
     },
     {
      "t": 359,
      "modules": 36,
      "latency_us_p50": 2,
      "latency_us_p95": 3,
-     "us_per_task_wall": 90.0
+     "us_per_task_wall": 106.7
     },
     {
      "t": 419,
      "modules": 36,
      "latency_us_p50": 2,
      "latency_us_p95": 3,
-     "us_per_task_wall": 93.3
+     "us_per_task_wall": 103.3
     },
     {
      "t": 479,
      "modules": 36,
-     "latency_us_p50": 1,
-     "latency_us_p95": 2,
-     "us_per_task_wall": 86.7
+     "latency_us_p50": 3,
+     "latency_us_p95": 4,
+     "us_per_task_wall": 150.0
     },
     {
      "t": 539,
      "modules": 36,
      "latency_us_p50": 2,
      "latency_us_p95": 3,
-     "us_per_task_wall": 93.3
+     "us_per_task_wall": 113.3
     },
     {
      "t": 599,
      "modules": 36,
      "latency_us_p50": 2,
-     "latency_us_p95": 3,
-     "us_per_task_wall": 93.3
+     "latency_us_p95": 2,
+     "us_per_task_wall": 106.7
     },
     {
      "t": 659,
      "modules": 36,
      "latency_us_p50": 2,
      "latency_us_p95": 3,
-     "us_per_task_wall": 103.3
+     "us_per_task_wall": 106.7
     },
     {
      "t": 719,
      "modules": 36,
      "latency_us_p50": 2,
      "latency_us_p95": 3,
-     "us_per_task_wall": 86.7
+     "us_per_task_wall": 106.7
     }
    ],
    "options": {},
@@ -363,7 +365,7 @@
      "modules": 36,
      "learned_router": {
       "val_accuracy": 0.6896551847457886,
-      "train_seconds": 0.54,
+      "train_seconds": 0.58,
       "params": 18853,
       "installed": true
      },
@@ -994,7 +996,7 @@
    }
   },
   "serve_uncertain": {
-   "wall_seconds": 54.6,
+   "wall_seconds": 48.0,
    "arrivals": 720,
    "teacher_calls": 107,
    "teacher_calls_by_action": {
@@ -1230,7 +1232,9 @@
    "final_accuracy_mean": 0.9703703703703704,
    "final_accuracy_min": 0.78,
    "backward_transfer_stable_capabilities": -8.881784197001253e-18,
-   "build_seconds": 11.9,
+   "build_seconds": 10.8,
+   "label_queries": 0,
+   "probe_rounds": 0,
    "drift": {
     "boiler_alarm": {
      "drift_t": 300,
@@ -1257,15 +1261,15 @@
      "t": 59,
      "modules": 8,
      "latency_us_p50": 1,
-     "latency_us_p95": 4,
-     "us_per_task_wall": 36.7
+     "latency_us_p95": 2,
+     "us_per_task_wall": 30.0
     },
     {
      "t": 119,
      "modules": 11,
-     "latency_us_p50": 2,
-     "latency_us_p95": 3,
-     "us_per_task_wall": 50.0
+     "latency_us_p50": 1,
+     "latency_us_p95": 2,
+     "us_per_task_wall": 36.7
     },
     {
      "t": 179,
@@ -1277,65 +1281,65 @@
     {
      "t": 239,
      "modules": 15,
-     "latency_us_p50": 2,
-     "latency_us_p95": 7,
-     "us_per_task_wall": 53.3
+     "latency_us_p50": 1,
+     "latency_us_p95": 4,
+     "us_per_task_wall": 46.7
     },
     {
      "t": 299,
      "modules": 17,
      "latency_us_p50": 1,
      "latency_us_p95": 4,
-     "us_per_task_wall": 50.0
+     "us_per_task_wall": 66.7
     },
     {
      "t": 359,
      "modules": 17,
-     "latency_us_p50": 2,
-     "latency_us_p95": 5,
-     "us_per_task_wall": 53.3
+     "latency_us_p50": 1,
+     "latency_us_p95": 4,
+     "us_per_task_wall": 73.3
     },
     {
      "t": 419,
      "modules": 19,
      "latency_us_p50": 2,
      "latency_us_p95": 5,
-     "us_per_task_wall": 56.7
+     "us_per_task_wall": 70.0
     },
     {
      "t": 479,
      "modules": 23,
      "latency_us_p50": 1,
      "latency_us_p95": 4,
-     "us_per_task_wall": 63.3
+     "us_per_task_wall": 66.7
     },
     {
      "t": 539,
      "modules": 23,
-     "latency_us_p50": 2,
-     "latency_us_p95": 4,
-     "us_per_task_wall": 63.3
+     "latency_us_p50": 1,
+     "latency_us_p95": 5,
+     "us_per_task_wall": 70.0
     },
     {
      "t": 599,
      "modules": 25,
-     "latency_us_p50": 2,
-     "latency_us_p95": 3,
-     "us_per_task_wall": 76.7
+     "latency_us_p50": 3,
+     "latency_us_p95": 4,
+     "us_per_task_wall": 96.7
     },
     {
      "t": 659,
      "modules": 27,
      "latency_us_p50": 2,
-     "latency_us_p95": 4,
-     "us_per_task_wall": 80.0
+     "latency_us_p95": 5,
+     "us_per_task_wall": 86.7
     },
     {
      "t": 719,
      "modules": 27,
-     "latency_us_p50": 2,
-     "latency_us_p95": 4,
-     "us_per_task_wall": 70.0
+     "latency_us_p50": 1,
+     "latency_us_p95": 3,
+     "us_per_task_wall": 76.7
     }
    ],
    "options": {
@@ -1344,7 +1348,7 @@
    "seed": 0
   },
   "no_frame_filter": {
-   "wall_seconds": 44.8,
+   "wall_seconds": 41.9,
    "arrivals": 720,
    "teacher_calls": 154,
    "teacher_calls_by_action": {
@@ -1587,7 +1591,9 @@
    "final_accuracy_mean": 0.9616666666666666,
    "final_accuracy_min": 0.78,
    "backward_transfer_stable_capabilities": -0.0031250000000000028,
-   "build_seconds": 23.6,
+   "build_seconds": 23.5,
+   "label_queries": 0,
+   "probe_rounds": 0,
    "drift": {
     "boiler_alarm": {
      "drift_t": 300,
@@ -1627,55 +1633,55 @@
      "modules": 10,
      "latency_us_p50": 1,
      "latency_us_p95": 2,
-     "us_per_task_wall": 63.3
+     "us_per_task_wall": 36.7
     },
     {
      "t": 119,
      "modules": 12,
      "latency_us_p50": 1,
-     "latency_us_p95": 4,
-     "us_per_task_wall": 36.7
+     "latency_us_p95": 5,
+     "us_per_task_wall": 50.0
     },
     {
      "t": 179,
      "modules": 13,
      "latency_us_p50": 1,
      "latency_us_p95": 4,
-     "us_per_task_wall": 43.3
+     "us_per_task_wall": 50.0
     },
     {
      "t": 239,
      "modules": 13,
      "latency_us_p50": 1,
-     "latency_us_p95": 4,
-     "us_per_task_wall": 46.7
+     "latency_us_p95": 5,
+     "us_per_task_wall": 63.3
     },
     {
      "t": 299,
      "modules": 14,
      "latency_us_p50": 1,
-     "latency_us_p95": 4,
-     "us_per_task_wall": 43.3
+     "latency_us_p95": 5,
+     "us_per_task_wall": 60.0
     },
     {
      "t": 359,
      "modules": 14,
      "latency_us_p50": 1,
      "latency_us_p95": 4,
-     "us_per_task_wall": 50.0
+     "us_per_task_wall": 46.7
     },
     {
      "t": 419,
      "modules": 14,
      "latency_us_p50": 1,
      "latency_us_p95": 4,
-     "us_per_task_wall": 40.0
+     "us_per_task_wall": 53.3
     },
     {
      "t": 479,
      "modules": 16,
      "latency_us_p50": 1,
-     "latency_us_p95": 5,
+     "latency_us_p95": 4,
      "us_per_task_wall": 53.3
     },
     {
@@ -1683,28 +1689,28 @@
      "modules": 17,
      "latency_us_p50": 1,
      "latency_us_p95": 4,
-     "us_per_task_wall": 46.7
+     "us_per_task_wall": 63.3
     },
     {
      "t": 599,
      "modules": 18,
-     "latency_us_p50": 2,
-     "latency_us_p95": 6,
-     "us_per_task_wall": 73.3
+     "latency_us_p50": 1,
+     "latency_us_p95": 4,
+     "us_per_task_wall": 83.3
     },
     {
      "t": 659,
      "modules": 18,
      "latency_us_p50": 1,
      "latency_us_p95": 4,
-     "us_per_task_wall": 50.0
+     "us_per_task_wall": 63.3
     },
     {
      "t": 719,
      "modules": 18,
      "latency_us_p50": 1,
-     "latency_us_p95": 5,
-     "us_per_task_wall": 56.7
+     "latency_us_p95": 4,
+     "us_per_task_wall": 60.0
     }
    ],
    "options": {
@@ -1713,7 +1719,7 @@
    "seed": 0
   },
   "cache_refusals": {
-   "wall_seconds": 94.4,
+   "wall_seconds": 98.6,
    "arrivals": 720,
    "teacher_calls": 147,
    "teacher_calls_by_action": {
@@ -1938,7 +1944,9 @@
    "final_accuracy_mean": 0.9702777777777778,
    "final_accuracy_min": 0.78,
    "backward_transfer_stable_capabilities": -0.0009090909090909132,
-   "build_seconds": 44.8,
+   "build_seconds": 46.0,
+   "label_queries": 0,
+   "probe_rounds": 0,
    "drift": {
     "boiler_alarm": {
      "drift_t": 300,
@@ -1978,84 +1986,84 @@
      "modules": 11,
      "latency_us_p50": 1,
      "latency_us_p95": 2,
-     "us_per_task_wall": 30.0
+     "us_per_task_wall": 43.3
     },
     {
      "t": 119,
      "modules": 17,
      "latency_us_p50": 1,
      "latency_us_p95": 4,
-     "us_per_task_wall": 50.0
+     "us_per_task_wall": 56.7
     },
     {
      "t": 179,
      "modules": 22,
      "latency_us_p50": 1,
      "latency_us_p95": 4,
-     "us_per_task_wall": 56.7
+     "us_per_task_wall": 70.0
     },
     {
      "t": 239,
      "modules": 28,
-     "latency_us_p50": 1,
+     "latency_us_p50": 2,
      "latency_us_p95": 4,
-     "us_per_task_wall": 70.0
+     "us_per_task_wall": 93.3
     },
     {
      "t": 299,
      "modules": 33,
      "latency_us_p50": 1,
-     "latency_us_p95": 3,
-     "us_per_task_wall": 73.3
+     "latency_us_p95": 4,
+     "us_per_task_wall": 113.3
     },
     {
      "t": 359,
      "modules": 36,
-     "latency_us_p50": 1,
-     "latency_us_p95": 3,
-     "us_per_task_wall": 76.7
+     "latency_us_p50": 3,
+     "latency_us_p95": 4,
+     "us_per_task_wall": 150.0
     },
     {
      "t": 419,
      "modules": 36,
      "latency_us_p50": 2,
-     "latency_us_p95": 3,
-     "us_per_task_wall": 93.3
+     "latency_us_p95": 4,
+     "us_per_task_wall": 230.0
     },
     {
      "t": 479,
      "modules": 36,
      "latency_us_p50": 2,
-     "latency_us_p95": 3,
-     "us_per_task_wall": 100.0
+     "latency_us_p95": 4,
+     "us_per_task_wall": 120.0
     },
     {
      "t": 539,
      "modules": 36,
-     "latency_us_p50": 1,
+     "latency_us_p50": 2,
      "latency_us_p95": 4,
-     "us_per_task_wall": 93.3
+     "us_per_task_wall": 123.3
     },
     {
      "t": 599,
      "modules": 36,
      "latency_us_p50": 3,
-     "latency_us_p95": 4,
-     "us_per_task_wall": 123.3
+     "latency_us_p95": 5,
+     "us_per_task_wall": 153.3
     },
     {
      "t": 659,
      "modules": 36,
-     "latency_us_p50": 1,
-     "latency_us_p95": 2,
-     "us_per_task_wall": 86.7
+     "latency_us_p50": 2,
+     "latency_us_p95": 3,
+     "us_per_task_wall": 110.0
     },
     {
      "t": 719,
      "modules": 36,
      "latency_us_p50": 2,
      "latency_us_p95": 3,
-     "us_per_task_wall": 96.7
+     "us_per_task_wall": 116.7
     }
    ],
    "options": {
@@ -2064,7 +2072,7 @@
    "seed": 0
   },
   "no_router_update": {
-   "wall_seconds": 52.3,
+   "wall_seconds": 54.2,
    "arrivals": 720,
    "teacher_calls": 292,
    "teacher_calls_by_action": {
@@ -2289,7 +2297,9 @@
    "final_accuracy_mean": 0.9702777777777778,
    "final_accuracy_min": 0.78,
    "backward_transfer_stable_capabilities": -0.0009090909090909132,
-   "build_seconds": 45.5,
+   "build_seconds": 46.8,
+   "label_queries": 0,
+   "probe_rounds": 0,
    "drift": {
     "boiler_alarm": {
      "drift_t": 300,
@@ -2317,84 +2327,84 @@
      "modules": 11,
      "latency_us_p50": 1,
      "latency_us_p95": 2,
-     "us_per_task_wall": 33.3
+     "us_per_task_wall": 36.7
     },
     {
      "t": 119,
      "modules": 17,
-     "latency_us_p50": 2,
-     "latency_us_p95": 7,
-     "us_per_task_wall": 60.0
+     "latency_us_p50": 1,
+     "latency_us_p95": 4,
+     "us_per_task_wall": 53.3
     },
     {
      "t": 179,
      "modules": 22,
-     "latency_us_p50": 1,
-     "latency_us_p95": 4,
-     "us_per_task_wall": 60.0
+     "latency_us_p50": 2,
+     "latency_us_p95": 6,
+     "us_per_task_wall": 83.3
     },
     {
      "t": 239,
      "modules": 28,
      "latency_us_p50": 2,
      "latency_us_p95": 4,
-     "us_per_task_wall": 76.7
+     "us_per_task_wall": 106.7
     },
     {
      "t": 299,
      "modules": 33,
      "latency_us_p50": 2,
-     "latency_us_p95": 3,
-     "us_per_task_wall": 80.0
+     "latency_us_p95": 5,
+     "us_per_task_wall": 103.3
     },
     {
      "t": 359,
      "modules": 36,
      "latency_us_p50": 2,
      "latency_us_p95": 3,
-     "us_per_task_wall": 90.0
+     "us_per_task_wall": 106.7
     },
     {
      "t": 419,
      "modules": 36,
-     "latency_us_p50": 1,
-     "latency_us_p95": 2,
-     "us_per_task_wall": 73.3
+     "latency_us_p50": 2,
+     "latency_us_p95": 3,
+     "us_per_task_wall": 100.0
     },
     {
      "t": 479,
      "modules": 36,
-     "latency_us_p50": 2,
-     "latency_us_p95": 3,
-     "us_per_task_wall": 93.3
+     "latency_us_p50": 1,
+     "latency_us_p95": 4,
+     "us_per_task_wall": 106.7
     },
     {
      "t": 539,
      "modules": 36,
-     "latency_us_p50": 2,
-     "latency_us_p95": 4,
-     "us_per_task_wall": 96.7
+     "latency_us_p50": 3,
+     "latency_us_p95": 5,
+     "us_per_task_wall": 150.0
     },
     {
      "t": 599,
      "modules": 36,
      "latency_us_p50": 2,
      "latency_us_p95": 3,
-     "us_per_task_wall": 83.3
+     "us_per_task_wall": 106.7
     },
     {
      "t": 659,
      "modules": 36,
      "latency_us_p50": 2,
-     "latency_us_p95": 4,
-     "us_per_task_wall": 100.0
+     "latency_us_p95": 5,
+     "us_per_task_wall": 120.0
     },
     {
      "t": 719,
      "modules": 36,
-     "latency_us_p50": 1,
+     "latency_us_p50": 2,
      "latency_us_p95": 3,
-     "us_per_task_wall": 110.0
+     "us_per_task_wall": 103.3
     }
    ],
    "options": {
@@ -2403,7 +2413,7 @@
    "seed": 0
   },
   "no_monitor": {
-   "wall_seconds": 93.9,
+   "wall_seconds": 94.3,
    "arrivals": 720,
    "teacher_calls": 184,
    "teacher_calls_by_action": {
@@ -2628,7 +2638,9 @@
    "final_accuracy_mean": 0.9702777777777778,
    "final_accuracy_min": 0.78,
    "backward_transfer_stable_capabilities": -0.0009090909090909132,
-   "build_seconds": 43.2,
+   "build_seconds": 44.2,
+   "label_queries": 0,
+   "probe_rounds": 0,
    "drift": {
     "boiler_alarm": {
      "drift_t": 300,
@@ -2655,85 +2667,85 @@
      "t": 59,
      "modules": 11,
      "latency_us_p50": 1,
-     "latency_us_p95": 2,
-     "us_per_task_wall": 30.0
+     "latency_us_p95": 3,
+     "us_per_task_wall": 43.3
     },
     {
      "t": 119,
      "modules": 17,
      "latency_us_p50": 1,
      "latency_us_p95": 4,
-     "us_per_task_wall": 43.3
+     "us_per_task_wall": 56.7
     },
     {
      "t": 179,
      "modules": 22,
      "latency_us_p50": 1,
      "latency_us_p95": 4,
-     "us_per_task_wall": 60.0
+     "us_per_task_wall": 73.3
     },
     {
      "t": 239,
      "modules": 28,
-     "latency_us_p50": 2,
-     "latency_us_p95": 5,
-     "us_per_task_wall": 103.3
-    },
-    {
-     "t": 299,
-     "modules": 33,
      "latency_us_p50": 1,
      "latency_us_p95": 3,
      "us_per_task_wall": 80.0
     },
     {
+     "t": 299,
+     "modules": 33,
+     "latency_us_p50": 2,
+     "latency_us_p95": 3,
+     "us_per_task_wall": 120.0
+    },
+    {
      "t": 359,
      "modules": 36,
-     "latency_us_p50": 3,
-     "latency_us_p95": 4,
-     "us_per_task_wall": 113.3
+     "latency_us_p50": 2,
+     "latency_us_p95": 3,
+     "us_per_task_wall": 106.7
     },
     {
      "t": 419,
      "modules": 36,
-     "latency_us_p50": 3,
+     "latency_us_p50": 2,
      "latency_us_p95": 4,
-     "us_per_task_wall": 136.7
+     "us_per_task_wall": 123.3
     },
     {
      "t": 479,
      "modules": 36,
      "latency_us_p50": 1,
      "latency_us_p95": 3,
-     "us_per_task_wall": 86.7
+     "us_per_task_wall": 103.3
     },
     {
      "t": 539,
      "modules": 36,
      "latency_us_p50": 2,
      "latency_us_p95": 3,
-     "us_per_task_wall": 83.3
+     "us_per_task_wall": 110.0
     },
     {
      "t": 599,
      "modules": 36,
-     "latency_us_p50": 2,
-     "latency_us_p95": 3,
-     "us_per_task_wall": 93.3
+     "latency_us_p50": 3,
+     "latency_us_p95": 5,
+     "us_per_task_wall": 143.3
     },
     {
      "t": 659,
      "modules": 36,
      "latency_us_p50": 2,
      "latency_us_p95": 3,
-     "us_per_task_wall": 90.0
+     "us_per_task_wall": 110.0
     },
     {
      "t": 719,
      "modules": 36,
      "latency_us_p50": 2,
-     "latency_us_p95": 3,
-     "us_per_task_wall": 100.0
+     "latency_us_p95": 4,
+     "us_per_task_wall": 140.0
     }
    ],
    "options": {
@@ -2742,7 +2754,7 @@
    "seed": 0
   },
   "feedback_0.1": {
-   "wall_seconds": 99.9,
+   "wall_seconds": 98.7,
    "arrivals": 720,
    "teacher_calls": 184,
    "teacher_calls_by_action": {
@@ -2967,7 +2979,9 @@
    "final_accuracy_mean": 0.9702777777777778,
    "final_accuracy_min": 0.78,
    "backward_transfer_stable_capabilities": -0.0009090909090909132,
-   "build_seconds": 48.5,
+   "build_seconds": 48.1,
+   "label_queries": 0,
+   "probe_rounds": 0,
    "drift": {
     "boiler_alarm": {
      "drift_t": 300,
@@ -2993,86 +3007,86 @@
     {
      "t": 59,
      "modules": 11,
-     "latency_us_p50": 1,
-     "latency_us_p95": 2,
-     "us_per_task_wall": 36.7
+     "latency_us_p50": 2,
+     "latency_us_p95": 4,
+     "us_per_task_wall": 53.3
     },
     {
      "t": 119,
      "modules": 17,
-     "latency_us_p50": 2,
-     "latency_us_p95": 8,
-     "us_per_task_wall": 70.0
+     "latency_us_p50": 1,
+     "latency_us_p95": 5,
+     "us_per_task_wall": 60.0
     },
     {
      "t": 179,
      "modules": 22,
      "latency_us_p50": 1,
-     "latency_us_p95": 4,
-     "us_per_task_wall": 56.7
+     "latency_us_p95": 3,
+     "us_per_task_wall": 66.7
     },
     {
      "t": 239,
      "modules": 28,
-     "latency_us_p50": 1,
+     "latency_us_p50": 2,
      "latency_us_p95": 4,
-     "us_per_task_wall": 70.0
+     "us_per_task_wall": 90.0
     },
     {
      "t": 299,
      "modules": 33,
      "latency_us_p50": 2,
      "latency_us_p95": 3,
-     "us_per_task_wall": 86.7
+     "us_per_task_wall": 96.7
     },
     {
      "t": 359,
      "modules": 36,
-     "latency_us_p50": 3,
-     "latency_us_p95": 5,
-     "us_per_task_wall": 130.0
+     "latency_us_p50": 2,
+     "latency_us_p95": 4,
+     "us_per_task_wall": 146.7
     },
     {
      "t": 419,
      "modules": 36,
      "latency_us_p50": 2,
      "latency_us_p95": 3,
-     "us_per_task_wall": 103.3
+     "us_per_task_wall": 110.0
     },
     {
      "t": 479,
      "modules": 36,
-     "latency_us_p50": 1,
-     "latency_us_p95": 3,
-     "us_per_task_wall": 86.7
+     "latency_us_p50": 2,
+     "latency_us_p95": 4,
+     "us_per_task_wall": 120.0
     },
     {
      "t": 539,
      "modules": 36,
      "latency_us_p50": 2,
-     "latency_us_p95": 3,
-     "us_per_task_wall": 93.3
+     "latency_us_p95": 4,
+     "us_per_task_wall": 123.3
     },
     {
      "t": 599,
      "modules": 36,
      "latency_us_p50": 2,
-     "latency_us_p95": 3,
-     "us_per_task_wall": 100.0
+     "latency_us_p95": 5,
+     "us_per_task_wall": 126.7
     },
     {
      "t": 659,
      "modules": 36,
      "latency_us_p50": 1,
      "latency_us_p95": 3,
-     "us_per_task_wall": 86.7
+     "us_per_task_wall": 106.7
     },
     {
      "t": 719,
      "modules": 36,
      "latency_us_p50": 2,
-     "latency_us_p95": 3,
-     "us_per_task_wall": 93.3
+     "latency_us_p95": 5,
+     "us_per_task_wall": 120.0
     }
    ],
    "options": {
@@ -3081,7 +3095,7 @@
    "seed": 0
   },
   "feedback_1.0": {
-   "wall_seconds": 110.4,
+   "wall_seconds": 109.6,
    "arrivals": 720,
    "teacher_calls": 207,
    "teacher_calls_by_action": {
@@ -3306,7 +3320,9 @@
    "final_accuracy_mean": 0.9763888888888889,
    "final_accuracy_min": 0.8,
    "backward_transfer_stable_capabilities": -0.0009090909090909132,
-   "build_seconds": 49.1,
+   "build_seconds": 48.1,
+   "label_queries": 0,
+   "probe_rounds": 0,
    "drift": {
     "boiler_alarm": {
      "drift_t": 300,
@@ -3369,7 +3385,689 @@
      "modules": 11,
      "latency_us_p50": 1,
      "latency_us_p95": 2,
-     "us_per_task_wall": 33.3
+     "us_per_task_wall": 40.0
+    },
+    {
+     "t": 119,
+     "modules": 17,
+     "latency_us_p50": 1,
+     "latency_us_p95": 5,
+     "us_per_task_wall": 60.0
+    },
+    {
+     "t": 179,
+     "modules": 22,
+     "latency_us_p50": 1,
+     "latency_us_p95": 3,
+     "us_per_task_wall": 63.3
+    },
+    {
+     "t": 239,
+     "modules": 28,
+     "latency_us_p50": 2,
+     "latency_us_p95": 4,
+     "us_per_task_wall": 100.0
+    },
+    {
+     "t": 299,
+     "modules": 33,
+     "latency_us_p50": 2,
+     "latency_us_p95": 5,
+     "us_per_task_wall": 106.7
+    },
+    {
+     "t": 359,
+     "modules": 36,
+     "latency_us_p50": 2,
+     "latency_us_p95": 3,
+     "us_per_task_wall": 106.7
+    },
+    {
+     "t": 419,
+     "modules": 36,
+     "latency_us_p50": 1,
+     "latency_us_p95": 2,
+     "us_per_task_wall": 96.7
+    },
+    {
+     "t": 479,
+     "modules": 36,
+     "latency_us_p50": 2,
+     "latency_us_p95": 3,
+     "us_per_task_wall": 120.0
+    },
+    {
+     "t": 539,
+     "modules": 36,
+     "latency_us_p50": 2,
+     "latency_us_p95": 5,
+     "us_per_task_wall": 110.0
+    },
+    {
+     "t": 599,
+     "modules": 36,
+     "latency_us_p50": 3,
+     "latency_us_p95": 5,
+     "us_per_task_wall": 163.3
+    },
+    {
+     "t": 659,
+     "modules": 36,
+     "latency_us_p50": 2,
+     "latency_us_p95": 3,
+     "us_per_task_wall": 106.7
+    },
+    {
+     "t": 719,
+     "modules": 36,
+     "latency_us_p50": 2,
+     "latency_us_p95": 3,
+     "us_per_task_wall": 103.3
+    }
+   ],
+   "options": {
+    "fq": 1.0
+   },
+   "seed": 0
+  },
+  "cusum_organic": {
+   "wall_seconds": 96.7,
+   "arrivals": 720,
+   "teacher_calls": 184,
+   "teacher_calls_by_action": {
+    "new_capability_spec": 36,
+    "reroute": 84,
+    "request_tool": 25,
+    "cannot_help": 19,
+    "use_memory": 20
+   },
+   "teacher_bytes_in": 119434,
+   "teacher_bytes_out": 48660,
+   "teacher_calls_per_100_arrivals_by_window": [
+    39.0,
+    25.0,
+    32.0,
+    23.0,
+    23.0,
+    21.0,
+    20.0,
+    5.0
+   ],
+   "windows_of_100": [
+    {
+     "arrivals": 100,
+     "teacher_calls": 39,
+     "capability_arrivals": 91,
+     "served": 90,
+     "wrong": 4,
+     "answered_without_teacher": 61
+    },
+    {
+     "arrivals": 100,
+     "teacher_calls": 25,
+     "capability_arrivals": 93,
+     "served": 93,
+     "wrong": 2,
+     "answered_without_teacher": 75
+    },
+    {
+     "arrivals": 100,
+     "teacher_calls": 32,
+     "capability_arrivals": 92,
+     "served": 92,
+     "wrong": 5,
+     "answered_without_teacher": 68
+    },
+    {
+     "arrivals": 100,
+     "teacher_calls": 23,
+     "capability_arrivals": 93,
+     "served": 90,
+     "wrong": 3,
+     "answered_without_teacher": 77
+    },
+    {
+     "arrivals": 100,
+     "teacher_calls": 23,
+     "capability_arrivals": 92,
+     "served": 91,
+     "wrong": 9,
+     "answered_without_teacher": 77
+    },
+    {
+     "arrivals": 100,
+     "teacher_calls": 21,
+     "capability_arrivals": 89,
+     "served": 88,
+     "wrong": 10,
+     "answered_without_teacher": 79
+    },
+    {
+     "arrivals": 100,
+     "teacher_calls": 20,
+     "capability_arrivals": 86,
+     "served": 86,
+     "wrong": 7,
+     "answered_without_teacher": 80
+    },
+    {
+     "arrivals": 20,
+     "teacher_calls": 1,
+     "capability_arrivals": 20,
+     "served": 20,
+     "wrong": 1,
+     "answered_without_teacher": 19
+    }
+   ],
+   "calls_not_leading_to_learning_or_routing": 64,
+   "cache_hits": 0,
+   "capability_arrivals": 656,
+   "served": 650,
+   "unserved_capability_arrivals": 6,
+   "silent_wrong_answers": 41,
+   "silent_wrong_rate": 0.0631,
+   "wrong_by_status": {
+    "KNOWN": 39,
+    "null": 2
+   },
+   "wrong_by_type": {
+    "paraphrase": 21,
+    "new": 1,
+    "known": 19
+   },
+   "new_capabilities_requested": 36,
+   "new_capabilities_learned_at_first_request": 36,
+   "capabilities_never_learned": [],
+   "modules_final": {
+    "active_modules": 36,
+    "params": 48089,
+    "model_bytes": 215723
+   },
+   "checkpoints": [
+    {
+     "t": 59,
+     "mean_accuracy": 0.9927272727272727,
+     "min_accuracy": 0.98,
+     "active_modules": 11,
+     "params": 13594,
+     "model_bytes": 61515,
+     "teacher_calls": 26
+    },
+    {
+     "t": 119,
+     "mean_accuracy": 0.9829411764705883,
+     "min_accuracy": 0.94,
+     "active_modules": 17,
+     "params": 24490,
+     "model_bytes": 108996,
+     "teacher_calls": 45
+    },
+    {
+     "t": 179,
+     "mean_accuracy": 0.9868181818181817,
+     "min_accuracy": 0.96,
+     "active_modules": 22,
+     "params": 30677,
+     "model_bytes": 136989,
+     "teacher_calls": 59
+    },
+    {
+     "t": 239,
+     "mean_accuracy": 0.9917857142857142,
+     "min_accuracy": 0.94,
+     "active_modules": 28,
+     "params": 38117,
+     "model_bytes": 170643,
+     "teacher_calls": 74
+    },
+    {
+     "t": 299,
+     "mean_accuracy": 0.9812121212121213,
+     "min_accuracy": 0.91,
+     "active_modules": 33,
+     "params": 44434,
+     "model_bytes": 199156,
+     "teacher_calls": 96
+    },
+    {
+     "t": 359,
+     "mean_accuracy": 0.9766666666666668,
+     "min_accuracy": 0.69,
+     "active_modules": 36,
+     "params": 48089,
+     "model_bytes": 215723,
+     "teacher_calls": 106
+    },
+    {
+     "t": 419,
+     "mean_accuracy": 0.983611111111111,
+     "min_accuracy": 0.8,
+     "active_modules": 36,
+     "params": 48089,
+     "model_bytes": 215723,
+     "teacher_calls": 124
+    },
+    {
+     "t": 479,
+     "mean_accuracy": 0.9738888888888889,
+     "min_accuracy": 0.68,
+     "active_modules": 36,
+     "params": 48089,
+     "model_bytes": 215723,
+     "teacher_calls": 140
+    },
+    {
+     "t": 539,
+     "mean_accuracy": 0.9752777777777778,
+     "min_accuracy": 0.75,
+     "active_modules": 36,
+     "params": 48089,
+     "model_bytes": 215723,
+     "teacher_calls": 150
+    },
+    {
+     "t": 599,
+     "mean_accuracy": 0.9655555555555555,
+     "min_accuracy": 0.67,
+     "active_modules": 36,
+     "params": 48089,
+     "model_bytes": 215723,
+     "teacher_calls": 163
+    },
+    {
+     "t": 659,
+     "mean_accuracy": 0.9627777777777778,
+     "min_accuracy": 0.73,
+     "active_modules": 36,
+     "params": 48089,
+     "model_bytes": 215723,
+     "teacher_calls": 176
+    },
+    {
+     "t": 719,
+     "mean_accuracy": 0.9702777777777778,
+     "min_accuracy": 0.78,
+     "active_modules": 36,
+     "params": 48089,
+     "model_bytes": 215723,
+     "teacher_calls": 184
+    }
+   ],
+   "final_accuracy_mean": 0.9702777777777778,
+   "final_accuracy_min": 0.78,
+   "backward_transfer_stable_capabilities": -0.0009090909090909132,
+   "build_seconds": 44.5,
+   "label_queries": 0,
+   "probe_rounds": 0,
+   "drift": {
+    "boiler_alarm": {
+     "drift_t": 300,
+     "repairs": []
+    },
+    "gear_zone": {
+     "drift_t": 420,
+     "repairs": []
+    },
+    "mixer_zone": {
+     "drift_t": 540,
+     "repairs": []
+    }
+   },
+   "spurious_repairs": [],
+   "router_updates_accepted": 21,
+   "wrong_after_drift_before_repair": {
+    "boiler_alarm": 19,
+    "gear_zone": 0,
+    "mixer_zone": 1
+   },
+   "latency_by_checkpoint": [
+    {
+     "t": 59,
+     "modules": 11,
+     "latency_us_p50": 1,
+     "latency_us_p95": 2,
+     "us_per_task_wall": 40.0
+    },
+    {
+     "t": 119,
+     "modules": 17,
+     "latency_us_p50": 1,
+     "latency_us_p95": 4,
+     "us_per_task_wall": 66.7
+    },
+    {
+     "t": 179,
+     "modules": 22,
+     "latency_us_p50": 1,
+     "latency_us_p95": 3,
+     "us_per_task_wall": 70.0
+    },
+    {
+     "t": 239,
+     "modules": 28,
+     "latency_us_p50": 1,
+     "latency_us_p95": 3,
+     "us_per_task_wall": 83.3
+    },
+    {
+     "t": 299,
+     "modules": 33,
+     "latency_us_p50": 2,
+     "latency_us_p95": 4,
+     "us_per_task_wall": 100.0
+    },
+    {
+     "t": 359,
+     "modules": 36,
+     "latency_us_p50": 2,
+     "latency_us_p95": 4,
+     "us_per_task_wall": 116.7
+    },
+    {
+     "t": 419,
+     "modules": 36,
+     "latency_us_p50": 2,
+     "latency_us_p95": 3,
+     "us_per_task_wall": 110.0
+    },
+    {
+     "t": 479,
+     "modules": 36,
+     "latency_us_p50": 2,
+     "latency_us_p95": 3,
+     "us_per_task_wall": 113.3
+    },
+    {
+     "t": 539,
+     "modules": 36,
+     "latency_us_p50": 2,
+     "latency_us_p95": 3,
+     "us_per_task_wall": 106.7
+    },
+    {
+     "t": 599,
+     "modules": 36,
+     "latency_us_p50": 2,
+     "latency_us_p95": 3,
+     "us_per_task_wall": 146.7
+    },
+    {
+     "t": 659,
+     "modules": 36,
+     "latency_us_p50": 2,
+     "latency_us_p95": 3,
+     "us_per_task_wall": 116.7
+    },
+    {
+     "t": 719,
+     "modules": 36,
+     "latency_us_p50": 2,
+     "latency_us_p95": 3,
+     "us_per_task_wall": 106.7
+    }
+   ],
+   "options": {
+    "monitor": "cusum"
+   },
+   "seed": 0
+  },
+  "cusum_probe_0.05": {
+   "wall_seconds": 103.4,
+   "arrivals": 720,
+   "teacher_calls": 184,
+   "teacher_calls_by_action": {
+    "new_capability_spec": 36,
+    "reroute": 84,
+    "request_tool": 25,
+    "cannot_help": 19,
+    "use_memory": 20
+   },
+   "teacher_bytes_in": 119434,
+   "teacher_bytes_out": 48660,
+   "teacher_calls_per_100_arrivals_by_window": [
+    39.0,
+    25.0,
+    32.0,
+    23.0,
+    23.0,
+    21.0,
+    20.0,
+    5.0
+   ],
+   "windows_of_100": [
+    {
+     "arrivals": 100,
+     "teacher_calls": 39,
+     "capability_arrivals": 91,
+     "served": 90,
+     "wrong": 4,
+     "answered_without_teacher": 61
+    },
+    {
+     "arrivals": 100,
+     "teacher_calls": 25,
+     "capability_arrivals": 93,
+     "served": 93,
+     "wrong": 2,
+     "answered_without_teacher": 75
+    },
+    {
+     "arrivals": 100,
+     "teacher_calls": 32,
+     "capability_arrivals": 92,
+     "served": 92,
+     "wrong": 5,
+     "answered_without_teacher": 68
+    },
+    {
+     "arrivals": 100,
+     "teacher_calls": 23,
+     "capability_arrivals": 93,
+     "served": 90,
+     "wrong": 3,
+     "answered_without_teacher": 77
+    },
+    {
+     "arrivals": 100,
+     "teacher_calls": 23,
+     "capability_arrivals": 92,
+     "served": 91,
+     "wrong": 9,
+     "answered_without_teacher": 77
+    },
+    {
+     "arrivals": 100,
+     "teacher_calls": 21,
+     "capability_arrivals": 89,
+     "served": 88,
+     "wrong": 10,
+     "answered_without_teacher": 79
+    },
+    {
+     "arrivals": 100,
+     "teacher_calls": 20,
+     "capability_arrivals": 86,
+     "served": 86,
+     "wrong": 7,
+     "answered_without_teacher": 80
+    },
+    {
+     "arrivals": 20,
+     "teacher_calls": 1,
+     "capability_arrivals": 20,
+     "served": 20,
+     "wrong": 1,
+     "answered_without_teacher": 19
+    }
+   ],
+   "calls_not_leading_to_learning_or_routing": 64,
+   "cache_hits": 0,
+   "capability_arrivals": 656,
+   "served": 650,
+   "unserved_capability_arrivals": 6,
+   "silent_wrong_answers": 41,
+   "silent_wrong_rate": 0.0631,
+   "wrong_by_status": {
+    "KNOWN": 39,
+    "null": 2
+   },
+   "wrong_by_type": {
+    "paraphrase": 21,
+    "new": 1,
+    "known": 19
+   },
+   "new_capabilities_requested": 36,
+   "new_capabilities_learned_at_first_request": 36,
+   "capabilities_never_learned": [],
+   "modules_final": {
+    "active_modules": 36,
+    "params": 48089,
+    "model_bytes": 215723
+   },
+   "checkpoints": [
+    {
+     "t": 59,
+     "mean_accuracy": 0.9927272727272727,
+     "min_accuracy": 0.98,
+     "active_modules": 11,
+     "params": 13594,
+     "model_bytes": 61515,
+     "teacher_calls": 26
+    },
+    {
+     "t": 119,
+     "mean_accuracy": 0.9829411764705883,
+     "min_accuracy": 0.94,
+     "active_modules": 17,
+     "params": 24490,
+     "model_bytes": 108996,
+     "teacher_calls": 45
+    },
+    {
+     "t": 179,
+     "mean_accuracy": 0.9868181818181817,
+     "min_accuracy": 0.96,
+     "active_modules": 22,
+     "params": 30677,
+     "model_bytes": 136989,
+     "teacher_calls": 59
+    },
+    {
+     "t": 239,
+     "mean_accuracy": 0.9917857142857142,
+     "min_accuracy": 0.94,
+     "active_modules": 28,
+     "params": 38117,
+     "model_bytes": 170643,
+     "teacher_calls": 74
+    },
+    {
+     "t": 299,
+     "mean_accuracy": 0.9812121212121213,
+     "min_accuracy": 0.91,
+     "active_modules": 33,
+     "params": 44434,
+     "model_bytes": 199156,
+     "teacher_calls": 96
+    },
+    {
+     "t": 359,
+     "mean_accuracy": 0.9766666666666668,
+     "min_accuracy": 0.69,
+     "active_modules": 36,
+     "params": 48089,
+     "model_bytes": 215723,
+     "teacher_calls": 106
+    },
+    {
+     "t": 419,
+     "mean_accuracy": 0.983611111111111,
+     "min_accuracy": 0.8,
+     "active_modules": 36,
+     "params": 48089,
+     "model_bytes": 215723,
+     "teacher_calls": 124
+    },
+    {
+     "t": 479,
+     "mean_accuracy": 0.9738888888888889,
+     "min_accuracy": 0.68,
+     "active_modules": 36,
+     "params": 48089,
+     "model_bytes": 215723,
+     "teacher_calls": 140
+    },
+    {
+     "t": 539,
+     "mean_accuracy": 0.9752777777777778,
+     "min_accuracy": 0.75,
+     "active_modules": 36,
+     "params": 48089,
+     "model_bytes": 215723,
+     "teacher_calls": 150
+    },
+    {
+     "t": 599,
+     "mean_accuracy": 0.9655555555555555,
+     "min_accuracy": 0.67,
+     "active_modules": 36,
+     "params": 48089,
+     "model_bytes": 215723,
+     "teacher_calls": 163
+    },
+    {
+     "t": 659,
+     "mean_accuracy": 0.9627777777777778,
+     "min_accuracy": 0.73,
+     "active_modules": 36,
+     "params": 48089,
+     "model_bytes": 215723,
+     "teacher_calls": 176
+    },
+    {
+     "t": 719,
+     "mean_accuracy": 0.9702777777777778,
+     "min_accuracy": 0.78,
+     "active_modules": 36,
+     "params": 48089,
+     "model_bytes": 215723,
+     "teacher_calls": 184
+    }
+   ],
+   "final_accuracy_mean": 0.9702777777777778,
+   "final_accuracy_min": 0.78,
+   "backward_transfer_stable_capabilities": -0.0009090909090909132,
+   "build_seconds": 46.3,
+   "label_queries": 150,
+   "probe_rounds": 50,
+   "drift": {
+    "boiler_alarm": {
+     "drift_t": 300,
+     "repairs": []
+    },
+    "gear_zone": {
+     "drift_t": 420,
+     "repairs": []
+    },
+    "mixer_zone": {
+     "drift_t": 540,
+     "repairs": []
+    }
+   },
+   "spurious_repairs": [],
+   "router_updates_accepted": 21,
+   "wrong_after_drift_before_repair": {
+    "boiler_alarm": 19,
+    "gear_zone": 0,
+    "mixer_zone": 1
+   },
+   "latency_by_checkpoint": [
+    {
+     "t": 59,
+     "modules": 11,
+     "latency_us_p50": 1,
+     "latency_us_p95": 2,
+     "us_per_task_wall": 40.0
     },
     {
      "t": 119,
@@ -3382,75 +4080,759 @@
      "t": 179,
      "modules": 22,
      "latency_us_p50": 1,
-     "latency_us_p95": 5,
-     "us_per_task_wall": 70.0
+     "latency_us_p95": 4,
+     "us_per_task_wall": 73.3
     },
     {
      "t": 239,
      "modules": 28,
-     "latency_us_p50": 1,
-     "latency_us_p95": 3,
-     "us_per_task_wall": 60.0
+     "latency_us_p50": 2,
+     "latency_us_p95": 5,
+     "us_per_task_wall": 103.3
     },
     {
      "t": 299,
      "modules": 33,
      "latency_us_p50": 2,
-     "latency_us_p95": 4,
-     "us_per_task_wall": 96.7
+     "latency_us_p95": 3,
+     "us_per_task_wall": 110.0
     },
     {
      "t": 359,
      "modules": 36,
      "latency_us_p50": 2,
-     "latency_us_p95": 3,
-     "us_per_task_wall": 93.3
+     "latency_us_p95": 5,
+     "us_per_task_wall": 133.3
     },
     {
      "t": 419,
      "modules": 36,
-     "latency_us_p50": 1,
-     "latency_us_p95": 3,
-     "us_per_task_wall": 83.3
+     "latency_us_p50": 2,
+     "latency_us_p95": 4,
+     "us_per_task_wall": 113.3
     },
     {
      "t": 479,
      "modules": 36,
      "latency_us_p50": 2,
      "latency_us_p95": 3,
-     "us_per_task_wall": 116.7
+     "us_per_task_wall": 106.7
     },
     {
      "t": 539,
      "modules": 36,
-     "latency_us_p50": 1,
-     "latency_us_p95": 2,
-     "us_per_task_wall": 76.7
+     "latency_us_p50": 2,
+     "latency_us_p95": 4,
+     "us_per_task_wall": 116.7
     },
     {
      "t": 599,
      "modules": 36,
      "latency_us_p50": 2,
-     "latency_us_p95": 3,
-     "us_per_task_wall": 96.7
+     "latency_us_p95": 5,
+     "us_per_task_wall": 126.7
     },
     {
      "t": 659,
+     "modules": 36,
+     "latency_us_p50": 2,
+     "latency_us_p95": 4,
+     "us_per_task_wall": 113.3
+    },
+    {
+     "t": 719,
+     "modules": 36,
+     "latency_us_p50": 3,
+     "latency_us_p95": 6,
+     "us_per_task_wall": 173.3
+    }
+   ],
+   "options": {
+    "monitor": "cusum",
+    "probe_rate": 0.05
+   },
+   "seed": 0
+  },
+  "cusum_probe_0.15": {
+   "wall_seconds": 103.7,
+   "arrivals": 720,
+   "teacher_calls": 184,
+   "teacher_calls_by_action": {
+    "new_capability_spec": 36,
+    "reroute": 84,
+    "request_tool": 25,
+    "cannot_help": 19,
+    "use_memory": 20
+   },
+   "teacher_bytes_in": 119434,
+   "teacher_bytes_out": 48660,
+   "teacher_calls_per_100_arrivals_by_window": [
+    39.0,
+    25.0,
+    32.0,
+    23.0,
+    23.0,
+    21.0,
+    20.0,
+    5.0
+   ],
+   "windows_of_100": [
+    {
+     "arrivals": 100,
+     "teacher_calls": 39,
+     "capability_arrivals": 91,
+     "served": 90,
+     "wrong": 4,
+     "answered_without_teacher": 61
+    },
+    {
+     "arrivals": 100,
+     "teacher_calls": 25,
+     "capability_arrivals": 93,
+     "served": 93,
+     "wrong": 2,
+     "answered_without_teacher": 75
+    },
+    {
+     "arrivals": 100,
+     "teacher_calls": 32,
+     "capability_arrivals": 92,
+     "served": 92,
+     "wrong": 5,
+     "answered_without_teacher": 68
+    },
+    {
+     "arrivals": 100,
+     "teacher_calls": 23,
+     "capability_arrivals": 93,
+     "served": 90,
+     "wrong": 3,
+     "answered_without_teacher": 77
+    },
+    {
+     "arrivals": 100,
+     "teacher_calls": 23,
+     "capability_arrivals": 92,
+     "served": 91,
+     "wrong": 9,
+     "answered_without_teacher": 77
+    },
+    {
+     "arrivals": 100,
+     "teacher_calls": 21,
+     "capability_arrivals": 89,
+     "served": 88,
+     "wrong": 10,
+     "answered_without_teacher": 79
+    },
+    {
+     "arrivals": 100,
+     "teacher_calls": 20,
+     "capability_arrivals": 86,
+     "served": 86,
+     "wrong": 7,
+     "answered_without_teacher": 80
+    },
+    {
+     "arrivals": 20,
+     "teacher_calls": 1,
+     "capability_arrivals": 20,
+     "served": 20,
+     "wrong": 1,
+     "answered_without_teacher": 19
+    }
+   ],
+   "calls_not_leading_to_learning_or_routing": 64,
+   "cache_hits": 0,
+   "capability_arrivals": 656,
+   "served": 650,
+   "unserved_capability_arrivals": 6,
+   "silent_wrong_answers": 41,
+   "silent_wrong_rate": 0.0631,
+   "wrong_by_status": {
+    "KNOWN": 39,
+    "null": 2
+   },
+   "wrong_by_type": {
+    "paraphrase": 21,
+    "new": 1,
+    "known": 19
+   },
+   "new_capabilities_requested": 36,
+   "new_capabilities_learned_at_first_request": 36,
+   "capabilities_never_learned": [],
+   "modules_final": {
+    "active_modules": 36,
+    "params": 48089,
+    "model_bytes": 215723
+   },
+   "checkpoints": [
+    {
+     "t": 59,
+     "mean_accuracy": 0.9927272727272727,
+     "min_accuracy": 0.98,
+     "active_modules": 11,
+     "params": 13594,
+     "model_bytes": 61515,
+     "teacher_calls": 26
+    },
+    {
+     "t": 119,
+     "mean_accuracy": 0.9829411764705883,
+     "min_accuracy": 0.94,
+     "active_modules": 17,
+     "params": 24490,
+     "model_bytes": 108996,
+     "teacher_calls": 45
+    },
+    {
+     "t": 179,
+     "mean_accuracy": 0.9868181818181817,
+     "min_accuracy": 0.96,
+     "active_modules": 22,
+     "params": 30677,
+     "model_bytes": 136989,
+     "teacher_calls": 59
+    },
+    {
+     "t": 239,
+     "mean_accuracy": 0.9917857142857142,
+     "min_accuracy": 0.94,
+     "active_modules": 28,
+     "params": 38117,
+     "model_bytes": 170643,
+     "teacher_calls": 74
+    },
+    {
+     "t": 299,
+     "mean_accuracy": 0.9812121212121213,
+     "min_accuracy": 0.91,
+     "active_modules": 33,
+     "params": 44434,
+     "model_bytes": 199156,
+     "teacher_calls": 96
+    },
+    {
+     "t": 359,
+     "mean_accuracy": 0.9766666666666668,
+     "min_accuracy": 0.69,
+     "active_modules": 36,
+     "params": 48089,
+     "model_bytes": 215723,
+     "teacher_calls": 106
+    },
+    {
+     "t": 419,
+     "mean_accuracy": 0.983611111111111,
+     "min_accuracy": 0.8,
+     "active_modules": 36,
+     "params": 48089,
+     "model_bytes": 215723,
+     "teacher_calls": 124
+    },
+    {
+     "t": 479,
+     "mean_accuracy": 0.9738888888888889,
+     "min_accuracy": 0.68,
+     "active_modules": 36,
+     "params": 48089,
+     "model_bytes": 215723,
+     "teacher_calls": 140
+    },
+    {
+     "t": 539,
+     "mean_accuracy": 0.9752777777777778,
+     "min_accuracy": 0.75,
+     "active_modules": 36,
+     "params": 48089,
+     "model_bytes": 215723,
+     "teacher_calls": 150
+    },
+    {
+     "t": 599,
+     "mean_accuracy": 0.9655555555555555,
+     "min_accuracy": 0.67,
+     "active_modules": 36,
+     "params": 48089,
+     "model_bytes": 215723,
+     "teacher_calls": 163
+    },
+    {
+     "t": 659,
+     "mean_accuracy": 0.9627777777777778,
+     "min_accuracy": 0.73,
+     "active_modules": 36,
+     "params": 48089,
+     "model_bytes": 215723,
+     "teacher_calls": 176
+    },
+    {
+     "t": 719,
+     "mean_accuracy": 0.9702777777777778,
+     "min_accuracy": 0.78,
+     "active_modules": 36,
+     "params": 48089,
+     "model_bytes": 215723,
+     "teacher_calls": 184
+    }
+   ],
+   "final_accuracy_mean": 0.9702777777777778,
+   "final_accuracy_min": 0.78,
+   "backward_transfer_stable_capabilities": -0.0009090909090909132,
+   "build_seconds": 47.9,
+   "label_queries": 270,
+   "probe_rounds": 90,
+   "drift": {
+    "boiler_alarm": {
+     "drift_t": 300,
+     "repairs": []
+    },
+    "gear_zone": {
+     "drift_t": 420,
+     "repairs": []
+    },
+    "mixer_zone": {
+     "drift_t": 540,
+     "repairs": []
+    }
+   },
+   "spurious_repairs": [],
+   "router_updates_accepted": 21,
+   "wrong_after_drift_before_repair": {
+    "boiler_alarm": 19,
+    "gear_zone": 0,
+    "mixer_zone": 1
+   },
+   "latency_by_checkpoint": [
+    {
+     "t": 59,
+     "modules": 11,
+     "latency_us_p50": 2,
+     "latency_us_p95": 4,
+     "us_per_task_wall": 66.7
+    },
+    {
+     "t": 119,
+     "modules": 17,
+     "latency_us_p50": 1,
+     "latency_us_p95": 4,
+     "us_per_task_wall": 56.7
+    },
+    {
+     "t": 179,
+     "modules": 22,
+     "latency_us_p50": 1,
+     "latency_us_p95": 4,
+     "us_per_task_wall": 80.0
+    },
+    {
+     "t": 239,
+     "modules": 28,
+     "latency_us_p50": 2,
+     "latency_us_p95": 5,
+     "us_per_task_wall": 93.3
+    },
+    {
+     "t": 299,
+     "modules": 33,
+     "latency_us_p50": 2,
+     "latency_us_p95": 4,
+     "us_per_task_wall": 136.7
+    },
+    {
+     "t": 359,
      "modules": 36,
      "latency_us_p50": 2,
      "latency_us_p95": 3,
      "us_per_task_wall": 106.7
     },
     {
-     "t": 719,
+     "t": 419,
+     "modules": 36,
+     "latency_us_p50": 2,
+     "latency_us_p95": 4,
+     "us_per_task_wall": 116.7
+    },
+    {
+     "t": 479,
+     "modules": 36,
+     "latency_us_p50": 2,
+     "latency_us_p95": 4,
+     "us_per_task_wall": 113.3
+    },
+    {
+     "t": 539,
      "modules": 36,
      "latency_us_p50": 1,
-     "latency_us_p95": 4,
-     "us_per_task_wall": 140.0
+     "latency_us_p95": 3,
+     "us_per_task_wall": 106.7
+    },
+    {
+     "t": 599,
+     "modules": 36,
+     "latency_us_p50": 3,
+     "latency_us_p95": 5,
+     "us_per_task_wall": 153.3
+    },
+    {
+     "t": 659,
+     "modules": 36,
+     "latency_us_p50": 2,
+     "latency_us_p95": 3,
+     "us_per_task_wall": 130.0
+    },
+    {
+     "t": 719,
+     "modules": 36,
+     "latency_us_p50": 2,
+     "latency_us_p95": 3,
+     "us_per_task_wall": 106.7
     }
    ],
    "options": {
-    "fq": 1.0
+    "monitor": "cusum",
+    "probe_rate": 0.15
+   },
+   "seed": 0
+  },
+  "idf_router_0.25": {
+   "wall_seconds": 67.9,
+   "arrivals": 720,
+   "teacher_calls": 143,
+   "teacher_calls_by_action": {
+    "new_capability_spec": 36,
+    "request_tool": 25,
+    "cannot_help": 19,
+    "reroute": 43,
+    "use_memory": 20
+   },
+   "teacher_bytes_in": 86906,
+   "teacher_bytes_out": 42262,
+   "teacher_calls_per_100_arrivals_by_window": [
+    24.0,
+    16.0,
+    22.0,
+    22.0,
+    16.0,
+    22.0,
+    21.0,
+    0.0
+   ],
+   "windows_of_100": [
+    {
+     "arrivals": 100,
+     "teacher_calls": 24,
+     "capability_arrivals": 91,
+     "served": 90,
+     "wrong": 1,
+     "answered_without_teacher": 76
+    },
+    {
+     "arrivals": 100,
+     "teacher_calls": 16,
+     "capability_arrivals": 93,
+     "served": 92,
+     "wrong": 2,
+     "answered_without_teacher": 84
+    },
+    {
+     "arrivals": 100,
+     "teacher_calls": 22,
+     "capability_arrivals": 92,
+     "served": 91,
+     "wrong": 6,
+     "answered_without_teacher": 78
+    },
+    {
+     "arrivals": 100,
+     "teacher_calls": 22,
+     "capability_arrivals": 93,
+     "served": 91,
+     "wrong": 4,
+     "answered_without_teacher": 78
+    },
+    {
+     "arrivals": 100,
+     "teacher_calls": 16,
+     "capability_arrivals": 92,
+     "served": 90,
+     "wrong": 8,
+     "answered_without_teacher": 84
+    },
+    {
+     "arrivals": 100,
+     "teacher_calls": 22,
+     "capability_arrivals": 89,
+     "served": 88,
+     "wrong": 8,
+     "answered_without_teacher": 78
+    },
+    {
+     "arrivals": 100,
+     "teacher_calls": 21,
+     "capability_arrivals": 86,
+     "served": 86,
+     "wrong": 6,
+     "answered_without_teacher": 79
+    },
+    {
+     "arrivals": 20,
+     "teacher_calls": 0,
+     "capability_arrivals": 20,
+     "served": 20,
+     "wrong": 1,
+     "answered_without_teacher": 20
+    }
+   ],
+   "calls_not_leading_to_learning_or_routing": 64,
+   "cache_hits": 0,
+   "capability_arrivals": 656,
+   "served": 648,
+   "unserved_capability_arrivals": 8,
+   "silent_wrong_answers": 36,
+   "silent_wrong_rate": 0.0556,
+   "wrong_by_status": {
+    "KNOWN": 34,
+    "null": 2
+   },
+   "wrong_by_type": {
+    "new": 3,
+    "known": 22,
+    "paraphrase": 11
+   },
+   "new_capabilities_requested": 36,
+   "new_capabilities_learned_at_first_request": 21,
+   "capabilities_never_learned": [],
+   "modules_final": {
+    "active_modules": 36,
+    "params": 48089,
+    "model_bytes": 215723
+   },
+   "checkpoints": [
+    {
+     "t": 59,
+     "mean_accuracy": 0.9924999999999999,
+     "min_accuracy": 0.98,
+     "active_modules": 8,
+     "params": 9972,
+     "model_bytes": 45080,
+     "teacher_calls": 17
+    },
+    {
+     "t": 119,
+     "mean_accuracy": 0.9833333333333334,
+     "min_accuracy": 0.94,
+     "active_modules": 12,
+     "params": 18301,
+     "model_bytes": 80995,
+     "teacher_calls": 27
+    },
+    {
+     "t": 179,
+     "mean_accuracy": 0.98375,
+     "min_accuracy": 0.96,
+     "active_modules": 16,
+     "params": 23270,
+     "model_bytes": 103467,
+     "teacher_calls": 38
+    },
+    {
+     "t": 239,
+     "mean_accuracy": 0.987894736842105,
+     "min_accuracy": 0.94,
+     "active_modules": 19,
+     "params": 27055,
+     "model_bytes": 120554,
+     "teacher_calls": 47
+    },
+    {
+     "t": 299,
+     "mean_accuracy": 0.9779166666666667,
+     "min_accuracy": 0.91,
+     "active_modules": 24,
+     "params": 33371,
+     "model_bytes": 149063,
+     "teacher_calls": 62
+    },
+    {
+     "t": 359,
+     "mean_accuracy": 0.9720689655172413,
+     "min_accuracy": 0.69,
+     "active_modules": 29,
+     "params": 39592,
+     "model_bytes": 177192,
+     "teacher_calls": 71
+    },
+    {
+     "t": 419,
+     "mean_accuracy": 0.981875,
+     "min_accuracy": 0.8,
+     "active_modules": 32,
+     "params": 43150,
+     "model_bytes": 193371,
+     "teacher_calls": 88
+    },
+    {
+     "t": 479,
+     "mean_accuracy": 0.9718181818181818,
+     "min_accuracy": 0.68,
+     "active_modules": 33,
+     "params": 44401,
+     "model_bytes": 199024,
+     "teacher_calls": 98
+    },
+    {
+     "t": 539,
+     "mean_accuracy": 0.9741176470588234,
+     "min_accuracy": 0.75,
+     "active_modules": 34,
+     "params": 45652,
+     "model_bytes": 204677,
+     "teacher_calls": 111
+    },
+    {
+     "t": 599,
+     "mean_accuracy": 0.9638235294117646,
+     "min_accuracy": 0.67,
+     "active_modules": 34,
+     "params": 45652,
+     "model_bytes": 204677,
+     "teacher_calls": 122
+    },
+    {
+     "t": 659,
+     "mean_accuracy": 0.9627777777777778,
+     "min_accuracy": 0.73,
+     "active_modules": 36,
+     "params": 48089,
+     "model_bytes": 215723,
+     "teacher_calls": 136
+    },
+    {
+     "t": 719,
+     "mean_accuracy": 0.9702777777777778,
+     "min_accuracy": 0.78,
+     "active_modules": 36,
+     "params": 48089,
+     "model_bytes": 215723,
+     "teacher_calls": 143
+    }
+   ],
+   "final_accuracy_mean": 0.9702777777777778,
+   "final_accuracy_min": 0.78,
+   "backward_transfer_stable_capabilities": -0.00030303030303030666,
+   "build_seconds": 36.6,
+   "label_queries": 0,
+   "probe_rounds": 0,
+   "drift": {
+    "boiler_alarm": {
+     "drift_t": 300,
+     "repairs": []
+    },
+    "gear_zone": {
+     "drift_t": 420,
+     "repairs": []
+    },
+    "mixer_zone": {
+     "drift_t": 540,
+     "repairs": []
+    }
+   },
+   "spurious_repairs": [],
+   "router_updates_accepted": 3,
+   "wrong_after_drift_before_repair": {
+    "boiler_alarm": 19,
+    "gear_zone": 0,
+    "mixer_zone": 1
+   },
+   "latency_by_checkpoint": [
+    {
+     "t": 59,
+     "modules": 8,
+     "latency_us_p50": 2,
+     "latency_us_p95": 3,
+     "us_per_task_wall": 46.7
+    },
+    {
+     "t": 119,
+     "modules": 12,
+     "latency_us_p50": 1,
+     "latency_us_p95": 4,
+     "us_per_task_wall": 43.3
+    },
+    {
+     "t": 179,
+     "modules": 16,
+     "latency_us_p50": 1,
+     "latency_us_p95": 4,
+     "us_per_task_wall": 56.7
+    },
+    {
+     "t": 239,
+     "modules": 19,
+     "latency_us_p50": 1,
+     "latency_us_p95": 2,
+     "us_per_task_wall": 60.0
+    },
+    {
+     "t": 299,
+     "modules": 24,
+     "latency_us_p50": 1,
+     "latency_us_p95": 3,
+     "us_per_task_wall": 80.0
+    },
+    {
+     "t": 359,
+     "modules": 29,
+     "latency_us_p50": 2,
+     "latency_us_p95": 5,
+     "us_per_task_wall": 110.0
+    },
+    {
+     "t": 419,
+     "modules": 32,
+     "latency_us_p50": 2,
+     "latency_us_p95": 6,
+     "us_per_task_wall": 140.0
+    },
+    {
+     "t": 479,
+     "modules": 33,
+     "latency_us_p50": 2,
+     "latency_us_p95": 3,
+     "us_per_task_wall": 103.3
+    },
+    {
+     "t": 539,
+     "modules": 34,
+     "latency_us_p50": 1,
+     "latency_us_p95": 3,
+     "us_per_task_wall": 100.0
+    },
+    {
+     "t": 599,
+     "modules": 34,
+     "latency_us_p50": 2,
+     "latency_us_p95": 3,
+     "us_per_task_wall": 163.3
+    },
+    {
+     "t": 659,
+     "modules": 36,
+     "latency_us_p50": 2,
+     "latency_us_p95": 5,
+     "us_per_task_wall": 123.3
+    },
+    {
+     "t": 719,
+     "modules": 36,
+     "latency_us_p50": 2,
+     "latency_us_p95": 5,
+     "us_per_task_wall": 136.7
+    }
+   ],
+   "options": {
+    "router": "idf:0.25"
    },
    "seed": 0
   }
@@ -3522,7 +4904,7 @@
    "final_accuracy_mean": 0.5197222222222222,
    "final_accuracy_min": 0.14,
    "params": 22404,
-   "train_seconds": 20.3,
+   "train_seconds": 18.0,
    "learn_events": 37,
    "backward_transfer_stable_capabilities": -0.04060606060606062,
    "teacher_calls": 37,
@@ -3594,7 +4976,7 @@
    "final_accuracy_mean": 0.9502777777777778,
    "final_accuracy_min": 0.75,
    "params": 22404,
-   "train_seconds": 84.6,
+   "train_seconds": 83.3,
    "learn_events": 37,
    "backward_transfer_stable_capabilities": 0.0018181818181818232,
    "teacher_calls": 37,
@@ -3666,7 +5048,7 @@
    "final_accuracy_mean": 0.9599999999999999,
    "final_accuracy_min": 0.78,
    "params": 22404,
-   "train_seconds": 357.2,
+   "train_seconds": 339.6,
    "learn_events": 37,
    "backward_transfer_stable_capabilities": 3.3643121958338078e-18,
    "teacher_calls": 37,
@@ -3678,6 +5060,80 @@
   "teacher_bytes_in": 456736,
   "arrivals": 720,
   "note": "every non-drift arrival is sent to the teacher; accuracy equals the teacher's by assumption; no module is ever trained"
+ },
+ "seeds_cusum_probe_0.15": {
+  "1": {
+   "teacher_calls": 188,
+   "silent_wrong_answers": 32,
+   "silent_wrong_rate": 0.049,
+   "final_accuracy_mean": 0.9836111111111112,
+   "final_accuracy_min": 0.83,
+   "new_capabilities_learned_at_first_request": 36,
+   "capabilities_never_learned": [],
+   "modules_final": {
+    "active_modules": 36,
+    "params": 48089,
+    "model_bytes": 215723
+   },
+   "build_seconds": 48.0,
+   "label_queries": 270,
+   "drift_delays": {
+    "boiler_alarm": [
+     342
+    ],
+    "gear_zone": [
+     248
+    ],
+    "mixer_zone": []
+   },
+   "spurious_repairs": 0
+  },
+  "2": {
+   "teacher_calls": 178,
+   "silent_wrong_answers": 54,
+   "silent_wrong_rate": 0.0826,
+   "final_accuracy_mean": 0.973611111111111,
+   "final_accuracy_min": 0.74,
+   "new_capabilities_learned_at_first_request": 36,
+   "capabilities_never_learned": [],
+   "modules_final": {
+    "active_modules": 36,
+    "params": 48089,
+    "model_bytes": 215723
+   },
+   "build_seconds": 42.9,
+   "label_queries": 270,
+   "drift_delays": {
+    "boiler_alarm": [],
+    "gear_zone": [
+     248
+    ],
+    "mixer_zone": []
+   },
+   "spurious_repairs": 0
+  },
+  "0": {
+   "teacher_calls": 184,
+   "silent_wrong_answers": 41,
+   "silent_wrong_rate": 0.0631,
+   "final_accuracy_mean": 0.9702777777777778,
+   "final_accuracy_min": 0.78,
+   "new_capabilities_learned_at_first_request": 36,
+   "capabilities_never_learned": [],
+   "modules_final": {
+    "active_modules": 36,
+    "params": 48089,
+    "model_bytes": 215723
+   },
+   "build_seconds": 47.9,
+   "label_queries": 270,
+   "drift_delays": {
+    "boiler_alarm": [],
+    "gear_zone": [],
+    "mixer_zone": []
+   },
+   "spurious_repairs": 0
+  }
  },
  "seeds": {
   "1": {
@@ -3693,12 +5149,14 @@
     "params": 48089,
     "model_bytes": 215723
    },
-   "build_seconds": 46.3,
+   "build_seconds": 44.5,
+   "label_queries": 0,
    "drift_delays": {
     "boiler_alarm": [],
     "gear_zone": [],
     "mixer_zone": []
-   }
+   },
+   "spurious_repairs": 1
   },
   "2": {
    "teacher_calls": 185,
@@ -3713,14 +5171,16 @@
     "params": 48089,
     "model_bytes": 215723
    },
-   "build_seconds": 44.1,
+   "build_seconds": 45.0,
+   "label_queries": 0,
    "drift_delays": {
     "boiler_alarm": [
      234
     ],
     "gear_zone": [],
     "mixer_zone": []
-   }
+   },
+   "spurious_repairs": 0
   },
   "0": {
    "teacher_calls": 185,
@@ -3735,12 +5195,14 @@
     "params": 48089,
     "model_bytes": 215723
    },
-   "build_seconds": 47.9,
+   "build_seconds": 47.7,
+   "label_queries": 0,
    "drift_delays": {
     "boiler_alarm": [],
     "gear_zone": [],
     "mixer_zone": []
-   }
+   },
+   "spurious_repairs": 1
   }
  }
 }

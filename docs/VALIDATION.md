@@ -56,3 +56,17 @@ Network check (curl through `$HTTPS_PROXY`, status page `recentRelayFailures`): 
 | R5 OpenClaw agent turn / real-site tool generation | PENDING | same as R1; an agent turn also needs an OpenClaw model provider |
 
 Steps the operator must perform (cannot be done from this container) are in the section "Your steps" of docs/RUNBOOKS.md (to be added when the first one is needed).
+
+## Session 2026-10-05, part 4 (benchmark rerun, routing and drift work; final state of this session)
+
+Reproduction of the baseline: the full Phase 14 suite was rerun from scratch; all 8 original arms matched the first run exactly (base 185 calls / 41 wrong; serve_uncertain 107 / 47; no_frame_filter 154 / 72; cache_refusals 147 / 41; no_router_update 292 / 28; no_monitor 184 / 41; feedback_0.1 184 / 41; feedback_1.0 207 / 23). Evidence: `benchmarks/reports/phase14.{json,md}`.
+
+| Item | Result | Evidence |
+|---|---|---|
+| Probe-based drift detection (CUSUM + capability-isolated probes) vs the window monitor | MEASURED, not enabled | 3 of 9 drifts repaired vs 1 of 9 across 3 seeds, 0 vs 2 spurious repairs, 270 label queries per run; F53 |
+| IDF router, teacher synonyms | MEASURED, not enabled | adversarial fabricated KNOWN 0.20 to 0.93 (3 capabilities); 21/36 learned at first request; F54, F55; `benchmarks/reports/routing_study.json`, `routing_phase7_sets.json` |
+| Default test suite | PASS | 327 passed, 11 skipped (338 collected) |
+| Real-OpenClaw tests (`OPENCLAW_BIN`): browser teacher/generator against the mock, skill loading, contract | PASS (mock site and real OpenClaw 2026.6.35 only) | `OPENCLAW_BIN=... pytest tests/test_browser_teacher.py tests/test_phase13.py tests/test_phase8.py -k real`: 10 passed in 556 s |
+| R1, R2, R3 (live search), R4, R5 | STATUS UNCHANGED: BLOCKED (network policy) or PENDING (needs your PC/phone/sign-in) | parts 1-3 above |
+
+What you need to do yourself (exact steps, one at a time, will be given when you are ready to run them on your own machines): (1) on a PC with a display, install OpenClaw and its gateway, start `openclaw browser --browser-profile openclaw start` (not headless), open the chosen AI website and sign in yourself; (2) tell me the site so the `SiteAdapter` can be tuned and the site's terms checked by you; (3) build and install the Android app on your phone with the SDK/NDK on your PC (`scripts/build_android_libs.sh`, `gradle :app:assembleDebug`, `adb install`). None of these were executed here.
