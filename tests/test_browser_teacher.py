@@ -123,9 +123,9 @@ def oc_browser(tmp_path_factory):
     gw.terminate()
 
 
-def mock(advise, mode="normal"):
+def mock(advise, mode="normal", tool_advise=None):
     from scripts.mock_chat_site import start
-    return start(advise, mode)
+    return start(advise, mode, tool_advise=tool_advise)
 
 
 def local_site(url, **kw): return SiteAdapter(name="mock-chat", url=url, terms_acknowledged=True, busy_js="() => window.__busy === true", max_wait_s=40, **kw)
@@ -187,4 +187,53 @@ def test_real_hostile_or_useless_replies_install_nothing(oc_browser, tmp_path, m
         esc = Escalator(Cli(tmp_path / "rt", tmp_path / "trust.json"), BrowserTeacher(oc_browser, local_site(url)), BuildService(tmp_path / "keys", "k", tmp_path / "b", TeacherSimulator()), tmp_path / "esc")
         r = esc.solve("compare these two numbers", [0.1, 0.9]); assert r["result"] in ("NEEDS_HELP", "QUEUED_OFFLINE") and esc.cli.list() == []
         assert "rejected" in r.get("reason", "") or "no JSON" in r.get("reason", "")
+    finally: srv.shutdown()
+
+
+# ---------------------------------------------------------------------------------------------- tool generation through the browser (R5 without a model API key)
+def _hidden_only(t):
+    shown = [json.dumps(v) for v in t.visible]; return [c for c in t.spec_cases() if json.dumps(c["input"]) not in shown]       # spec cases the request did not already show as examples
+
+
+def _tool_json(t, buggy):
+    from integrations.toolgrowth.tasks import candidate
+    c = candidate(t, buggy=buggy); return json.dumps({"description": c.description, "keywords": c.keywords, "source": c.source, "tests": c.tests})
+
+
+def test_browser_tool_generator_sends_only_the_request_and_generic_feedback_and_survives_garbage():
+    from integrations.toolgrowth.browser_generator import BrowserToolGenerator
+    from integrations.toolgrowth.generator import ToolRequest
+    from integrations.toolgrowth.tasks import BY_ID
+    from integrations.teacher.browser_teacher import BrowserChat
+    t = BY_ID["slugify"]
+    fb = FakeBrowser(CHAT_SNAP, ['```json\n' + _tool_json(t, False) + '\n```'])
+    g = BrowserToolGenerator(BrowserChat(fb, site(stable_polls=1)))
+    c = g.generate(ToolRequest(t.task_id, t.intent, t.description, t.visible_cases()), 1, {"failed_stage": "spec", "message": "independent spec cases failed"})
+    assert c.tool_id == "slugify" and c.version == "0.1.1" and c.generator.startswith("browser:")
+    sent = g.seen_prompts[0]
+    for case in _hidden_only(t): assert json.dumps(case["input"]) not in sent                       # hidden spec cases never leave
+    assert "independent spec cases failed" in sent and "TOOL_REQUEST" in sent and "\n" not in sent
+    bad = BrowserToolGenerator(BrowserChat(FakeBrowser(CHAT_SNAP, ['```json\n{"nope": 1}\n```']), site(stable_polls=1)))
+    assert bad.generate(ToolRequest("x", "i", "d", []), 0, None) is None                           # malformed reply = a rejected attempt, not a crash
+
+
+@needs_oc
+def test_real_end_to_end_tool_growth_through_the_browser_generator_and_operator_approval(oc_browser, tmp_path):
+    from scripts.phase13_lab import ToolLab
+    from integrations.toolgrowth.browser_generator import BrowserToolGenerator
+    from integrations.toolgrowth.generator import ToolRequest
+    from integrations.toolgrowth.growth import GrowthLoop
+    from integrations.toolgrowth.tasks import BY_ID
+    from integrations.teacher.browser_teacher import BrowserChat
+    t = BY_ID["roman_numerals"]
+    srv, url, st = mock(TeacherSimulator().advise, tool_advise=lambda body: _tool_json(t, buggy=body["attempt"] == 0))
+    try:
+        L = ToolLab(tmp_path / "lab"); gen = BrowserToolGenerator(BrowserChat(oc_browser, local_site(url)))
+        loop = GrowthLoop(L.pipeline, L.registry, L.host, L.index, gen)
+        r = loop.handle(ToolRequest(t.task_id, t.intent, t.description, t.visible_cases()), t.spec_cases(), {"n": 1994}, operator=lambda c, rep: bool(L.operator_approve(c)))
+        assert r["ok"], json.dumps(r["trace"])[:1500]
+        assert r["output"] == {"result": "MCMXCIV"} and r["path"] == "grown"
+        assert [a["status"] for a in r["trace"]["attempts"]] == ["REJECTED", "AWAITING_APPROVAL"] and r["trace"]["attempts"][0]["failed_stage"] == "tests"
+        assert len(st["prompts"]) == 2 and "previous_attempt_failed" in st["prompts"][1] and "previous_attempt_failed" not in st["prompts"][0]
+        for case in _hidden_only(t): assert json.dumps(case["input"]) not in " ".join(st["prompts"])
     finally: srv.shutdown()

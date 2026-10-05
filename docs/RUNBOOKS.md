@@ -1,6 +1,7 @@
 # Runbooks for validation that could not be executed in the research container
 
 ## R1. Live teacher (PENDING)
+**Primary path (ADR-045): a chat website through OpenClaw's browser, no API key.** On a machine with a display and the target site reachable: install OpenClaw, start its gateway, `openclaw browser --browser-profile openclaw start`, open the site and sign in yourself, set `SiteAdapter(terms_acknowledged=True, ...)` after checking the site's terms, approve the URL with `aicli approve` (action `browser.chat`, params `{"url": ...}`), then run the escalation with `BrowserTeacher`. Record outcomes in docs/VALIDATION.md. The API steps below are an optional alternative.
 Blocked here by: no API credentials and restricted network egress. Everything up to the HTTP boundary is tested against a local mock server (`tests/test_phase6.py`).
 To validate against a real model:
 1. `export OPENAI_API_KEY=...` (or `ANTHROPIC_API_KEY`). Qwen works through any OpenAI-compatible endpoint (DashScope compatible mode, vLLM, Ollama).

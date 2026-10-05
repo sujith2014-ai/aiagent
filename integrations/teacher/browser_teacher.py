@@ -16,7 +16,7 @@ class TeacherNeedsHuman(TeacherUnavailable):
     def __init__(self, action: str): super().__init__(f"manual action required: {action}"); self.action = action
 
 
-GENERIC_RESPONSES_JS = "() => Array.from(document.querySelectorAll('[data-message-author-role=\"assistant\"], .msg.assistant, [class*=\"assistant-message\"]')).map(e => e.innerText)"
+GENERIC_RESPONSES_JS = "() => Array.from(document.querySelectorAll('[data-message-author-role=\"assistant\"], .msg.assistant, [class*=\"assistant-message\"]')).map(e => e.textContent)"   # textContent, not innerText: innerText collapses runs of spaces, which destroys code indentation inside JSON strings
 BLOCK_MARKERS = [r"\blog ?in\b", r"\bsign ?in\b", r"\bsign ?up\b", r"password", r"captcha", r"verify (that )?you are (a )?human", r"two-factor", r"verification code", r"unusual activity"]
 
 
@@ -51,10 +51,11 @@ def build_prompt(req: HelpRequest) -> str:
     return " ".join(SYSTEM_PROMPT.split()) + " REQUEST: " + req.to_json()
 
 
-class BrowserTeacher(TeacherProvider):
+class BrowserChat:
+    """Transport: send one single-line message to the chat site through OpenClaw's browser and return the assistant's reply text."""
     def __init__(self, browser: OpenClawBrowser, site: SiteAdapter, broker=None, task_id: str = "browser-teacher"):
         self.browser, self.site, self.broker, self.task_id = browser, site, broker, task_id
-        self.name = f"browser-teacher:{site.name}"; self.calls = 0
+        self.calls = 0
 
     def _blocked(self, snap: str) -> str | None:
         refs = parse_snapshot(snap)
@@ -65,7 +66,7 @@ class BrowserTeacher(TeacherProvider):
             return f"no message box was found at {self.site.url}; the site may need a manual step (consent, captcha, plan selection) or the adapter's input_names needs adjusting"
         return None
 
-    def advise(self, req: HelpRequest) -> str:
+    def ask(self, prompt: str) -> str:
         if not self.site.terms_acknowledged:
             raise TeacherNeedsHuman(f"confirm that the site's terms permit automated use, then set terms_acknowledged=True for '{self.site.name}'")
         if self.broker is not None:
@@ -81,7 +82,7 @@ class BrowserTeacher(TeacherProvider):
             refs = parse_snapshot(snap)
             box = next((r for r in refs if r.role in ("textbox", "searchbox", "combobox") and re.search(self.site.input_names, r.name, re.I)), None) or next(r for r in refs if r.role == "textbox")
             before = len(self.browser.evaluate(self.site.responses_js) or [])
-            self.browser.type(box.ref, build_prompt(req))
+            self.browser.type(box.ref, prompt)
             if self.site.submit.startswith("button:"):
                 pat = self.site.submit[7:]; btn = next((r for r in parse_snapshot(self.browser.snapshot()) if r.role == "button" and re.search(pat, r.name, re.I)), None)
                 if not btn: raise TeacherNeedsHuman(f"send button /{pat}/ not found at {self.site.url}")
@@ -96,7 +97,7 @@ class BrowserTeacher(TeacherProvider):
                 cur = msgs[-1] if len(msgs) > before else None
                 if cur and cur.strip() and cur == last and not busy:
                     same += 1
-                    if same >= self.site.stable_polls: return extract_json(cur)
+                    if same >= self.site.stable_polls: return cur
                 else: same = 0
                 last = cur
             raise TeacherUnavailable(f"no stable reply from {self.site.name} within {self.site.max_wait_s}s")
@@ -104,3 +105,14 @@ class BrowserTeacher(TeacherProvider):
             raise TeacherUnavailable(f"browser error: {e}")
         finally:
             if tab: self.browser.close(tab)
+
+
+class BrowserTeacher(TeacherProvider):
+    def __init__(self, browser: OpenClawBrowser, site: SiteAdapter, broker=None, task_id: str = "browser-teacher"):
+        self.chat = BrowserChat(browser, site, broker, task_id); self.site = site; self.name = f"browser-teacher:{site.name}"
+
+    @property
+    def calls(self) -> int: return self.chat.calls
+
+    def advise(self, req: HelpRequest) -> str:
+        return extract_json(self.chat.ask(build_prompt(req)))

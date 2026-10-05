@@ -20,8 +20,8 @@ LOGIN = "<!doctype html><title>Log in</title><h1>Log in to continue</h1><input a
 CAPTCHA = "<!doctype html><title>Check</title><h1>Please verify you are human</h1><button>I am not a robot</button>"
 
 
-def start(advise, mode="normal", port=0):
-    state = {"mode": mode, "prompts": [], "advise": advise}
+def start(advise, mode="normal", port=0, tool_advise=None):
+    state = {"mode": mode, "prompts": [], "advise": advise, "tool_advise": tool_advise}
 
     class H(BaseHTTPRequestHandler):
         def log_message(self, *a): pass
@@ -33,6 +33,8 @@ def start(advise, mode="normal", port=0):
             m = state["mode"]
             if m == "slow": time.sleep(2.5)
             if m == "garbage": reply = "Sure! Here is a poem about numbers instead. Roses are red."
+            elif "TOOL_REQUEST:" in prompt:
+                reply = "Here is the tool:\n```json\n" + state["tool_advise"](json.loads(prompt.split("TOOL_REQUEST:", 1)[1].strip())) + "\n```"
             else:
                 req_json = prompt.split("REQUEST:", 1)[-1].strip(); d = json.loads(req_json)
                 raw = state["advise"](HelpRequest(**d))

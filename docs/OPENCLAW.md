@@ -30,3 +30,7 @@ Runbook: docs/RUNBOOKS.md R3.
 
 ## Tool growth and OpenClaw (Phase 13)
 OpenClaw skills are markdown files (`name`, `description`, optional single-line `metadata` JSON for gating) that teach the agent how to use tools; `openclaw skills install ./dir`, `list --json`, `info` and `check` work offline. Our integration exports an approved tool as a skill that tells the agent to run `scripts/aitool.py --root <registry> run <tool> --input <json>` and nothing else; that host enforces policy, signature/hash verification and the sandbox, so the skill grants no extra power. Skills are preferred over plugins because a plugin runs inside OpenClaw with its own permissions. See FINDINGS F40-F44, ADR-038..042 and docs/RUNBOOKS.md R5.
+
+
+## Browser teacher (ADR-045)
+`openclaw browser` (open, snapshot, type, press, click, wait, evaluate, close) is the supported surface. It needs a running local gateway (`openclaw gateway`, loopback, token auth) and a Chromium. Config used by the tests: `gateway.mode=local`, `gateway.auth.token`, `browser.enabled/headless/noSandbox/executablePath`; private-network URLs are blocked unless `browser.ssrfPolicy.dangerouslyAllowPrivateNetwork` is set (tests only). For a real site on your own machine: run `openclaw browser --browser-profile openclaw start` (not headless), open the site, sign in yourself, then run the escalation with `BrowserTeacher` and a `SiteAdapter` tuned to that site; docs/VALIDATION.md records what has and has not been validated.
