@@ -27,6 +27,15 @@ class ActionBroker:
             return {"effect": "deny", "rule_id": "policy-engine-error", "reason": p.stderr.strip()[:200]}   # fail closed
         return json.loads(p.stdout)
 
+    def check_or_raise(self, task_id: str, action: str, params: dict) -> dict:
+        """Policy decision for an action another component performs itself (e.g. the browser teacher): audited, raises like the provider paths do."""
+        dec = self.check(task_id, action, params)
+        self._audit(task=task_id, action=action, params_preview={k: str(v)[:80] for k, v in params.items()}, decision=dec["effect"], rule=dec["rule_id"], reason=dec["reason"])
+        if dec["effect"] == "deny": raise ActionDenied(dec)
+        if dec["effect"] == "require_approval": raise NeedsApproval(dec)
+        self.counts.setdefault(task_id, {})[action] = self.counts.get(task_id, {}).get(action, 0) + 1
+        return dec
+
     def audit(self, **kw):
         """Append an audit line (public so other action surfaces, e.g. the tool host, share one log)."""
         self._audit(**kw)
