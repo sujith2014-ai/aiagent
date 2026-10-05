@@ -62,6 +62,7 @@ fn main() -> Result<()> {
     rt.detect.novelty_rule = aicore::runtime::NoveltyRule::by_name(&novelty).ok_or_else(|| anyhow!("unknown --novelty {novelty} (strict|balanced)"))?;
     rt.force_capability = force;
     if router_kind == "learned" { rt.use_learned_router()?; }
+    else if let Some(w) = router_kind.strip_prefix("idf") { rt.use_idf_router(w.trim_start_matches(':').parse().unwrap_or(0.5)); }          // "idf" or "idf:0.75" (weight of an unmatched intent word)
     let cmd = rest.first().map(|s| s.as_str()).unwrap_or("help");
     match cmd {
         "import" => {

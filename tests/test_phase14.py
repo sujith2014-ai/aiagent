@@ -131,3 +131,58 @@ def test_report_is_internally_consistent():
         assert sum(w["teacher_calls"] for w in a["windows_of_100"]) <= a["teacher_calls"], name        # repairs happen outside arrival windows
         assert all(c2["active_modules"] >= c1["active_modules"] - 0 for c1, c2 in zip(a["checkpoints"], a["checkpoints"][1:])), name
     assert r["teacher_always"]["teacher_calls"] > r["arms"]["base"]["teacher_calls"]
+
+
+# ---------------------------------------------------------------------------------------------- drift detection (follow-up) and routing generalisation (follow-up)
+def test_cusum_alarms_after_a_few_net_errors_and_not_on_a_healthy_error_rate():
+    from training.drift import Cusum
+    import random
+    c = Cusum(); assert [c.add("a", True) for _ in range(3)] == [False, False, True]
+    c.reset("a"); assert not c.add("a", True) and not c.add("a", False) and c.s["a"] > 0
+    rng = random.Random(0); h = Cusum()
+    assert not any(h.add("b", rng.random() < 0.03) for _ in range(600))                       # 3% errors: below H0, never alarms
+    d = Cusum(); first = next(i for i in range(200) if d.add("c", random.Random(i).random() < 0.5) or False) if False else None
+    rng = random.Random(1); alarm_at = next(i for i in range(200) if d.add("c", rng.random() < 0.5)); assert alarm_at < 20      # 50% errors: alarms within a few dozen observations
+
+
+def test_probe_scheduler_spends_its_budget_on_the_stalest_capability():
+    from training.drift import ProbeScheduler
+    s = ProbeScheduler(1.0, k=3, seed=0); caps = ["a", "b", "c"]
+    picks = [s.pick(t, caps) for t in range(6)]
+    assert picks[:3] and set(picks[:3]) == set(caps) and set(picks[3:]) == set(caps) and s.queries == 18
+    assert ProbeScheduler(0.0).pick(0, caps) is None
+
+
+def test_window_monitor_keeps_its_phase14_behaviour():
+    from training.drift import WindowMonitor
+    m = WindowMonitor(); assert not any(m.add("a", True) for _ in range(7)) and m.add("a", True)
+
+
+def test_probes_detect_drift_without_any_organic_traffic_and_repair_it(tmp_path):
+    w = World(); r = ModularRun(tmp_path, w, monitor="cusum", probe_rate=0.5)
+    r.run([ev(w, i, "new", c.cap_id) for i, c in enumerate(w.caps[:3])], 100)
+    r.run([{"t": 3, "type": "drift", "cap": "boiler_alarm"}] + [{"t": 4 + i, "type": "oos", "cap": None, "intent": "what is the capital of peru", "x": [0.1], "feedback": False} for i in range(50)], 100)
+    assert r.repairs and r.repairs[0]["cap"] == "boiler_alarm" and r.repairs[0]["delay"] < 40 and not r.repairs[0]["spurious"] and r.probes.queries > 0
+    assert r.accuracy_all(99)["boiler_alarm"] > 0.9
+
+
+def test_synonyms_offered_by_the_teacher_are_vetted_against_what_is_already_learned(tmp_path):
+    w, r = mini(tmp_path, monitor=False)
+    r.run([ev(w, 0, "new", "boiler_alarm"), ev(w, 1, "new", "pump_zone")], 100)
+    got = r.esc._vetted_synonyms(["furnace", "pump", "alarm", "the", "x1", "ab", "Furnace", "check", "heater", "boiler"], ["valve", "side"])
+    assert got == ["furnace", "heater"]                                   # 'pump' and 'alarm' are installed keywords, 'check' was served, 'the' is a stopword, 'x1'/'ab' are not words, 'boiler' is installed
+    assert len(r.esc._vetted_synonyms([f"word{chr(97 + i)}" * 1 for i in range(20)], [])) == 8
+
+
+def test_idf_router_accepts_a_distinctive_word_amid_frame_words_where_the_plain_router_only_doubts(tmp_path):
+    w, r = mini(tmp_path, monitor=False)
+    r.run([ev(w, 0, "new", "boiler_alarm"), ev(w, 1, "new", "fan_alarm"), ev(w, 2, "new", "pump_zone")], 100)
+    run = lambda intent, router: r.cli._run_detect("full", "batch", "--cases", str(_cases(tmp_path, intent)), router=router)["results"][0]
+    plain, idf = run("run the boiler trigger test", None), run("run the boiler trigger test", "idf:0.25")
+    assert plain["status"] != "KNOWN" and idf["status"] == "KNOWN" and idf["capability"] == "boiler_alarm"
+    assert run("check the alarm", "idf:0.25")["status"] != "KNOWN"                      # a word shared by two capabilities is not evidence for either
+    assert run("translate this paragraph into french", "idf:0.25").get("needs_help") or run("translate this paragraph into french", "idf:0.25")["status"] != "KNOWN"
+
+
+def _cases(tmp_path, intent):
+    f = tmp_path / "one.jsonl"; f.write_text(json.dumps({"intent": intent, "input": [0.3]}) + "\n"); return f

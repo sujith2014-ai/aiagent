@@ -1,0 +1,505 @@
+{
+ "benchmark_format": "bench/1",
+ "experiment": "routing-generalisation-study",
+ "date": "2026-10-05",
+ "coverage": {
+  "0.0": {
+   "modules": 36,
+   "learned_router_val_accuracy": 0.6896551847457886,
+   "routers": {
+    "keyword": {
+     "canonical": {
+      "n": 36,
+      "correct_known": 1.0,
+      "wrong_known": 0.0,
+      "not_known": 0.0
+     },
+     "easy_unseen": {
+      "n": 36,
+      "correct_known": 0.0,
+      "wrong_known": 0.0,
+      "not_known": 1.0
+     },
+     "hard_unseen": {
+      "n": 36,
+      "correct_known": 0.0,
+      "wrong_known": 0.0,
+      "not_known": 1.0
+     },
+     "out_of_scope": {
+      "n": 24,
+      "correct_known": 0.0,
+      "wrong_known": 0.0,
+      "not_known": 1.0
+     },
+     "adversarial_overlap": {
+      "n": 30,
+      "correct_known": 0.0,
+      "wrong_known": 0.0,
+      "not_known": 1.0
+     }
+    },
+    "idf:0.25": {
+     "canonical": {
+      "n": 36,
+      "correct_known": 1.0,
+      "wrong_known": 0.0,
+      "not_known": 0.0
+     },
+     "easy_unseen": {
+      "n": 36,
+      "correct_known": 1.0,
+      "wrong_known": 0.0,
+      "not_known": 0.0
+     },
+     "hard_unseen": {
+      "n": 36,
+      "correct_known": 0.0,
+      "wrong_known": 0.0,
+      "not_known": 1.0
+     },
+     "out_of_scope": {
+      "n": 24,
+      "correct_known": 0.0,
+      "wrong_known": 0.0,
+      "not_known": 1.0
+     },
+     "adversarial_overlap": {
+      "n": 30,
+      "correct_known": 0.0,
+      "wrong_known": 0.0,
+      "not_known": 1.0
+     }
+    },
+    "idf:0.5": {
+     "canonical": {
+      "n": 36,
+      "correct_known": 1.0,
+      "wrong_known": 0.0,
+      "not_known": 0.0
+     },
+     "easy_unseen": {
+      "n": 36,
+      "correct_known": 0.0,
+      "wrong_known": 0.0,
+      "not_known": 1.0
+     },
+     "hard_unseen": {
+      "n": 36,
+      "correct_known": 0.0,
+      "wrong_known": 0.0,
+      "not_known": 1.0
+     },
+     "out_of_scope": {
+      "n": 24,
+      "correct_known": 0.0,
+      "wrong_known": 0.0,
+      "not_known": 1.0
+     },
+     "adversarial_overlap": {
+      "n": 30,
+      "correct_known": 0.0,
+      "wrong_known": 0.0,
+      "not_known": 1.0
+     }
+    },
+    "idf:1.0": {
+     "canonical": {
+      "n": 36,
+      "correct_known": 1.0,
+      "wrong_known": 0.0,
+      "not_known": 0.0
+     },
+     "easy_unseen": {
+      "n": 36,
+      "correct_known": 0.0,
+      "wrong_known": 0.0,
+      "not_known": 1.0
+     },
+     "hard_unseen": {
+      "n": 36,
+      "correct_known": 0.0,
+      "wrong_known": 0.0,
+      "not_known": 1.0
+     },
+     "out_of_scope": {
+      "n": 24,
+      "correct_known": 0.0,
+      "wrong_known": 0.0,
+      "not_known": 1.0
+     },
+     "adversarial_overlap": {
+      "n": 30,
+      "correct_known": 0.0,
+      "wrong_known": 0.0,
+      "not_known": 1.0
+     }
+    },
+    "learned": {
+     "canonical": {
+      "n": 36,
+      "correct_known": 0.972,
+      "wrong_known": 0.0,
+      "not_known": 0.028
+     },
+     "easy_unseen": {
+      "n": 36,
+      "correct_known": 0.222,
+      "wrong_known": 0.0,
+      "not_known": 0.778
+     },
+     "hard_unseen": {
+      "n": 36,
+      "correct_known": 0.028,
+      "wrong_known": 0.0,
+      "not_known": 0.972
+     },
+     "out_of_scope": {
+      "n": 24,
+      "correct_known": 0.0,
+      "wrong_known": 0.0,
+      "not_known": 1.0
+     },
+     "adversarial_overlap": {
+      "n": 30,
+      "correct_known": 0.0,
+      "wrong_known": 0.0,
+      "not_known": 1.0
+     }
+    }
+   }
+  },
+  "0.5": {
+   "modules": 32,
+   "learned_router_val_accuracy": 0.6666666865348816,
+   "routers": {
+    "keyword": {
+     "canonical": {
+      "n": 32,
+      "correct_known": 0.969,
+      "wrong_known": 0.0,
+      "not_known": 0.031
+     },
+     "easy_unseen": {
+      "n": 32,
+      "correct_known": 0.219,
+      "wrong_known": 0.0,
+      "not_known": 0.781
+     },
+     "hard_unseen": {
+      "n": 32,
+      "correct_known": 0.156,
+      "wrong_known": 0.0,
+      "not_known": 0.844
+     },
+     "out_of_scope": {
+      "n": 24,
+      "correct_known": 0.0,
+      "wrong_known": 0.0,
+      "not_known": 1.0
+     },
+     "adversarial_overlap": {
+      "n": 30,
+      "correct_known": 0.0,
+      "wrong_known": 0.0,
+      "not_known": 1.0
+     }
+    },
+    "idf:0.25": {
+     "canonical": {
+      "n": 32,
+      "correct_known": 0.969,
+      "wrong_known": 0.0,
+      "not_known": 0.031
+     },
+     "easy_unseen": {
+      "n": 32,
+      "correct_known": 0.344,
+      "wrong_known": 0.0,
+      "not_known": 0.656
+     },
+     "hard_unseen": {
+      "n": 32,
+      "correct_known": 0.312,
+      "wrong_known": 0.312,
+      "not_known": 0.375
+     },
+     "out_of_scope": {
+      "n": 24,
+      "correct_known": 0.0,
+      "wrong_known": 0.0,
+      "not_known": 1.0
+     },
+     "adversarial_overlap": {
+      "n": 30,
+      "correct_known": 0.0,
+      "wrong_known": 0.033,
+      "not_known": 0.967
+     }
+    },
+    "idf:0.5": {
+     "canonical": {
+      "n": 32,
+      "correct_known": 0.969,
+      "wrong_known": 0.0,
+      "not_known": 0.031
+     },
+     "easy_unseen": {
+      "n": 32,
+      "correct_known": 0.219,
+      "wrong_known": 0.0,
+      "not_known": 0.781
+     },
+     "hard_unseen": {
+      "n": 32,
+      "correct_known": 0.156,
+      "wrong_known": 0.0,
+      "not_known": 0.844
+     },
+     "out_of_scope": {
+      "n": 24,
+      "correct_known": 0.0,
+      "wrong_known": 0.0,
+      "not_known": 1.0
+     },
+     "adversarial_overlap": {
+      "n": 30,
+      "correct_known": 0.0,
+      "wrong_known": 0.0,
+      "not_known": 1.0
+     }
+    },
+    "idf:1.0": {
+     "canonical": {
+      "n": 32,
+      "correct_known": 0.969,
+      "wrong_known": 0.0,
+      "not_known": 0.031
+     },
+     "easy_unseen": {
+      "n": 32,
+      "correct_known": 0.156,
+      "wrong_known": 0.0,
+      "not_known": 0.844
+     },
+     "hard_unseen": {
+      "n": 32,
+      "correct_known": 0.156,
+      "wrong_known": 0.0,
+      "not_known": 0.844
+     },
+     "out_of_scope": {
+      "n": 24,
+      "correct_known": 0.0,
+      "wrong_known": 0.0,
+      "not_known": 1.0
+     },
+     "adversarial_overlap": {
+      "n": 30,
+      "correct_known": 0.0,
+      "wrong_known": 0.0,
+      "not_known": 1.0
+     }
+    },
+    "learned": {
+     "canonical": {
+      "n": 32,
+      "correct_known": 0.938,
+      "wrong_known": 0.0,
+      "not_known": 0.062
+     },
+     "easy_unseen": {
+      "n": 32,
+      "correct_known": 0.312,
+      "wrong_known": 0.0,
+      "not_known": 0.688
+     },
+     "hard_unseen": {
+      "n": 32,
+      "correct_known": 0.062,
+      "wrong_known": 0.0,
+      "not_known": 0.938
+     },
+     "out_of_scope": {
+      "n": 24,
+      "correct_known": 0.0,
+      "wrong_known": 0.0,
+      "not_known": 1.0
+     },
+     "adversarial_overlap": {
+      "n": 30,
+      "correct_known": 0.0,
+      "wrong_known": 0.0,
+      "not_known": 1.0
+     }
+    }
+   }
+  },
+  "1.0": {
+   "modules": 32,
+   "learned_router_val_accuracy": 0.6666666865348816,
+   "routers": {
+    "keyword": {
+     "canonical": {
+      "n": 32,
+      "correct_known": 0.969,
+      "wrong_known": 0.0,
+      "not_known": 0.031
+     },
+     "easy_unseen": {
+      "n": 32,
+      "correct_known": 0.25,
+      "wrong_known": 0.0,
+      "not_known": 0.75
+     },
+     "hard_unseen": {
+      "n": 32,
+      "correct_known": 0.25,
+      "wrong_known": 0.0,
+      "not_known": 0.75
+     },
+     "out_of_scope": {
+      "n": 24,
+      "correct_known": 0.0,
+      "wrong_known": 0.0,
+      "not_known": 1.0
+     },
+     "adversarial_overlap": {
+      "n": 30,
+      "correct_known": 0.0,
+      "wrong_known": 0.0,
+      "not_known": 1.0
+     }
+    },
+    "idf:0.25": {
+     "canonical": {
+      "n": 32,
+      "correct_known": 0.969,
+      "wrong_known": 0.0,
+      "not_known": 0.031
+     },
+     "easy_unseen": {
+      "n": 32,
+      "correct_known": 0.25,
+      "wrong_known": 0.0,
+      "not_known": 0.75
+     },
+     "hard_unseen": {
+      "n": 32,
+      "correct_known": 0.25,
+      "wrong_known": 0.0,
+      "not_known": 0.75
+     },
+     "out_of_scope": {
+      "n": 24,
+      "correct_known": 0.0,
+      "wrong_known": 0.0,
+      "not_known": 1.0
+     },
+     "adversarial_overlap": {
+      "n": 30,
+      "correct_known": 0.0,
+      "wrong_known": 0.033,
+      "not_known": 0.967
+     }
+    },
+    "idf:0.5": {
+     "canonical": {
+      "n": 32,
+      "correct_known": 0.969,
+      "wrong_known": 0.0,
+      "not_known": 0.031
+     },
+     "easy_unseen": {
+      "n": 32,
+      "correct_known": 0.25,
+      "wrong_known": 0.0,
+      "not_known": 0.75
+     },
+     "hard_unseen": {
+      "n": 32,
+      "correct_known": 0.25,
+      "wrong_known": 0.0,
+      "not_known": 0.75
+     },
+     "out_of_scope": {
+      "n": 24,
+      "correct_known": 0.0,
+      "wrong_known": 0.0,
+      "not_known": 1.0
+     },
+     "adversarial_overlap": {
+      "n": 30,
+      "correct_known": 0.0,
+      "wrong_known": 0.0,
+      "not_known": 1.0
+     }
+    },
+    "idf:1.0": {
+     "canonical": {
+      "n": 32,
+      "correct_known": 0.969,
+      "wrong_known": 0.0,
+      "not_known": 0.031
+     },
+     "easy_unseen": {
+      "n": 32,
+      "correct_known": 0.25,
+      "wrong_known": 0.0,
+      "not_known": 0.75
+     },
+     "hard_unseen": {
+      "n": 32,
+      "correct_known": 0.25,
+      "wrong_known": 0.0,
+      "not_known": 0.75
+     },
+     "out_of_scope": {
+      "n": 24,
+      "correct_known": 0.0,
+      "wrong_known": 0.0,
+      "not_known": 1.0
+     },
+     "adversarial_overlap": {
+      "n": 30,
+      "correct_known": 0.0,
+      "wrong_known": 0.0,
+      "not_known": 1.0
+     }
+    },
+    "learned": {
+     "canonical": {
+      "n": 32,
+      "correct_known": 0.938,
+      "wrong_known": 0.0,
+      "not_known": 0.062
+     },
+     "easy_unseen": {
+      "n": 32,
+      "correct_known": 0.312,
+      "wrong_known": 0.0,
+      "not_known": 0.688
+     },
+     "hard_unseen": {
+      "n": 32,
+      "correct_known": 0.062,
+      "wrong_known": 0.0,
+      "not_known": 0.938
+     },
+     "out_of_scope": {
+      "n": 24,
+      "correct_known": 0.0,
+      "wrong_known": 0.0,
+      "not_known": 1.0
+     },
+     "adversarial_overlap": {
+      "n": 30,
+      "correct_known": 0.0,
+      "wrong_known": 0.0,
+      "not_known": 1.0
+     }
+    }
+   }
+  }
+ }
+}

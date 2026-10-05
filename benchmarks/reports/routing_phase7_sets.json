@@ -1,0 +1,65 @@
+{
+ "keyword": {
+  "in_scope": {
+   "n": 27,
+   "correct_known": 0.4444444444444444,
+   "routed_correct": 0.6666666666666666,
+   "misrouted_known": 0.0,
+   "needs_help": 0.3333333333333333
+  },
+  "out_of_scope": {
+   "n": 24,
+   "fabrication_known": 0.041666666666666664,
+   "uncertain": 0.08333333333333333,
+   "rejected": 0.875
+  },
+  "adversarial": {
+   "n": 15,
+   "fabrication_known": 0.2,
+   "uncertain": 0.6666666666666666,
+   "rejected": 0.13333333333333333
+  }
+ },
+ "idf:0.25": {
+  "in_scope": {
+   "n": 27,
+   "correct_known": 0.6666666666666666,
+   "routed_correct": 0.7037037037037037,
+   "misrouted_known": 0.0,
+   "needs_help": 0.2962962962962963
+  },
+  "out_of_scope": {
+   "n": 24,
+   "fabrication_known": 0.125,
+   "uncertain": 0.0,
+   "rejected": 0.875
+  },
+  "adversarial": {
+   "n": 15,
+   "fabrication_known": 0.9333333333333333,
+   "uncertain": 0.0,
+   "rejected": 0.06666666666666667
+  }
+ },
+ "idf:0.5": {
+  "in_scope": {
+   "n": 27,
+   "correct_known": 0.5555555555555556,
+   "routed_correct": 0.7037037037037037,
+   "misrouted_known": 0.0,
+   "needs_help": 0.2962962962962963
+  },
+  "out_of_scope": {
+   "n": 24,
+   "fabrication_known": 0.125,
+   "uncertain": 0.0,
+   "rejected": 0.875
+  },
+  "adversarial": {
+   "n": 15,
+   "fabrication_known": 0.6,
+   "uncertain": 0.3333333333333333,
+   "rejected": 0.06666666666666667
+  }
+ }
+}

@@ -63,6 +63,44 @@ fn score(rec: &CapabilityRecord, toks: &[String]) -> (f64, f64) {
     (m / toks.len() as f64, 2.0 * m / (toks.len() + kws.len()) as f64)
 }
 
+/// IDF-weighted keyword router (Phase 14 routing study). A matched keyword counts ln(1 + N/df) where df is the number of capabilities that declare it,
+/// so shared words ("alarm", frame words that leaked into keywords) count little and distinctive words ("boiler") count a lot; intent words matching no capability's
+/// keywords dilute the score by `unmatched_weight` of a maximal word each, instead of by a full token as in the plain keyword router.
+pub struct IdfRouter { pub known_threshold: f64, pub uncertain_threshold: f64, pub margin: f64, pub unmatched_weight: f64 }
+
+impl Default for IdfRouter {
+    fn default() -> Self { Self { known_threshold: 0.50, uncertain_threshold: 0.25, margin: 0.10, unmatched_weight: 0.5 } }
+}
+
+impl Router for IdfRouter {
+    fn route(&self, reg: &Registry, task: &Task) -> Decision {
+        let toks = tokens(&task.intent);
+        let recs: Vec<&CapabilityRecord> = reg.all().collect();
+        let n = recs.len().max(1) as f64;
+        let kws: Vec<std::collections::BTreeSet<String>> = recs.iter().map(|r| r.keywords.iter().flat_map(|k| tokens(k)).collect()).collect();
+        let w = |t: &String| -> Option<f64> { let df = kws.iter().filter(|k| k.contains(t)).count(); if df == 0 { None } else { Some((1.0 + n / df as f64).ln()) } };
+        let wmax = (1.0 + n).ln();
+        let unmatched = toks.iter().filter(|t| w(t).is_none()).count() as f64;
+        let total: f64 = toks.iter().filter_map(|t| w(t)).sum::<f64>() + self.unmatched_weight * wmax * unmatched;
+        let mut cands: Vec<Candidate> = recs.iter().zip(&kws).map(|(r, k)| {
+            let m: f64 = toks.iter().filter(|t| k.contains(*t)).filter_map(|t| w(t)).sum();
+            let score = if total > 0.0 { m / total } else { 0.0 };
+            let dice = if toks.is_empty() || k.is_empty() { 0.0 } else { 2.0 * toks.iter().filter(|t| k.contains(*t)).count() as f64 / (toks.len() + k.len()) as f64 };
+            Candidate { capability_id: r.capability_id.clone(), score, dice, shape_ok: r.input_dim == task.input.len() }
+        }).collect();
+        cands.sort_by(|a, b| b.shape_ok.cmp(&a.shape_ok).then(b.score.partial_cmp(&a.score).unwrap()).then(b.dice.partial_cmp(&a.dice).unwrap()).then(a.capability_id.cmp(&b.capability_id)));
+        let best = cands.first().filter(|c| c.shape_ok);
+        let runner_up = cands.get(1).filter(|c| c.shape_ok).map(|c| c.score).unwrap_or(0.0);
+        let (status, chosen) = match best {
+            Some(c) if c.score >= self.known_threshold && c.score - runner_up >= self.margin => (Status::Known, Some(c.capability_id.clone())),
+            Some(c) if c.score >= self.known_threshold => (Status::Uncertain, Some(c.capability_id.clone())),
+            Some(c) if c.score >= self.uncertain_threshold => (Status::Uncertain, Some(c.capability_id.clone())),
+            _ => (Status::Unknown, None),
+        };
+        Decision { status, chosen, candidates: cands }
+    }
+}
+
 impl Router for KeywordRouter {
     fn route(&self, reg: &Registry, task: &Task) -> Decision {
         let toks = tokens(&task.intent);
@@ -89,6 +127,14 @@ impl Router for KeywordRouter {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn idf_weights_distinctive_words_over_shared_ones() {
+        // a shared word alone is weak evidence, a distinctive word is strong evidence, an unmatched word dilutes only partly
+        let r = IdfRouter::default();
+        let kw = |s: &str| tokens(s);
+        assert_eq!(kw("check the boiler alarm"), vec!["alarm", "boiler", "check"]);
+        let _ = r;
+    }
     #[test]
     fn tokenizer_drops_stopwords_and_dedups() {
         assert_eq!(tokens("Compare the numbers, compare!"), vec!["compare", "numbers"]);

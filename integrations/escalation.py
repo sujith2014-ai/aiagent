@@ -27,6 +27,7 @@ class Escalator:
         self.routing_suite: list[tuple[str, list[float], str]] = []   # (intent, input, capability) served KNOWN: regression suite for routing changes
         self.router_updates = 0
         self.persist_router_updates = True
+        self.accept_synonyms = False              # teacher synonym lists add routing keywords only if enabled: measured harmful with noisy lists (routing study)
         self.filter_frame_words = True            # Phase 14: do not alias words that also occur in intents served by other capabilities (F46)
 
     def _queue(self, entry):
@@ -53,7 +54,7 @@ class Escalator:
         r = self.cli.solve(intent, x)
         rec = {"intent": intent, "path": ["local"], "teacher_called": False, "task_id": f"esc{len(self.log)}"}
         if r["result"] == "ANSWER":
-            rec.update(result="ANSWER", status=r["status"], capability=r["capability_id"], label=r["label"], flags=r.get("flags", []))
+            rec.update(result="ANSWER", status=r["status"], capability=r["capability_id"], label=r["label"], flags=r.get("flags", []), route_score=r.get("route_score"))
             if r["status"] == "KNOWN" and len(self.routing_suite) < 200:
                 self.routing_suite.append((intent, x, r["capability_id"]))
             self.log.append(rec); return rec
@@ -112,6 +113,10 @@ class Escalator:
                     rec.update(result="NEEDS_HELP", reason=f"teacher spec rejected: {e}"); return
             else:
                 lp = resp.learning_package
+            if self.accept_synonyms and resp.action == "new_capability_spec" and resp.spec.get("synonyms"):
+                added = self._vetted_synonyms(resp.spec["synonyms"], lp.keywords)
+                if added: lp.keywords = list(lp.keywords) + added
+                rec["synonyms_added"] = added
             if evidence:   # preserve provenance; internet content is never ground truth
                 lp.provenance["evidence"] = [{"id": e.id, "provider": e.provider, "source": e.source, "retrieved_at": e.retrieved_at, "sha256": e.sha256, "simulated": e.simulated} for e in evidence]
                 lp.provenance["unverified_internet_content"] = True
@@ -158,6 +163,17 @@ class Escalator:
             rec.update(result="NEEDS_EXTERNAL", needs="external_research", detail=resp.research_query)
         else:
             rec.update(result="NEEDS_HELP", reason="teacher cannot help")
+
+    def _vetted_synonyms(self, synonyms, own_keywords, limit=8) -> list[str]:
+        """Teacher-proposed alternative words for a new capability's routing keywords. A word is dropped if it is already a keyword anywhere, appears in an intent served by an
+        existing capability (frame words), is a stopword, or is not a plain word: proposals must not steal routes from what is already learned."""
+        taken = {w for c in self.cli.list() for k in c.get("keywords", []) for w in k.lower().split()} | {w.lower() for w in own_keywords}
+        served = {w for r in self.log for w in r.get("intent", "").lower().replace(",", " ").split()} | {w for i, _, _ in self.routing_suite for w in i.lower().split()}
+        out = []
+        for w in synonyms:
+            w = str(w).lower().strip()
+            if w.isalpha() and 3 <= len(w) <= 20 and w not in self._STOP and w not in taken and w not in served and w not in out: out.append(w)
+        return out[:limit]
 
     _STOP = {"a", "an", "the", "of", "to", "and", "or", "is", "are", "two", "this", "that", "please", "for", "in", "on", "these", "those", "with", "from", "which", "what", "given", "me", "it", "my"}
 

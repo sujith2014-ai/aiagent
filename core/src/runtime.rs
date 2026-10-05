@@ -5,7 +5,7 @@ use crate::device::DeviceProfile;
 use crate::graph::{NodeRecord, Node, Plan, PlanError, PlanResult, Ref, MAX_STEPS};
 use crate::package::{CapPackage, PackageError};
 use crate::registry::{now_secs, CapabilityRecord, Registry, Stats, VersionRecord};
-use crate::router::{hash_features, KeywordRouter, LearnedRouter, Router, Status, Task};
+use crate::router::{hash_features, IdfRouter, KeywordRouter, LearnedRouter, Router, Status, Task};
 use crate::trace::Trace;
 use crate::trust::TrustStore;
 use crate::workspace::{Step, Workspace};
@@ -471,6 +471,7 @@ impl Runtime {
     }
 
     pub fn use_keyword_router(&mut self) { self.router = Box::new(KeywordRouter::default()); }
+    pub fn use_idf_router(&mut self, unmatched_weight: f64) { self.router = Box::new(IdfRouter { unmatched_weight, ..Default::default() }); }
 
     /// Hide a capability from routing without deleting anything. Refused if an active capability depends on it.
     pub fn archive(&mut self, cap: &str) -> Result<()> {

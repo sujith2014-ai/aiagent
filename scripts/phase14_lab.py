@@ -5,6 +5,7 @@ import json, random, time, collections
 from dataclasses import dataclass, field
 from pathlib import Path
 import numpy as np
+from training.drift import Cusum, WindowMonitor, ProbeScheduler
 from integrations.teacher.provider import TeacherProvider, HelpRequest, make_help_request
 from integrations.teacher.response import parse_response
 from integrations.escalation import Escalator
@@ -122,9 +123,18 @@ class BankTeacher(TeacherProvider):
     """Stands in for an LLM that knows the world as it is NOW (including drift) and what it cannot do. Counts calls and bytes."""
     name = "bank-teacher/1"
 
-    def __init__(self, world: World):
-        self.w, self.calls, self.bytes_in, self.bytes_out = world, 0, 0, 0
+    def __init__(self, world: World, synonym_coverage: float = 0.0):
+        """synonym_coverage p: with p > 0 each new-capability spec also lists alternative words, each of the capability's real synonyms included with probability p (deterministic per word),
+        plus two distractor words borrowed from other capabilities (a model's synonym lists are neither complete nor clean). p = 0: no synonyms are offered."""
+        self.w, self.calls, self.bytes_in, self.bytes_out = world, 0, 0, 0; self.p = synonym_coverage
         self.by_action: collections.Counter = collections.Counter()
+
+    def _synonyms(self, cap) -> list[str]:
+        import hashlib
+        keep = lambda w: int(hashlib.sha256(f"{cap.cap_id}:{w}".encode()).hexdigest(), 16) % 1000 < self.p * 1000
+        real = [w for w in (NOUN_SYN[cap.noun], *SYN[cap.family]) if keep(w)]
+        others = [c.noun for c in self.w.caps if c.noun != cap.noun]; h = int(hashlib.sha256(cap.cap_id.encode()).hexdigest(), 16)
+        return real + [others[h % len(others)], others[(h // 7) % len(others)]]
 
     def advise(self, req: HelpRequest) -> str:
         self.calls += 1; self.bytes_in += len(req.to_json())
@@ -143,6 +153,7 @@ class BankTeacher(TeacherProvider):
         else:
             d = self.w.spec_dict(cap.cap_id); xs, ys = self.w.sample(cap.cap_id, 6, 4242)
             out = {"action": "new_capability_spec", "rationale": "rule known to the teacher", "spec": {**d, "worked_examples": [{"x": x, "y": y} for x, y in zip(xs, ys)]}}
+            if self.p > 0: out["spec"]["synonyms"] = self._synonyms(cap)
         s = json.dumps(out); self.bytes_out += len(s); self.by_action[out["action"]] += 1
         return s
 
@@ -210,19 +221,22 @@ class CachingEscalator(Escalator):
 
 # ---------------------------------------------------------------------------------------------- the modular system under test
 class ModularRun:
-    def __init__(self, tmp: Path, world: World, cache_refusals=False, router_updates=True, monitor=True, uncertain="escalate", seed=0):
+    def __init__(self, tmp: Path, world: World, cache_refusals=False, router_updates=True, monitor=True, uncertain="escalate", seed=0, probe_rate=0.0, probe_k=3, strong_route=0.9, synonym_coverage=0.0, router=None, accept_synonyms=False):
         from packages.capbuild import keygen, write_trust
         from scripts.cli import Cli
         from training.service import BuildService
-        self.tmp, self.world, self.opts = Path(tmp), world, dict(cache_refusals=cache_refusals, router_updates=router_updates, monitor=monitor, uncertain=uncertain)
+        self.tmp, self.world, self.opts = Path(tmp), world, dict(cache_refusals=cache_refusals, router_updates=router_updates, monitor=monitor, uncertain=uncertain, probe_rate=probe_rate)
         self.tmp.mkdir(parents=True, exist_ok=True)
         keygen("build-svc-1", self.tmp / "keys"); write_trust(self.tmp / "trust.json", {"build-svc-1": (self.tmp / "keys/build-svc-1.public").read_text()})
-        self.teacher = BankTeacher(world)
+        self.teacher = BankTeacher(world, synonym_coverage)
         self.svc = BuildService(self.tmp / "keys", "build-svc-1", self.tmp / "build", self.teacher)
         self.cli = Cli(self.tmp / "rt", self.tmp / "trust.json", "PC_FULL")
         self.esc = CachingEscalator(UncertainAsHelp(self.cli) if uncertain == "escalate" else self.cli, self.teacher, self.svc, self.tmp / "esc", cache_refusals=cache_refusals)
-        self.esc.persist_router_updates = router_updates
-        self.mon = DriftMonitor() if monitor else None
+        self.esc.persist_router_updates = router_updates; self.esc.accept_synonyms = accept_synonyms
+        if router: self.cli.extra = ["--router", router]
+        mk = {True: "window", "window": "window", "cusum": "cusum"}.get(monitor)
+        self.mon_kind = mk; self.mon = {"window": DriftMonitor, "cusum": Cusum}[mk]() if mk else None
+        self.probes = ProbeScheduler(probe_rate, probe_k, seed); self.strong_route = strong_route; self.probe_log: list[dict] = []
         self._ex: dict = {}; self.rows: list[dict] = []; self.repairs: list[dict] = []; self.checkpoints: list[dict] = []; self.build_seconds = 0.0; self.drift_times: dict[str, int] = {}
 
     # -- measurement against the world's CURRENT rules
@@ -239,6 +253,16 @@ class ModularRun:
     def stats(self) -> dict:
         caps = [c for c in self.cli.json("list-all") if c["role"] == "capability" and not c["archived"]]
         return {"active_modules": len(caps), "params": sum(c["params"] for c in caps), "model_bytes": sum(c["model_bytes"] for c in caps)}
+
+    def _probe(self, cap: str, t: int):
+        w = self.world; xs, ys = w.sample(cap, self.probes.k, 9000 + t)
+        f = self.tmp / "probe.jsonl"; f.write_text("\n".join(json.dumps({"intent": "x", "input": x, "expected_index": y}) for x, y in zip(xs, ys)) + "\n")
+        res = self.cli._run_detect("keyword", "batch", "--cases", str(f), capability=cap)["results"]
+        wrong = [r.get("label_index") != y for r, y in zip(res, ys)]; self.probe_log.append({"t": t, "cap": cap, "wrong": sum(wrong)})
+        alarm = False
+        for wr in wrong:
+            alarm = (self.mon.add(cap, not wr) if self.mon_kind == "window" else self.mon.add(cap, wr)) or alarm
+        if alarm: self._repair(cap, t, xs[0])
 
     def _repair(self, cap: str, t: int, x):
         w = self.world; intent = w.canonical(cap)
@@ -274,8 +298,14 @@ class ModularRun:
                 correct = rec.get("label") == w.labels(cap)[w.label(cap, ev["x"])]
             self.rows.append({"t": t, "type": ev["type"], "cap": cap, "served": served, "correct": correct, "status": rec.get("status"), "capability": rec.get("capability"), "teacher_calls": self.teacher.calls - calls0, "path": rec.get("path"), "result": rec.get("result"),
                               "learned": rec.get("learned"), "teacher_action": rec.get("teacher_action")})
-            if self.mon and served and ev["feedback"] and correct is not None and self.mon.add(cap, correct):
-                self._repair(cap, t, ev["x"])
+            if self.mon and served and ev["feedback"] and correct is not None:
+                # the CUSUM monitor only counts organic feedback whose route was near-exact (a routing mistake is not model drift); the window monitor counts everything (the Phase 14 original)
+                counts = self.mon_kind == "window" or (rec.get("route_score") or 0) >= self.strong_route
+                if counts and (self.mon.add(cap, correct) if self.mon_kind == "window" else self.mon.add(cap, not correct)): self._repair(cap, t, ev["x"])
+            if self.mon and self.probes.rate:
+                installed = [c["capability_id"] for c in self.cli.list() if c["capability_id"] in w.by_id]
+                pc = self.probes.pick(t, installed)
+                if pc is not None: self._probe(pc, t)
             if (t + 1) % checkpoint_every == 0:
                 acc = self.accuracy_all(t); self.checkpoints.append({"t": t, "accuracy": acc, "mean_accuracy": float(np.mean(list(acc.values()))) if acc else None, "min_accuracy": min(acc.values()) if acc else None, **self.stats(), "teacher_calls": self.teacher.calls})
                 if on_checkpoint: on_checkpoint(self, t)

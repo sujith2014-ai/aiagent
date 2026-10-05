@@ -11,7 +11,11 @@ from scripts.phase14_lab import World, make_stream, ModularRun, Monolith, BankTe
 RUN = ROOT / "runs" / "phase14"
 CK = 60
 ARMS = {"base": {}, "serve_uncertain": {"uncertain": "serve"}, "no_frame_filter": {"frame_filter": False}, "cache_refusals": {"cache_refusals": True}, "no_router_update": {"router_updates": False},
-        "no_monitor": {"monitor": False}, "feedback_0.1": {"fq": 0.1}, "feedback_1.0": {"fq": 1.0}}
+        "no_monitor": {"monitor": False}, "feedback_0.1": {"fq": 0.1}, "feedback_1.0": {"fq": 1.0},
+        # drift-detection follow-up: sequential test, capability-isolated probes with a label-query budget
+        "cusum_organic": {"monitor": "cusum"}, "cusum_probe_0.05": {"monitor": "cusum", "probe_rate": 0.05}, "cusum_probe_0.15": {"monitor": "cusum", "probe_rate": 0.15},
+        # routing follow-up: IDF-weighted keyword router (rejected as default, see docs/FINDINGS F54)
+        "idf_router_0.25": {"router": "idf:0.25"}}
 
 
 def window_stats(rows, lo, hi):
@@ -48,7 +52,7 @@ def summarize(run: ModularRun, stream, wall):
             "new_capabilities_requested": new_all, "new_capabilities_learned_at_first_request": new_ok, "capabilities_never_learned": sorted(set(unlearned)),
             "modules_final": run.stats(), "checkpoints": [{k: c[k] for k in ("t", "mean_accuracy", "min_accuracy", "active_modules", "params", "model_bytes", "teacher_calls")} for c in cks],
             "final_accuracy_mean": cks[-1]["mean_accuracy"] if cks else None, "final_accuracy_min": cks[-1]["min_accuracy"] if cks else None,
-            "backward_transfer_stable_capabilities": bwt, "build_seconds": round(run.build_seconds, 1),
+            "backward_transfer_stable_capabilities": bwt, "build_seconds": round(run.build_seconds, 1), "label_queries": run.probes.queries, "probe_rounds": len(run.probe_log),
             "drift": {cap: {"drift_t": t, "repairs": [r for r in run.repairs if r["cap"] == cap]} for cap, t in run.drift_times.items()},
             "spurious_repairs": [r for r in run.repairs if r["spurious"]], "router_updates_accepted": run.esc.router_updates,
             "wrong_after_drift_before_repair": {cap: sum(1 for r in wrong if r["cap"] == cap and r["t"] >= t and (not [x for x in run.repairs if x["cap"] == cap] or r["t"] < min(x["t"] for x in run.repairs if x["cap"] == cap)))
@@ -70,7 +74,7 @@ def run_arm(name: str, opts: dict, seed=0, post=None):
     out = RUN / "arms" / f"{name}_s{seed}.json"
     if out.exists(): return json.loads(out.read_text())
     w = World(seed); fq = opts.get("fq", 0.3); stream = make_stream(w, seed=seed, feedback_q=fq)
-    run = ModularRun(RUN / f"arm_{name}_s{seed}", w, cache_refusals=opts.get("cache_refusals", False), router_updates=opts.get("router_updates", True), monitor=opts.get("monitor", True), uncertain=opts.get("uncertain", "escalate"))
+    run = ModularRun(RUN / f"arm_{name}_s{seed}", w, cache_refusals=opts.get("cache_refusals", False), router_updates=opts.get("router_updates", True), monitor=opts.get("monitor", True), uncertain=opts.get("uncertain", "escalate"), probe_rate=opts.get("probe_rate", 0.0), router=opts.get("router"))
     run.esc.filter_frame_words = opts.get("frame_filter", True)
     lat = []
     t0 = time.time(); run.run(stream, CK, on_checkpoint=lambda r, t: lat.append({"t": t, **latency_probe(r, w)}))
@@ -82,31 +86,38 @@ def run_arm(name: str, opts: dict, seed=0, post=None):
 
 
 # ------------------------------------------------------------------------------------------ post-run analyses on the live base run
-def routing_at_scale(run: ModularRun, w: World) -> dict:
+def routing_rows_and_learned(run: ModularRun, w: World, adversarial=()):
+    """Evaluation rows (wordings the routers were not trained on) and an installed learned router. Returns (rows, learned-router training report)."""
     from training.routing import train_router, hash_features, DIM as RDIM
     from training.exporters.onnx_export import export_onnx
     from packages.capbuild import build_cap
     caps = [c["capability_id"] for c in run.cli.list() if c["capability_id"] in w.by_id]
-    classes = caps + ["UNKNOWN"]
-    para = {c: w.paraphrases(c) for c in caps}                       # [easy1, easy2, hard1, hard2]
-    train = [(w.canonical(c), c) for c in caps] + [(para[c][0], c) for c in caps] + [(para[c][2], c) for c in caps]      # canonical + one easy + one hard form
+    classes = caps + ["UNKNOWN"]; para = {c: w.paraphrases(c) for c in caps}                  # [easy1, easy2, hard1, hard2]
+    train = [(w.canonical(c), c) for c in caps] + [(para[c][0], c) for c in caps] + [(para[c][2], c) for c in caps]
     unk_train = [t for k in ("cannot_help", "request_tool") for t in OOS[k]][:5] + ["tell me a story", "what time is it", "play music"]
     train += [(t, "UNKNOWN") for t in unk_train for _ in range(6)]
-    rng = random.Random(0); train += [(w.canonical(c).replace("check", "inspect"), c) for c in caps]                    # light augmentation
+    rng = random.Random(0); train += [(w.canonical(c).replace("check", "inspect"), c) for c in caps]
     model, rep = train_router(train, classes, epochs=200)
     val = [(t, c) for c in caps for t in (w.canonical(c), para[c][0])][:60]
-    tests = [(hash_features(t), classes.index(c)) for t, c in val]
-    p = run.tmp / "router36.cap"
+    tests = [(hash_features(t), classes.index(c)) for t, c in val]; p = run.tmp / "router36.cap"
     build_cap(p, capability_id="__router__", version="0.1.0", model_bytes=export_onnx(model, RDIM), params=rep["params"], input_dim=RDIM, labels=classes, tests=tests, keywords=["router"], description="learned router",
-              signer_id="build-svc-1", signer_key=run.svc.key, provenance={"source": "phase14"}, min_accuracy=0.8, role="router")
-    imp = run.cli.import_caps(str(p))[0]
+              signer_id="build-svc-1", signer_key=run.svc.key, provenance={"source": "phase14"}, min_accuracy=0.5, role="router")
+    imp = run.cli.import_caps(str(p))[0]; rep["installed"] = imp["activated"]
     rows = []
     for c in caps:
         d = w.input_dim(c); lo = -1.0 if w.by_id[c].family in ("zone", "side") else 0.0; x = [round(rng.uniform(lo, 1), 3) for _ in range(d)]
         for kind, t in (("canonical", w.canonical(c)), ("easy_unseen", para[c][1]), ("hard_unseen", para[c][3])): rows.append({"set": kind, "gold": c, "intent": t, "input": x})
-    for t in ["translate this paragraph into french", "write me a poem about the sea", "what is the capital of peru", "explain recursion simply", "book me a flight", "draw a cat", "sort my emails", "how do i bake bread"]:
+    oos = ["translate this paragraph into french", "write me a poem about the sea", "what is the capital of peru", "explain recursion simply", "book me a flight", "draw a cat", "sort my emails", "how do i bake bread"]
+    for t in oos:
         for d in (1, 2, 4): rows.append({"set": "out_of_scope", "gold": "UNKNOWN", "intent": t, "input": [round(rng.random(), 3) for _ in range(d)]})
-    out = {"modules": len(caps), "learned_router": {"val_accuracy": rep["val_accuracy"], "train_seconds": round(rep["train_seconds"], 2), "params": rep["params"], "installed": imp["activated"]}}
+    for t in adversarial:
+        for d in (1, 2, 4): rows.append({"set": "adversarial_overlap", "gold": "UNKNOWN", "intent": t, "input": [round(rng.random(), 3) for _ in range(d)]})
+    return rows, rep
+
+
+def routing_at_scale(run: ModularRun, w: World) -> dict:
+    rows, rep = routing_rows_and_learned(run, w)
+    out = {"modules": len([c for c in run.cli.list() if c["capability_id"] in w.by_id]), "learned_router": {"val_accuracy": rep["val_accuracy"], "train_seconds": round(rep["train_seconds"], 2), "params": rep["params"], "installed": rep["installed"]}}
     for rname, router in (("keyword_with_aliases_learned_in_stream", None), ("learned", "learned")):
         f = run.tmp / f"r_{rname}.jsonl"; f.write_text("\n".join(json.dumps({"intent": r["intent"], "input": r["input"]}) for r in rows) + "\n")
         res = run.cli._run_detect("full", "batch", "--cases", str(f), router=router)["results"]
@@ -209,13 +220,14 @@ def main():
         t0 = time.time(); arms[name] = run_arm(name, opts, 0, post=post_base if name == "base" else None); print(name, "done", round(time.time() - t0), "s", "calls", arms[name]["teacher_calls"], "wrong", arms[name]["silent_wrong_answers"], flush=True)
     rep["arms"] = {k: {kk: vv for kk, vv in v.items() if kk != "_repairs_for_baselines"} for k, v in arms.items()}
     rep["baselines"] = baselines(arms["base"]); rep["teacher_always"] = teacher_always()
-    seeds = {}
-    for s in (1, 2):
-        r = run_arm("base", {}, s); seeds[str(s)] = {k: r[k] for k in ("teacher_calls", "silent_wrong_answers", "silent_wrong_rate", "final_accuracy_mean", "final_accuracy_min", "new_capabilities_learned_at_first_request", "capabilities_never_learned", "modules_final", "build_seconds")}
-        seeds[str(s)]["drift_delays"] = {c: [x["delay"] for x in d["repairs"]] for c, d in r["drift"].items()}
-        print("seed", s, "done", flush=True)
-    b = arms["base"]; seeds["0"] = {k: b[k] for k in ("teacher_calls", "silent_wrong_answers", "silent_wrong_rate", "final_accuracy_mean", "final_accuracy_min", "new_capabilities_learned_at_first_request", "capabilities_never_learned", "modules_final", "build_seconds")}
-    seeds["0"]["drift_delays"] = {c: [x["delay"] for x in d["repairs"]] for c, d in b["drift"].items()}
+    def seed_table(arm, opts):
+        seeds = {}; keys = ("teacher_calls", "silent_wrong_answers", "silent_wrong_rate", "final_accuracy_mean", "final_accuracy_min", "new_capabilities_learned_at_first_request", "capabilities_never_learned", "modules_final", "build_seconds", "label_queries")
+        for sd in (1, 2):
+            r = run_arm(arm, opts, sd); seeds[str(sd)] = {k: r[k] for k in keys}
+            seeds[str(sd)]["drift_delays"] = {c: [x["delay"] for x in d["repairs"]] for c, d in r["drift"].items()}; seeds[str(sd)]["spurious_repairs"] = len(r["spurious_repairs"]); print("seed", sd, arm, "done", flush=True)
+        b = arms[arm]; seeds["0"] = {k: b[k] for k in keys}; seeds["0"]["drift_delays"] = {c: [x["delay"] for x in d["repairs"]] for c, d in b["drift"].items()}; seeds["0"]["spurious_repairs"] = len(b["spurious_repairs"])
+        return seeds
+    seeds = seed_table("base", {}); rep["seeds_cusum_probe_0.15"] = seed_table("cusum_probe_0.15", ARMS["cusum_probe_0.15"])
     rep["seeds"] = seeds
     (ROOT / "benchmarks/reports/phase14.json").write_text(json.dumps(rep, indent=1, default=str)); print("ok")
 
