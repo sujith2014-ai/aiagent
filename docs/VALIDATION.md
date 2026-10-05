@@ -40,3 +40,19 @@ Network after the change: `duckduckgo.com`, `html.duckduckgo.com`, `dl.google.co
 | R2/R4 physical phone | NOT RUN | no device; not claimed |
 
 Findings from this work: OpenClaw's managed browser blocks private-network URLs by default (`browser.ssrfPolicy`), so the mock tests enable `dangerouslyAllowPrivateNetwork` in a throwaway test profile only; managed Chrome launches direct (no `HTTPS_PROXY`), so inside a proxied container it needs `browser.extraArgs --proxy-server=...`; reading replies with `innerText` collapsed runs of spaces and destroyed code indentation inside JSON strings, so the default extractor uses `textContent` (sites that render code in `<pre>` need an adapter that targets it); every browser action is a separate CLI process, so a full chat round trip takes tens of seconds.
+
+## Session 2026-10-05, part 3 (new session; network re-verified first)
+
+Network check (curl through `$HTTPS_PROXY`, status page `recentRelayFailures`): `duckduckgo.com`, `html.duckduckgo.com`, `dl.google.com`, `chatgpt.com`, `gemini.google.com`, `chat.qwen.ai`, `chat.deepseek.com` still 403 on CONNECT; `claude.ai` 403; reachable: `maven.google.com` (301 to `dl.google.com`), Maven Central (200), `plugins.gradle.org`, `services.gradle.org`, `registry.npmjs.org`, PyPI. The requested allowlist entries for DuckDuckGo and Google were NOT in effect for this session.
+
+| Step | Result | Evidence |
+|---|---|---|
+| R3.3 live search rerun | BLOCKED | still `Proxy response (403) !== 200 when HTTP Tunneling`; audit `unavailable:network`; nothing fabricated |
+| Android SDK / NDK / AGP install | BLOCKED | `dl.google.com` refused; no NDK source reachable |
+| Android `app/` Kotlin compile-level check | PASS (partial) | compiled `platforms/android/app` + `core-bridge` with Gradle/Kotlin against the Android 14 framework jar from Maven Central (`org.robolectric:android-all:14-robolectric-10818077`) with a signature stub for `androidx.core.app.NotificationCompat` (androidx is served from dl.google.com). First compile ever found one real error (`ramMb` vs `maxRamMb` in `AndroidDevice.kt`), fixed. NOT validated: AGP, resources, manifest merge, APK, linking the JNI `.so` with the NDK, running on ART |
+| Kotlin/JVM bridge suite | PASS | 16 tests, both library variants (earlier this session; unchanged) |
+| R1 real AI website via the browser teacher | PENDING | site unreachable here and needs your interactive sign-in on a machine with a display; the local mock is NOT evidence for R1 |
+| R2/R4 physical phone | PENDING | no device |
+| R5 OpenClaw agent turn / real-site tool generation | PENDING | same as R1; an agent turn also needs an OpenClaw model provider |
+
+Steps the operator must perform (cannot be done from this container) are in the section "Your steps" of docs/RUNBOOKS.md (to be added when the first one is needed).

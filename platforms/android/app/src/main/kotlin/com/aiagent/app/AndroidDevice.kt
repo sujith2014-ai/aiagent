@@ -21,7 +21,7 @@ object AndroidDevice {
         val caps = mutableListOf("clipboard")
         if (Build.VERSION.SDK_INT < 33 || ctx.checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) caps += "notifications"
         // camera/microphone/filesystem are deliberately absent: the manifest does not request them.
-        return DeviceProfile("ANDROID_${Build.MODEL}", caps, ramMb = minOf(512L, totalMb / 8), maxModelBytes = 8L shl 20, maxActiveModules = if (am.isLowRamDevice) 2 else 4)
+        return DeviceProfile("ANDROID_${Build.MODEL}", caps, maxRamMb = minOf(512L, totalMb / 8), maxModelBytes = 8L shl 20, maxActiveModules = if (am.isLowRamDevice) 2 else 4)
     }
 }
 
